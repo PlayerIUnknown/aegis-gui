@@ -7,9 +7,12 @@ export type IconName =
   | 'chevron-down'
   | 'chevron-up'
   | 'code'
+  | 'clock'
   | 'external-link'
   | 'git-branch'
   | 'git-commit'
+  | 'globe'
+  | 'hash'
   | 'key'
   | 'link'
   | 'package'
@@ -17,6 +20,9 @@ export type IconName =
   | 'search'
   | 'shield'
   | 'check-circle'
+  | 'sparkle'
+  | 'user'
+  | 'users'
   | 'x-circle';
 
 type IconProps = SVGProps<SVGSVGElement> & {
@@ -55,6 +61,12 @@ const iconPaths: Record<IconName, JSX.Element> = {
       <polyline points="16 7 22 12 16 17" />
     </>
   ),
+  clock: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <polyline points="12 7 12 12 15 15" />
+    </>
+  ),
   'external-link': (
     <>
       <path d="M18 13v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
@@ -77,6 +89,21 @@ const iconPaths: Record<IconName, JSX.Element> = {
       <circle cx="12" cy="12" r="3" />
       <line x1="3" y1="12" x2="9" y2="12" />
       <line x1="15" y1="12" x2="21" y2="12" />
+    </>
+  ),
+  globe: (
+    <>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M2 12h20" />
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10" />
+    </>
+  ),
+  hash: (
+    <>
+      <line x1="4" y1="9" x2="20" y2="9" />
+      <line x1="4" y1="15" x2="20" y2="15" />
+      <line x1="10" y1="3" x2="8" y2="21" />
+      <line x1="16" y1="3" x2="14" y2="21" />
     </>
   ),
   key: (
@@ -122,6 +149,27 @@ const iconPaths: Record<IconName, JSX.Element> = {
     <>
       <circle cx="12" cy="12" r="9" />
       <polyline points="9 12 11 14 15 10" />
+    </>
+  ),
+  sparkle: (
+    <>
+      <path d="m12 3 1.3 3.3 3.7.3-2.8 2.3.9 3.6-3.1-1.8-3.1 1.8.9-3.6-2.8-2.3 3.7-.3L12 3z" />
+      <path d="M5 14l1 2 2 .2-1.5 1.2.5 1.8-1.6-.9-1.6.9.5-1.8L3 16.2l2-.2 1-2z" />
+      <path d="M19 14l.8 1.6 1.8.2-1.4 1.2.4 1.8-1.6-.9-1.6.9.4-1.8-1.4-1.2 1.8-.2L19 14z" />
+    </>
+  ),
+  user: (
+    <>
+      <circle cx="12" cy="7" r="4" />
+      <path d="M5.5 21v-2a4.5 4.5 0 0 1 4.5-4.5h4a4.5 4.5 0 0 1 4.5 4.5v2" />
+    </>
+  ),
+  users: (
+    <>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
     </>
   ),
   'x-circle': (
