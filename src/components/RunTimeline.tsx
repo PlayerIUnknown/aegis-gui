@@ -12,7 +12,7 @@ type RunTimelineProps = {
 
 export const RunTimeline: React.FC<RunTimelineProps> = ({ runs }) => {
   const sortedRuns = [...runs].sort((a, b) => dayjs(b.timestamp).diff(dayjs(a.timestamp)));
-  const [openRunId, setOpenRunId] = useState(sortedRuns[0]?.id);
+  const [openRunId, setOpenRunId] = useState<string | undefined>(sortedRuns[0]?.id);
 
   return (
     <div className="relative space-y-6">
