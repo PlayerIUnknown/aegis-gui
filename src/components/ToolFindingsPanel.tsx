@@ -20,7 +20,7 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools }) =
       {tools.map((tool) => (
         <div
           key={tool.name}
-          className="rounded-2xl border border-slate-800/60 bg-slate-950/40 p-5"
+          className="rounded-3xl border border-slate-800/70 bg-slate-900/50 p-6"
         >
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -29,16 +29,29 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools }) =
               </div>
               <div>
                 <p className="text-sm font-semibold text-slate-100">{tool.name}</p>
-                <p className="text-xs text-slate-400">{tool.findings.length} finding(s)</p>
+                <p className="text-xs text-slate-400">
+                  {tool.findings.length} finding{tool.findings.length === 1 ? '' : 's'} reported
+                </p>
               </div>
             </div>
+            <span
+              className={clsx(
+                'inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide',
+                tool.findings.length > 0
+                  ? 'border-warning/40 bg-warning/10 text-warning'
+                  : 'border-success/30 bg-success/10 text-success'
+              )}
+            >
+              <Icon name={tool.findings.length > 0 ? 'alert' : 'check-circle'} width={14} height={14} />
+              {tool.findings.length > 0 ? 'Review required' : 'Clean'}
+            </span>
           </div>
           {tool.findings.length > 0 ? (
             <div className="mt-4 space-y-3">
               {tool.findings.map((finding, index) => (
                 <div
                   key={index}
-                  className="rounded-xl border border-slate-800/60 bg-slate-900/40 p-4"
+                  className="rounded-2xl border border-slate-800/70 bg-slate-900/60 p-4"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <p className="text-sm font-semibold text-slate-100">{finding.name}</p>
@@ -54,7 +67,7 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools }) =
               ))}
             </div>
           ) : (
-            <p className="mt-4 rounded-xl border border-slate-800/60 bg-slate-900/20 p-4 text-xs text-slate-400">
+            <p className="mt-4 rounded-2xl border border-slate-800/70 bg-slate-900/40 p-4 text-xs text-slate-400">
               No findings reported.
             </p>
           )}
