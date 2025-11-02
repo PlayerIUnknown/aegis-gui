@@ -7,14 +7,39 @@ import { GlobalSummary } from './components/GlobalSummary';
 import { StatusPill } from './components/StatusPill';
 import { SummaryCard } from './components/SummaryCard';
 import { RunTimeline } from './components/RunTimeline';
+import { AuthWindow } from './components/AuthWindow';
 
 import './styles/index.css';
 
 const getDefaultRepo = (): Repository => repositories[0];
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.sessionStorage.getItem('aegis-authenticated') === 'true';
+    }
+    return false;
+  });
   const [search, setSearch] = useState('');
   const [activeRepositoryId, setActiveRepositoryId] = useState(getDefaultRepo().id);
+
+  const handleAuthenticated = () => {
+    setIsAuthenticated(true);
+    if (typeof window !== 'undefined') {
+      window.sessionStorage.setItem('aegis-authenticated', 'true');
+    }
+  };
+
+  const handleSignOut = () => {
+    setIsAuthenticated(false);
+    if (typeof window !== 'undefined') {
+      window.sessionStorage.removeItem('aegis-authenticated');
+    }
+  };
+
+  if (!isAuthenticated) {
+    return <AuthWindow onAuthenticated={handleAuthenticated} />;
+  }
 
   const filteredRepositories = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -45,14 +70,23 @@ function App() {
               Live observability across every repository, commit, and quality gate managed by your CI/CD scanners.
             </p>
           </div>
-          <div className="relative">
-            <Icon name="search" className="absolute left-3 top-2.5 text-slate-500" width={18} height={18} />
-            <input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search repositories"
-              className="w-72 rounded-full border border-slate-800/60 bg-slate-900/80 py-2 pl-10 pr-4 text-sm text-slate-100 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/40"
-            />
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <Icon name="search" className="absolute left-3 top-2.5 text-slate-500" width={18} height={18} />
+              <input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search repositories"
+                className="w-72 rounded-full border border-slate-800/60 bg-slate-900/80 py-2 pl-10 pr-4 text-sm text-slate-100 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/40"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="rounded-full border border-slate-700/70 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-300 transition hover:border-accent hover:text-accent"
+            >
+              Sign out
+            </button>
           </div>
         </div>
       </header>
