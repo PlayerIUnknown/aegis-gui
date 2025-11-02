@@ -58,11 +58,11 @@ function App() {
     }
   };
 
-  if (!isAuthenticated) {
-    return <AuthWindow onAuthenticated={handleAuthenticated} />;
-  }
-
   const filteredRepositories = useMemo(() => {
+    if (!isAuthenticated) {
+      return repositories;
+    }
+
     const query = search.trim().toLowerCase();
     const matchesSearch = (repo: Repository) => {
       if (!query) return true;
@@ -93,23 +93,35 @@ function App() {
     };
 
     return repositories.filter((repo) => matchesSearch(repo) && matchesRisk(repo));
-  }, [search, riskFilter]);
+  }, [isAuthenticated, search, riskFilter]);
 
   const activeRepository = useMemo(() => {
+    if (!isAuthenticated) {
+      return getDefaultRepo();
+    }
+
     const repo = filteredRepositories.find((r) => r.id === activeRepositoryId);
     return repo ?? filteredRepositories[0];
-  }, [filteredRepositories, activeRepositoryId]);
+  }, [isAuthenticated, filteredRepositories, activeRepositoryId]);
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      return;
+    }
+
     if (
       filteredRepositories.length > 0 &&
       !filteredRepositories.some((repo) => repo.id === activeRepositoryId)
     ) {
       setActiveRepositoryId(filteredRepositories[0].id);
     }
-  }, [filteredRepositories, activeRepositoryId]);
+  }, [isAuthenticated, filteredRepositories, activeRepositoryId]);
 
   const latestRun = activeRepository ? getLatestRun(activeRepository) : undefined;
+
+  if (!isAuthenticated) {
+    return <AuthWindow onAuthenticated={handleAuthenticated} />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-950 to-slate-900">
