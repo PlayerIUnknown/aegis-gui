@@ -67,7 +67,7 @@ export const RepositoryList: React.FC<RepositoryListProps> = ({
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="inline-flex items-center gap-1">
                     <Icon name="clock" width={12} height={12} />
-                    {dayjs(latestRun.timestamp).fromNow()}
+                    {dayjs(latestRun.timestamp).format('MMM D, YYYY h:mm A')}
                   </span>
                   {latestRun.repository.commitHash && (
                     <span className="inline-flex items-center gap-1">

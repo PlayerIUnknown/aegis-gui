@@ -35,6 +35,14 @@ npm run dev
 
 The server prints a local URL (typically <http://localhost:5173>). Open it in your browser to access the dashboard.
 
+### Usage overview
+
+- **Dashboard tab** — default landing view with a left-hand navigation rail, repository filters, and a responsive summary of scan
+  activity. Select a repository to review commit history and expand individual runs for detailed findings. All timestamps use
+  exact local formats for audit-friendly reporting.
+- **Setup tab** — dedicated space for onboarding. Copy your tenant API key, review the active quality gate thresholds, and grab
+  the GitHub Actions snippet that forwards CI results to the Config API.
+
 ## Building for production
 
 Create an optimised build with:
@@ -44,6 +52,15 @@ npm run build
 ```
 
 The compiled assets are emitted to the `dist/` directory.
+
+## Testing
+
+Run the lint and build checks to verify the project compiles cleanly before deploying:
+
+```bash
+npm run lint
+npm run build
+```
 
 ## Authentication flow
 
