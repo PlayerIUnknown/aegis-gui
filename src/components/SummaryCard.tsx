@@ -10,9 +10,12 @@ type SummaryCardProps = {
 
 const intentStyles: Record<NonNullable<SummaryCardProps['intent']>, string> = {
   neutral: 'bg-white border-slate-200 text-slate-900 dark:bg-slate-900/60 dark:border-slate-800/60 dark:text-slate-100',
-  success: 'bg-success/10 border-success/30 text-success',
-  warning: 'bg-warning/10 border-warning/30 text-warning',
-  danger: 'bg-danger/10 border-danger/30 text-danger'
+  success:
+    'bg-success/10 border-success/30 text-success dark:border-success/50 dark:bg-success/20 dark:text-success/90',
+  warning:
+    'bg-warning/10 border-warning/30 text-warning dark:border-warning/50 dark:bg-warning/20 dark:text-warning/90',
+  danger:
+    'bg-danger/10 border-danger/30 text-danger dark:border-danger/50 dark:bg-danger/20 dark:text-danger/90'
 };
 
 export const SummaryCard: React.FC<SummaryCardProps> = ({

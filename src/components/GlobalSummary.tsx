@@ -55,16 +55,19 @@ type SummaryTileProps = {
 
 const backgroundByTone: Record<SummaryTileProps['tone'], string> = {
   neutral: 'border-slate-200 bg-white text-slate-900 dark:border-slate-800/60 dark:bg-slate-900/60 dark:text-slate-100',
-  success: 'border-success/40 bg-success/10 text-success',
-  danger: 'border-danger/40 bg-danger/10 text-danger',
-  accent: 'border-accent/40 bg-accent/10 text-accent',
+  success:
+    'border-success/40 bg-success/10 text-success dark:border-success/60 dark:bg-success/20 dark:text-success/90',
+  danger:
+    'border-danger/40 bg-danger/10 text-danger dark:border-danger/60 dark:bg-danger/20 dark:text-danger/90',
+  accent:
+    'border-accent/40 bg-accent/10 text-accent dark:border-accent/60 dark:bg-accent/20 dark:text-accent/90',
 };
 
 const iconBackgroundByTone: Record<SummaryTileProps['tone'], string> = {
   neutral: 'bg-slate-100 text-slate-500 dark:bg-slate-900/50 dark:text-slate-300',
-  success: 'bg-success/20 text-success',
-  danger: 'bg-danger/20 text-danger',
-  accent: 'bg-accent/20 text-accent',
+  success: 'bg-success/20 text-success dark:bg-success/30 dark:text-success/90',
+  danger: 'bg-danger/20 text-danger dark:bg-danger/30 dark:text-danger/90',
+  accent: 'bg-accent/20 text-accent dark:bg-accent/30 dark:text-accent/90',
 };
 
 const tileBaseClasses =

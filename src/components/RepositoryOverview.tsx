@@ -91,16 +91,19 @@ type RepositoryStatProps = {
 
 const toneStyles: Record<NonNullable<RepositoryStatProps['tone']>, string> = {
   default: 'border-slate-200 bg-white text-slate-900 dark:border-slate-800/70 dark:bg-slate-900/60 dark:text-slate-100',
-  success: 'border-success/40 bg-success/10 text-success',
-  danger: 'border-danger/40 bg-danger/10 text-danger',
-  warning: 'border-warning/40 bg-warning/10 text-warning',
+  success:
+    'border-success/40 bg-success/10 text-success dark:border-success/60 dark:bg-success/20 dark:text-success/90',
+  danger:
+    'border-danger/40 bg-danger/10 text-danger dark:border-danger/60 dark:bg-danger/20 dark:text-danger/90',
+  warning:
+    'border-warning/40 bg-warning/10 text-warning dark:border-warning/60 dark:bg-warning/20 dark:text-warning/90',
 };
 
 const iconToneStyles: Record<NonNullable<RepositoryStatProps['tone']>, string> = {
   default: 'bg-slate-100 text-slate-500 dark:bg-slate-900/50 dark:text-slate-300',
-  success: 'bg-success/20 text-success',
-  danger: 'bg-danger/20 text-danger',
-  warning: 'bg-warning/20 text-warning',
+  success: 'bg-success/20 text-success dark:bg-success/30 dark:text-success/90',
+  danger: 'bg-danger/20 text-danger dark:bg-danger/30 dark:text-danger/90',
+  warning: 'bg-warning/20 text-warning dark:bg-warning/30 dark:text-warning/90',
 };
 
 const RepositoryStat: React.FC<RepositoryStatProps> = ({ icon, label, value, helper, tone = 'default' }) => (
