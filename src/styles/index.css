@@ -3,17 +3,26 @@
 @tailwind utilities;
 
 :root {
+  color-scheme: light;
+}
+
+.dark {
   color-scheme: dark;
 }
 
 body {
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.dark body {
   background: #020617;
   color: #e2e8f0;
 }
 
 * {
-  scrollbar-color: rgba(148, 163, 184, 0.6) rgba(15, 23, 42, 0.7);
+  scrollbar-color: rgba(148, 163, 184, 0.6) rgba(226, 232, 240, 0.8);
   scrollbar-width: thin;
 }
 
@@ -23,10 +32,18 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(226, 232, 240, 0.8);
 }
 
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, #6366f1 0%, #4338ca 100%);
   border-radius: 999px;
+}
+
+.dark * {
+  scrollbar-color: rgba(148, 163, 184, 0.6) rgba(15, 23, 42, 0.7);
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
 }

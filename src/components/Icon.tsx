@@ -15,11 +15,13 @@ export type IconName =
   | 'hash'
   | 'key'
   | 'link'
+  | 'moon'
   | 'package'
   | 'package-export'
   | 'refresh'
   | 'search'
   | 'shield'
+  | 'sun'
   | 'check-circle'
   | 'sparkle'
   | 'user'
@@ -120,6 +122,9 @@ const iconPaths: Record<IconName, JSX.Element> = {
       <path d="M14 11a5 5 0 0 0-7.54-.54l-1.92 1.92a5 5 0 0 0 7.07 7.07l1.22-1.22" />
     </>
   ),
+  moon: (
+    <path d="M21 12.79A9 9 0 0 1 11.21 3 7 7 0 1 0 21 12.79z" />
+  ),
   package: (
     <>
       <path d="m21 16-9 5-9-5 9-5 9 5" />
@@ -150,6 +155,19 @@ const iconPaths: Record<IconName, JSX.Element> = {
   shield: (
     <>
       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </>
+  ),
+  sun: (
+    <>
+      <circle cx="12" cy="12" r="5" />
+      <line x1="12" y1="1" x2="12" y2="3" />
+      <line x1="12" y1="21" x2="12" y2="23" />
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+      <line x1="1" y1="12" x2="3" y2="12" />
+      <line x1="21" y1="12" x2="23" y2="12" />
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
     </>
   ),
   'check-circle': (

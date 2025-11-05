@@ -15,7 +15,7 @@ const toolIconMap: Record<string, JSX.Element> = {
 export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools }) => {
   if (!tools || Object.keys(tools).length === 0) {
     return (
-      <p className="rounded-2xl border border-slate-800/70 bg-slate-900/40 p-4 text-sm text-slate-400">
+      <p className="rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-600 shadow-sm dark:border-slate-800/70 dark:bg-slate-900/40 dark:text-slate-400">
         Tool results are not available for this scan yet.
       </p>
     );
@@ -24,20 +24,20 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools }) =
   return (
     <div className="space-y-4">
       {Object.entries(tools).map(([toolName, toolData]) => (
-        <div key={toolName} className="rounded-3xl border border-slate-800/70 bg-slate-900/50 p-6">
+        <div key={toolName} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/40 dark:border-slate-800/70 dark:bg-slate-900/50 dark:shadow-slate-950/30">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/10 text-accent">
                 {toolIconMap[toolName] ?? <Icon name="package" width={20} height={20} />}
               </div>
               <div>
-                <p className="text-sm font-semibold text-slate-100">{toolName}</p>
-                <p className="text-xs text-slate-400">
+                <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{toolName}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   {toolData.output.length} finding{toolData.output.length === 1 ? '' : 's'} reported
                 </p>
               </div>
             </div>
-            <span className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-300">
+            <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:border-slate-700/60 dark:bg-slate-900/40 dark:text-slate-300">
               <Icon name={toolData.output.length > 0 ? 'alert' : 'check-circle'} width={14} height={14} />
               {toolData.output.length > 0 ? 'Review required' : 'Clean'}
             </span>
@@ -45,15 +45,15 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools }) =
           {toolData.output.length > 0 ? (
             <div className="mt-4 space-y-3">
               {toolData.output.map((finding, index) => (
-                <div key={index} className="rounded-2xl border border-slate-800/70 bg-slate-900/60 p-4">
-                  <pre className="max-h-60 overflow-auto whitespace-pre-wrap break-words text-xs text-slate-300">
+                <div key={index} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800/70 dark:bg-slate-900/60">
+                  <pre className="max-h-60 overflow-auto whitespace-pre-wrap break-words text-xs text-slate-700 dark:text-slate-300">
                     {JSON.stringify(finding, null, 2)}
                   </pre>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="mt-4 rounded-2xl border border-slate-800/70 bg-slate-900/40 p-4 text-xs text-slate-400">
+            <p className="mt-4 rounded-2xl border border-slate-200 bg-slate-100 p-4 text-xs text-slate-600 dark:border-slate-800/70 dark:bg-slate-900/40 dark:text-slate-400">
               No findings reported.
             </p>
           )}

@@ -37,7 +37,7 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
     <div className="relative space-y-6">
       <span
         aria-hidden
-        className="pointer-events-none absolute left-6 top-12 bottom-12 hidden w-px bg-slate-800/60 md:block"
+        className="pointer-events-none absolute left-6 top-12 bottom-12 hidden w-px bg-slate-200 dark:bg-slate-800/60 md:block"
       />
       {sortedRuns.map((run) => {
         const isOpen = run.id === openRunId;
@@ -56,7 +56,7 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
             <span
               aria-hidden
               className={clsx(
-                'pointer-events-none absolute left-5 top-11 hidden h-3 w-3 rounded-full border-2 border-slate-950 md:block',
+                'pointer-events-none absolute left-5 top-11 hidden h-3 w-3 rounded-full border-2 border-white dark:border-slate-950 md:block',
                 run.qualityGatePassed === true
                   ? 'bg-success border-success/50 shadow-[0_0_0_4px_rgba(34,197,94,0.15)]'
                   : run.qualityGatePassed === false
@@ -64,17 +64,17 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                   : 'bg-warning/80 border-warning/60 shadow-[0_0_0_4px_rgba(250,204,21,0.12)]',
               )}
             />
-            <div className="rounded-3xl border border-slate-800/70 bg-slate-950/70 p-6 shadow-xl shadow-slate-950/40">
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/40 dark:border-slate-800/70 dark:bg-slate-950/70 dark:shadow-slate-950/40">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/10 text-accent">
                     <Icon name="git-commit" width={20} height={20} />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-slate-100">
+                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                       Scan executed {dayjs(run.timestamp).format('MMM D, YYYY h:mm A')}
                     </p>
-                    <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-slate-400">
+                    <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
                       {run.repository.branch && (
                         <span className="inline-flex items-center gap-1">
                           <Icon name="git-branch" width={12} height={12} />
@@ -98,7 +98,7 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                   <StatusPill qualityGatePassed={run.qualityGatePassed} />
                   <button
                     onClick={handleToggle}
-                    className="flex items-center gap-2 rounded-full border border-slate-700/60 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-300 transition hover:border-accent/60 hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent/50"
+                    className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-700 transition hover:border-accent/60 hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent/30 dark:border-slate-700/60 dark:bg-transparent dark:text-slate-300 dark:focus:ring-accent/50"
                     aria-expanded={isOpen}
                     type="button"
                   >
@@ -124,14 +124,14 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                     <DetailStat label="Critical" value={run.summary.criticalSeverity} />
                   </div>
                   {isLoading && (
-                    <p className="rounded-2xl border border-slate-800/70 bg-slate-900/40 p-4 text-sm text-slate-400">
+                    <p className="rounded-2xl border border-slate-200 bg-slate-100 p-4 text-sm text-slate-600 dark:border-slate-800/70 dark:bg-slate-900/40 dark:text-slate-400">
                       Loading tool results…
                     </p>
                   )}
                   {!isLoading && <ToolFindingsPanel tools={details?.tools} />}
                   {run.targetPath && (
-                    <p className="text-xs text-slate-400">
-                      Target path: <span className="font-mono text-slate-200">{run.targetPath}</span>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Target path: <span className="font-mono text-slate-800 dark:text-slate-200">{run.targetPath}</span>
                     </p>
                   )}
                 </div>
@@ -150,8 +150,8 @@ type DetailStatProps = {
 };
 
 const DetailStat: React.FC<DetailStatProps> = ({ label, value }) => (
-  <div className="rounded-2xl border border-slate-800/70 bg-slate-900/60 p-4">
-    <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">{label}</p>
-    <p className="mt-1 text-xl font-semibold text-slate-100">{value}</p>
+  <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800/70 dark:bg-slate-900/60">
+    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{label}</p>
+    <p className="mt-1 text-xl font-semibold text-slate-900 dark:text-slate-100">{value}</p>
   </div>
 );
