@@ -8,6 +8,7 @@ import {
   getScans,
   getTenantProfile,
   getScanDetails,
+  updateQualityGates,
 } from './api';
 import { BASE_URL } from './api/client';
 import { RepositoryList } from './components/RepositoryList';
@@ -24,6 +25,8 @@ import {
   type ScanView,
 } from './types/domain';
 import { formatTimestamp, timestampToValue } from './utils/timestamps';
+import type { QualityGateConfig } from './api/types';
+import { QualityGateForm } from './components/QualityGateForm';
 
 import './styles/index.css';
 
@@ -65,6 +68,10 @@ function App() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'setup'>('dashboard');
   const [activeRepositoryId, setActiveRepositoryId] = useState<string | null>(null);
   const [copyMessage, setCopyMessage] = useState<string | null>(null);
+  const [isSavingQualityGates, setIsSavingQualityGates] = useState(false);
+  const [qualityGateMessage, setQualityGateMessage] = useState<
+    { type: 'success' | 'error'; text: string } | null
+  >(null);
   const actionsSnippet = useMemo(() => {
     const apiKey = profile?.api_key ?? '${{ secrets.AEGIS_API_KEY }}';
     return String.raw`- name: Run Aegis Security Scan
@@ -286,7 +293,50 @@ function App() {
     }
   }, [profile]);
 
-  const formattedLastUpdated = formatTimestamp(dashboardSummary?.last_scan_at);
+  const handleSaveQualityGates = useCallback(
+    async (config: QualityGateConfig) => {
+      if (!token) {
+        setQualityGateMessage({ type: 'error', text: 'You must be signed in to update quality gates.' });
+        return;
+      }
+
+      setIsSavingQualityGates(true);
+      setQualityGateMessage(null);
+      try {
+        const response = await updateQualityGates(token, config);
+        setProfile((prev) => (prev ? { ...prev, quality_gates: response.quality_gates } : prev));
+        setQualityGateMessage({
+          type: 'success',
+          text: response.message || 'Quality gate defaults updated.',
+        });
+      } catch (err) {
+        processApiError(err);
+        const message =
+          err instanceof Error ? err.message : 'Unable to update quality gate settings. Please try again.';
+        setQualityGateMessage({ type: 'error', text: message });
+      } finally {
+        setIsSavingQualityGates(false);
+      }
+    },
+    [token, processApiError],
+  );
+
+  const latestScanTimestamp = useMemo(() => {
+    let candidate: string | number | null | undefined = dashboardSummary?.last_scan_at ?? null;
+    let candidateValue = timestampToValue(candidate);
+
+    for (const scan of scans) {
+      const value = timestampToValue(scan.timestamp);
+      if (value > candidateValue) {
+        candidate = scan.timestamp;
+        candidateValue = value;
+      }
+    }
+
+    return candidate ?? null;
+  }, [dashboardSummary?.last_scan_at, scans]);
+
+  const formattedLastUpdated = formatTimestamp(latestScanTimestamp);
 
   const totalRepositories = repositories.length;
 
@@ -316,22 +366,7 @@ function App() {
     return badges;
   }, [tenantId, totalRepositories, formattedLastUpdated, profile?.name]);
 
-  const qualityGateStats = useMemo(() => {
-    const gates = profile?.quality_gates;
-    if (!gates) {
-      return [];
-    }
-
-    return [
-      { label: 'Quality gates', value: gates.enabled ? 'Enabled' : 'Disabled' },
-      { label: 'Max critical', value: gates.max_critical },
-      { label: 'Max high', value: gates.max_high },
-      { label: 'Max medium', value: gates.max_medium },
-      { label: 'Max low', value: gates.max_low },
-      { label: 'Fail on secrets', value: gates.fail_on_secrets ? 'Yes' : 'No' },
-      { label: 'Fail on critical code issues', value: gates.fail_on_critical_code_issues ? 'Yes' : 'No' },
-    ];
-  }, [profile?.quality_gates]);
+  const qualityGateConfig = profile?.quality_gates ?? null;
 
   if (!token) {
     return <AuthWindow onAuthenticated={handleAuthenticated} />;
@@ -476,82 +511,92 @@ function App() {
                 </p>
               )}
 
-              <div className="grid gap-8 xl:grid-cols-[320px_1fr]">
-                <div className="space-y-6">
-                  <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-lg shadow-slate-950/30">
-                    <div className="flex flex-col gap-3">
-                      <div>
-                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Repositories</p>
-                        <p className="mt-1 text-sm text-slate-600">
-                          Showing {filteredRepositories.length} of {totalRepositories}{' '}
-                          {totalRepositories === 1 ? 'workspace' : 'workspaces'}
-                        </p>
+              <section className="space-y-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-950/40">
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Scans</p>
+                  <h2 className="text-xl font-semibold text-slate-900">Explore repository history</h2>
+                  <p className="text-sm text-slate-600">
+                    Select a workspace to review recent pipeline executions and quality gate outcomes.
+                  </p>
+                </div>
+
+                <div className="grid gap-8 xl:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
+                  <div className="space-y-6">
+                    <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 shadow-inner shadow-slate-950/5">
+                      <div className="flex flex-col gap-3">
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Repositories</p>
+                          <p className="mt-1 text-sm text-slate-600">
+                            Showing {filteredRepositories.length} of {totalRepositories}{' '}
+                            {totalRepositories === 1 ? 'workspace' : 'workspaces'}
+                          </p>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {riskFilters.map((filter) => {
+                            const isActive = filter.value === riskFilter;
+                            return (
+                              <button
+                                key={filter.value}
+                                type="button"
+                                onClick={() => setRiskFilter(filter.value)}
+                                className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-wide transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 ${
+                                  isActive
+                                    ? 'border-accent/60 bg-accent/10 text-accent'
+                                    : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900'
+                                }`}
+                                aria-pressed={isActive}
+                              >
+                                {filter.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <p className="text-xs text-slate-500">{riskFilters.find((f) => f.value === riskFilter)?.description}</p>
                       </div>
-                      <div className="flex flex-wrap gap-2">
-                        {riskFilters.map((filter) => {
-                          const isActive = filter.value === riskFilter;
-                          return (
-                            <button
-                              key={filter.value}
-                              type="button"
-                              onClick={() => setRiskFilter(filter.value)}
-                              className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-wide transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 ${
-                                isActive
-                                  ? 'border-accent/60 bg-accent/10 text-accent'
-                                  : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900'
-                              }`}
-                              aria-pressed={isActive}
-                            >
-                              {filter.label}
-                            </button>
-                          );
-                        })}
-                      </div>
-                      <p className="text-xs text-slate-500">{riskFilters.find((f) => f.value === riskFilter)?.description}</p>
                     </div>
+
+                    <RepositoryList
+                      repositories={filteredRepositories}
+                      activeRepositoryId={activeRepository?.id ?? null}
+                      onSelect={setActiveRepositoryId}
+                    />
                   </div>
 
-                  <RepositoryList
-                    repositories={filteredRepositories}
-                    activeRepositoryId={activeRepository?.id ?? null}
-                    onSelect={setActiveRepositoryId}
-                  />
-                </div>
+                  <div className="space-y-6">
+                    {activeRepository ? (
+                      <>
+                        <RepositoryOverview repository={activeRepository} />
 
-                <div className="space-y-8">
-                  {activeRepository ? (
-                    <>
-                      <RepositoryOverview repository={activeRepository} />
-
-                      {activeRepository.scans.length > 0 ? (
-                        <div className="space-y-4">
-                          <div>
-                            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Commit history</p>
-                            <h2 className="text-xl font-semibold text-slate-900">Pipeline runs</h2>
-                            <p className="mt-2 text-sm text-slate-600">
-                              Expand a run to inspect tool findings and quality gate outcomes for each commit.
-                            </p>
+                        {activeRepository.scans.length > 0 ? (
+                          <div className="space-y-4 rounded-3xl border border-slate-200 bg-slate-50 p-6 shadow-inner shadow-slate-950/5">
+                            <div className="space-y-1">
+                              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Pipeline runs</p>
+                              <h3 className="text-lg font-semibold text-slate-900">Commit activity &amp; findings</h3>
+                              <p className="text-sm text-slate-600">
+                                Expand a run to inspect tool findings and quality gate outcomes for each commit.
+                              </p>
+                            </div>
+                            <RunTimeline
+                              runs={activeRepository.scans}
+                              detailsById={scanDetails}
+                              loadingScanIds={loadingScanIds}
+                              onLoadDetails={handleLoadScanDetails}
+                            />
                           </div>
-                          <RunTimeline
-                            runs={activeRepository.scans}
-                            detailsById={scanDetails}
-                            loadingScanIds={loadingScanIds}
-                            onLoadDetails={handleLoadScanDetails}
-                          />
-                        </div>
-                      ) : (
-                        <p className="rounded-3xl border border-slate-200 bg-white p-6 text-sm text-slate-600">
-                          When your first scan completes it will appear here with detailed findings.
-                        </p>
-                      )}
-                    </>
-                  ) : (
-                    <p className="rounded-3xl border border-slate-200 bg-white p-6 text-sm text-slate-600">
-                      Connect a repository or adjust your filters to begin exploring scan history.
-                    </p>
-                  )}
+                        ) : (
+                          <p className="rounded-3xl border border-slate-200 bg-slate-50 p-6 text-sm text-slate-600">
+                            When your first scan completes it will appear here with detailed findings.
+                          </p>
+                        )}
+                      </>
+                    ) : (
+                      <p className="rounded-3xl border border-slate-200 bg-slate-50 p-6 text-sm text-slate-600">
+                        Connect a repository or adjust your filters to begin exploring scan history.
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
+              </section>
             </div>
           ) : (
             <div className="space-y-10">
@@ -587,24 +632,22 @@ function App() {
                       )}
                     </div>
 
-                    {qualityGateStats.length > 0 && (
-                      <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-lg shadow-slate-950/30">
-                        <div className="space-y-2">
-                          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Quality gate defaults</p>
-                          <p className="text-sm text-slate-600">
-                            Current enforcement thresholds returned by the Config API.
-                          </p>
-                        </div>
-                        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                          {qualityGateStats.map((item) => (
-                            <div key={item.label} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                              <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">{item.label}</p>
-                              <p className="mt-1 text-sm text-slate-800">{item.value}</p>
-                            </div>
-                          ))}
-                        </div>
+                    <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-lg shadow-slate-950/30">
+                      <div className="space-y-2">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Quality gate defaults</p>
+                        <p className="text-sm text-slate-600">
+                          Adjust enforcement thresholds returned by the Config API.
+                        </p>
                       </div>
-                    )}
+                      <div className="mt-4">
+                        <QualityGateForm
+                          config={qualityGateConfig}
+                          onSubmit={handleSaveQualityGates}
+                          saving={isSavingQualityGates}
+                          message={qualityGateMessage}
+                        />
+                      </div>
+                    </div>
                   </div>
 
                   <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-950/30">

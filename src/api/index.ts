@@ -46,7 +46,7 @@ export const getTenantProfile = async (token: string) =>
 
 export const updateQualityGates = async (token: string, payload: QualityGateUpdateRequest) =>
   apiRequest<QualityGateUpdateResponse>('/v1/tenant/quality-gates', {
-    method: 'PUT',
+    method: 'POST',
     token,
     body: JSON.stringify(payload),
   });
