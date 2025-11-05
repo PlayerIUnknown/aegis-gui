@@ -445,8 +445,8 @@ function App() {
           <header className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="space-y-3">
               <p className="text-xs font-semibold uppercase tracking-[0.32em] text-accent">Security Posture Command Center</p>
-              <h1 className="text-3xl font-semibold text-slate-900">Stay ahead of every scan</h1>
-              <p className="max-w-xl text-sm text-slate-600">
+              <h1 className="text-3xl font-semibold text-white">Stay ahead of every scan</h1>
+              <p className="max-w-xl text-sm text-white">
                 Search, filter, and drill into pipeline runs with confidence. Quality gate performance updates in real time from
                 the Config API.
               </p>
