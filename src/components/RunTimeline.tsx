@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
-import dayjs from '../utils/dayjs';
 import type { ScanDetailsView, ScanView } from '../types/domain';
 import { StatusPill } from './StatusPill';
 import { ToolFindingsPanel } from './ToolFindingsPanel';
 import { Icon } from './Icon';
+import { formatTimestamp, timestampToValue } from '../utils/timestamps';
 
 type RunTimelineProps = {
   runs: ScanView[];
@@ -19,8 +19,25 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
   loadingScanIds,
   onLoadDetails,
 }) => {
-  const sortedRuns = [...runs].sort((a, b) => dayjs(b.timestamp).diff(dayjs(a.timestamp)));
+  const sortedRuns = useMemo(
+    () => [...runs].sort((a, b) => timestampToValue(b.timestamp) - timestampToValue(a.timestamp)),
+    [runs],
+  );
   const [openRunId, setOpenRunId] = useState<string | undefined>(sortedRuns[0]?.id);
+
+  useEffect(() => {
+    if (sortedRuns.length === 0) {
+      setOpenRunId(undefined);
+      return;
+    }
+
+    setOpenRunId((current) => {
+      if (current && sortedRuns.some((run) => run.id === current)) {
+        return current;
+      }
+      return sortedRuns[0]?.id;
+    });
+  }, [sortedRuns]);
 
   useEffect(() => {
     if (!openRunId) {
@@ -34,7 +51,7 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
   }, [openRunId, detailsById, onLoadDetails]);
 
   return (
-    <div className="relative space-y-6">
+    <div className="relative space-y-6 overflow-hidden">
       <span
         aria-hidden
         className="pointer-events-none absolute left-6 top-12 bottom-12 hidden w-px bg-slate-200 md:block"
@@ -64,7 +81,7 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                   : 'bg-warning/80 border-warning/60 shadow-[0_0_0_4px_rgba(250,204,21,0.12)]',
               )}
             />
-            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/40">
+            <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/40">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/10 text-accent">
@@ -72,7 +89,7 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-slate-900">
-                      Scan executed {dayjs(run.timestamp).format('MMM D, YYYY h:mm A')}
+                      Scan executed {formatTimestamp(run.timestamp)}
                     </p>
                     <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-slate-500">
                       {run.repository.branch && (

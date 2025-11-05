@@ -24,7 +24,10 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools }) =
   return (
     <div className="space-y-4">
       {Object.entries(tools).map(([toolName, toolData]) => (
-        <div key={toolName} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/40">
+        <div
+          key={toolName}
+          className="max-w-full overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/40"
+        >
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/10 text-accent">
@@ -46,7 +49,7 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools }) =
             <div className="mt-4 space-y-3">
               {toolData.output.map((finding, index) => (
                 <div key={index} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <pre className="max-h-60 overflow-auto whitespace-pre-wrap break-words text-xs text-slate-700">
+                  <pre className="max-h-60 overflow-y-auto whitespace-pre-wrap break-all text-xs text-slate-700">
                     {JSON.stringify(finding, null, 2)}
                   </pre>
                 </div>
