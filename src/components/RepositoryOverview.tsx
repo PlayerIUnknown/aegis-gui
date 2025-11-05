@@ -10,7 +10,7 @@ type RepositoryOverviewProps = {
 export const RepositoryOverview: React.FC<RepositoryOverviewProps> = ({ repository }) => {
   if (!repository) {
     return (
-      <p className="rounded-3xl border border-slate-200 bg-white p-6 text-sm text-slate-600 shadow-sm dark:border-slate-800/70 dark:bg-slate-950/60 dark:text-slate-400">
+      <p className="rounded-3xl border border-slate-200 bg-white p-6 text-sm text-slate-600 shadow-sm">
         Select a repository on the left to view its recent activity.
       </p>
     );
@@ -27,12 +27,12 @@ export const RepositoryOverview: React.FC<RepositoryOverviewProps> = ({ reposito
   const runningRuns = repository.scans.filter((scan) => scan.status === 'running').length;
 
   return (
-    <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/40 dark:border-slate-800/70 dark:bg-slate-950/70 dark:shadow-slate-950/40">
+    <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/40">
       <div className="flex flex-wrap items-start justify-between gap-6">
         <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Repository overview</p>
-          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">{repository.repoName}</h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400">{totalRuns} recorded run{totalRuns === 1 ? '' : 's'} for this workspace.</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Repository overview</p>
+          <h2 className="text-xl font-semibold text-slate-900">{repository.repoName}</h2>
+          <p className="text-xs text-slate-500">{totalRuns} recorded run{totalRuns === 1 ? '' : 's'} for this workspace.</p>
         </div>
         {latestRun && <StatusPill qualityGatePassed={latestRun.qualityGatePassed} />}
       </div>
@@ -90,20 +90,20 @@ type RepositoryStatProps = {
 };
 
 const toneStyles: Record<NonNullable<RepositoryStatProps['tone']>, string> = {
-  default: 'border-slate-200 bg-white text-slate-900 dark:border-slate-800/70 dark:bg-slate-900/60 dark:text-slate-100',
+  default: 'border-slate-200 bg-white text-slate-900',
   success:
-    'border-success/40 bg-success/10 text-success dark:border-success/60 dark:bg-success/20 dark:text-success/90',
+    'border-success/40 bg-success/10 text-success',
   danger:
-    'border-danger/40 bg-danger/10 text-danger dark:border-danger/60 dark:bg-danger/20 dark:text-danger/90',
+    'border-danger/40 bg-danger/10 text-danger',
   warning:
-    'border-warning/40 bg-warning/10 text-warning dark:border-warning/60 dark:bg-warning/20 dark:text-warning/90',
+    'border-warning/40 bg-warning/10 text-warning',
 };
 
 const iconToneStyles: Record<NonNullable<RepositoryStatProps['tone']>, string> = {
-  default: 'bg-slate-100 text-slate-500 dark:bg-slate-900/50 dark:text-slate-300',
-  success: 'bg-success/20 text-success dark:bg-success/30 dark:text-success/90',
-  danger: 'bg-danger/20 text-danger dark:bg-danger/30 dark:text-danger/90',
-  warning: 'bg-warning/20 text-warning dark:bg-warning/30 dark:text-warning/90',
+  default: 'bg-slate-100 text-slate-500',
+  success: 'bg-success/20 text-success',
+  danger: 'bg-danger/20 text-danger',
+  warning: 'bg-warning/20 text-warning',
 };
 
 const RepositoryStat: React.FC<RepositoryStatProps> = ({ icon, label, value, helper, tone = 'default' }) => (
@@ -111,8 +111,8 @@ const RepositoryStat: React.FC<RepositoryStatProps> = ({ icon, label, value, hel
     <div className={`mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl ${iconToneStyles[tone]}`}>
       <Icon name={icon} width={18} height={18} />
     </div>
-    <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{label}</dt>
+    <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</dt>
     <dd className="mt-2 text-lg font-semibold text-inherit">{value}</dd>
-    {helper && <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{helper}</p>}
+    {helper && <p className="mt-1 text-xs text-slate-500">{helper}</p>}
   </div>
 );
