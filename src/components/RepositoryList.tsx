@@ -1,8 +1,8 @@
 import clsx from 'clsx';
-import dayjs from '../utils/dayjs';
 import type { RepositoryGroup } from '../types/domain';
 import { StatusPill } from './StatusPill';
 import { Icon } from './Icon';
+import { formatTimestamp } from '../utils/timestamps';
 
 export type RepositoryListProps = {
   repositories: RepositoryGroup[];
@@ -69,7 +69,7 @@ export const RepositoryList: React.FC<RepositoryListProps> = ({
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="inline-flex items-center gap-1">
                     <Icon name="clock" width={12} height={12} />
-                    {dayjs(latestRun.timestamp).format('MMM D, YYYY h:mm A')}
+                    {formatTimestamp(latestRun.timestamp)}
                   </span>
                   {latestRun.repository.commitHash && (
                     <span className="inline-flex items-center gap-1">

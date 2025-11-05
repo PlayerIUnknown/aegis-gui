@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import dayjs from './utils/dayjs';
 import {
   ApiError,
   type AuthResponse,
@@ -24,6 +23,7 @@ import {
   type ScanDetailsView,
   type ScanView,
 } from './types/domain';
+import { formatTimestamp, timestampToValue } from './utils/timestamps';
 
 import './styles/index.css';
 
@@ -159,7 +159,7 @@ function App() {
       const updatedScans = [...existing.scans, scan];
       const latestScan = updatedScans.reduce<ScanView | undefined>((latest, current) => {
         if (!latest) return current;
-        return dayjs(current.timestamp).isAfter(dayjs(latest.timestamp)) ? current : latest;
+        return timestampToValue(current.timestamp) > timestampToValue(latest.timestamp) ? current : latest;
       }, existing.latestScan ?? undefined);
 
       repoMap.set(repoId, { id: repoId, repoName: repoId, scans: updatedScans, latestScan });
@@ -167,9 +167,9 @@ function App() {
 
     const groups = Array.from(repoMap.values());
     groups.sort((a, b) => {
-      const aTime = a.latestScan ? dayjs(a.latestScan.timestamp) : dayjs(0);
-      const bTime = b.latestScan ? dayjs(b.latestScan.timestamp) : dayjs(0);
-      return bTime.diff(aTime);
+      const aTime = a.latestScan ? timestampToValue(a.latestScan.timestamp) : Number.NEGATIVE_INFINITY;
+      const bTime = b.latestScan ? timestampToValue(b.latestScan.timestamp) : Number.NEGATIVE_INFINITY;
+      return bTime - aTime;
     });
     return groups;
   }, [scans]);
@@ -286,9 +286,7 @@ function App() {
     }
   }, [profile]);
 
-  const formattedLastUpdated = dashboardSummary?.last_scan_at
-    ? dayjs(dashboardSummary.last_scan_at).format('MMM D, YYYY h:mm A')
-    : '—';
+  const formattedLastUpdated = formatTimestamp(dashboardSummary?.last_scan_at);
 
   const totalRepositories = repositories.length;
 

@@ -1,7 +1,7 @@
-import dayjs from '../utils/dayjs';
 import type { RepositoryGroup } from '../types/domain';
 import { Icon } from './Icon';
 import { StatusPill } from './StatusPill';
+import { formatTimestamp, timestampToValue } from '../utils/timestamps';
 
 type RepositoryOverviewProps = {
   repository?: RepositoryGroup;
@@ -20,8 +20,8 @@ export const RepositoryOverview: React.FC<RepositoryOverviewProps> = ({ reposito
   const latestRun = repository.latestScan;
   const lastCompletedRun = repository.scans
     .filter((scan) => scan.status === 'completed')
-    .sort((a, b) => dayjs(b.timestamp).diff(dayjs(a.timestamp)))[0];
-  const lastCompletedDate = lastCompletedRun ? dayjs(lastCompletedRun.timestamp).format('MMM D, YYYY h:mm A') : '—';
+    .sort((a, b) => timestampToValue(b.timestamp) - timestampToValue(a.timestamp))[0];
+  const lastCompletedDate = formatTimestamp(lastCompletedRun?.timestamp);
   const passingRuns = repository.scans.filter((scan) => scan.qualityGatePassed === true).length;
   const failedRuns = repository.scans.filter((scan) => scan.qualityGatePassed === false).length;
   const runningRuns = repository.scans.filter((scan) => scan.status === 'running').length;
