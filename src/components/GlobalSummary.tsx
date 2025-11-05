@@ -54,24 +54,24 @@ type SummaryTileProps = {
 };
 
 const backgroundByTone: Record<SummaryTileProps['tone'], string> = {
-  neutral: 'border-slate-200 bg-white text-slate-900',
+  neutral: 'border-slate-200 bg-gradient-to-br from-white via-slate-50 to-white text-slate-900',
   success:
-    'border-success/40 bg-success/10 text-success',
+    'border-success/40 bg-gradient-to-br from-success/10 via-success/5 to-white text-success',
   danger:
-    'border-danger/40 bg-danger/10 text-danger',
+    'border-danger/40 bg-gradient-to-br from-danger/10 via-danger/5 to-white text-danger',
   accent:
-    'border-accent/40 bg-accent/10 text-accent',
+    'border-accent/40 bg-gradient-to-br from-accent/10 via-accent/5 to-white text-accent',
 };
 
 const iconBackgroundByTone: Record<SummaryTileProps['tone'], string> = {
-  neutral: 'bg-slate-100 text-slate-500',
-  success: 'bg-success/20 text-success',
-  danger: 'bg-danger/20 text-danger',
-  accent: 'bg-accent/20 text-accent',
+  neutral: 'bg-slate-100 text-slate-500 shadow-inner',
+  success: 'bg-success/20 text-success shadow-inner',
+  danger: 'bg-danger/20 text-danger shadow-inner',
+  accent: 'bg-accent/20 text-accent shadow-inner',
 };
 
 const tileBaseClasses =
-  'flex flex-col gap-3 rounded-3xl border p-5 shadow-lg shadow-slate-200/50 transition hover:-translate-y-0.5 hover:shadow-2xl';
+  'flex flex-col gap-3 rounded-3xl border p-5 shadow-lg shadow-slate-200/40 transition hover:-translate-y-0.5 hover:shadow-2xl';
 
 const SummaryTile: React.FC<SummaryTileProps> = ({ title, value, icon, tone, helper }) => (
   <div className={`${tileBaseClasses} ${backgroundByTone[tone]}`}>
