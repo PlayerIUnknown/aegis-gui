@@ -35,7 +35,7 @@ export const RepositoryList: React.FC<RepositoryListProps> = ({
             aria-current={activeRepositoryId === repo.id}
             type="button"
           >
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/10 text-sm font-semibold uppercase text-accent">
                   {repo.repoName.slice(0, 2)}
