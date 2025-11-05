@@ -30,7 +30,7 @@ export const RepositoryList: React.FC<RepositoryListProps> = ({
             onClick={() => onSelect(repo.id)}
             className={clsx(
               'group w-full rounded-2xl border p-5 text-left transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50',
-              'border-slate-200 bg-white shadow-sm hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white/90',
+              'border-slate-200 bg-gradient-to-br from-white via-slate-50 to-white shadow hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg',
               activeRepositoryId === repo.id &&
                 'border-accent/70 bg-accent/10 text-slate-900 ring-2 ring-accent/20',
             )}
@@ -39,7 +39,7 @@ export const RepositoryList: React.FC<RepositoryListProps> = ({
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/10 text-sm font-semibold uppercase text-accent">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-accent/10 via-accent/5 to-white text-sm font-semibold uppercase text-accent shadow-inner">
                   {repo.repoName.slice(0, 2)}
                 </div>
                 <div>

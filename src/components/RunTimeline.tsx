@@ -81,7 +81,7 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                   : 'bg-warning/80 border-warning/60 shadow-[0_0_0_4px_rgba(250,204,21,0.12)]',
               )}
             />
-            <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/40">
+            <div className="overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-xl shadow-slate-300/40">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/10 text-accent">
@@ -167,7 +167,7 @@ type DetailStatProps = {
 };
 
 const DetailStat: React.FC<DetailStatProps> = ({ label, value }) => (
-  <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+  <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-white p-4 shadow">
     <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p>
     <p className="mt-1 text-xl font-semibold text-slate-900">{value}</p>
   </div>

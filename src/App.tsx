@@ -501,7 +501,7 @@ function App() {
 
           {activeTab === 'dashboard' ? (
             <div className="space-y-10">
-              <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-950/40">
+              <section className="rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-xl shadow-slate-950/30">
                 <GlobalSummary summary={dashboardSummary} />
               </section>
 
@@ -511,7 +511,7 @@ function App() {
                 </p>
               )}
 
-              <section className="space-y-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-950/40">
+              <section className="space-y-6 rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-xl shadow-slate-950/30">
                 <div className="space-y-2">
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Scans</p>
                   <h2 className="text-xl font-semibold text-slate-900">Explore repository history</h2>
@@ -522,7 +522,7 @@ function App() {
 
                 <div className="grid gap-8 xl:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
                   <div className="space-y-6">
-                    <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 shadow-inner shadow-slate-950/5">
+                    <div className="rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-50 via-white to-slate-100 p-5 shadow-inner shadow-slate-950/10">
                       <div className="flex flex-col gap-3">
                         <div>
                           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Repositories</p>
@@ -568,7 +568,7 @@ function App() {
                         <RepositoryOverview repository={activeRepository} />
 
                         {activeRepository.scans.length > 0 ? (
-                          <div className="space-y-4 rounded-3xl border border-slate-200 bg-slate-50 p-6 shadow-inner shadow-slate-950/5">
+                          <div className="space-y-4 rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-50 via-white to-slate-100 p-6 shadow-inner shadow-slate-950/10">
                             <div className="space-y-1">
                               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Pipeline runs</p>
                               <h3 className="text-lg font-semibold text-slate-900">Commit activity &amp; findings</h3>
@@ -584,13 +584,13 @@ function App() {
                             />
                           </div>
                         ) : (
-                          <p className="rounded-3xl border border-slate-200 bg-slate-50 p-6 text-sm text-slate-600">
+                          <p className="rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-50 via-white to-slate-100 p-6 text-sm text-slate-600 shadow-inner shadow-slate-950/5">
                             When your first scan completes it will appear here with detailed findings.
                           </p>
                         )}
                       </>
                     ) : (
-                      <p className="rounded-3xl border border-slate-200 bg-slate-50 p-6 text-sm text-slate-600">
+                      <p className="rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-50 via-white to-slate-100 p-6 text-sm text-slate-600 shadow-inner shadow-slate-950/5">
                         Connect a repository or adjust your filters to begin exploring scan history.
                       </p>
                     )}
@@ -600,7 +600,7 @@ function App() {
             </div>
           ) : (
             <div className="space-y-10">
-              <section className="space-y-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-950/40">
+              <section className="space-y-6 rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-xl shadow-slate-950/30">
                 <div className="space-y-2">
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Tenant onboarding</p>
                   <h2 className="text-xl font-semibold text-slate-900">Connect your scanners</h2>
@@ -611,7 +611,7 @@ function App() {
 
                 <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
                   <div className="space-y-6">
-                    <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-lg shadow-slate-950/30">
+                    <div className="rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-white p-5 shadow-lg shadow-slate-950/30">
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Scanner API key</p>
@@ -632,7 +632,7 @@ function App() {
                       )}
                     </div>
 
-                    <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-lg shadow-slate-950/30">
+                    <div className="rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-white p-5 shadow-lg shadow-slate-950/30">
                       <div className="space-y-2">
                         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Quality gate defaults</p>
                         <p className="text-sm text-slate-600">
@@ -650,7 +650,7 @@ function App() {
                     </div>
                   </div>
 
-                  <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-950/30">
+                  <div className="rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-lg shadow-slate-950/30">
                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">GitHub Actions snippet</p>
                     <p className="mt-2 text-sm text-slate-600">
                       Add this step to your workflow and store the API key as <code className="font-mono text-slate-800">AEGIS_API_KEY</code>.
@@ -661,11 +661,19 @@ function App() {
                   </div>
                 </div>
 
-                <ol className="list-decimal space-y-2 pl-5 text-sm text-slate-600">
-                  <li>Copy the tenant API key and store it as an encrypted secret in your repository.</li>
-                  <li>Paste the workflow snippet into your CI configuration, updating the path or image tags as needed.</li>
-                  <li>Run your pipeline to push scan results to the Config API.</li>
-                  <li>Return to the Dashboard tab to monitor quality gates, repositories, and findings in real time.</li>
+                <ol className="list-decimal space-y-3 pl-5 text-sm text-slate-600 marker:text-slate-400">
+                  <li className="rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-50 via-white to-slate-100 px-4 py-3 shadow-inner shadow-slate-950/5">
+                    Copy the tenant API key and store it as an encrypted secret in your repository.
+                  </li>
+                  <li className="rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-50 via-white to-slate-100 px-4 py-3 shadow-inner shadow-slate-950/5">
+                    Paste the workflow snippet into your CI configuration, updating the path or image tags as needed.
+                  </li>
+                  <li className="rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-50 via-white to-slate-100 px-4 py-3 shadow-inner shadow-slate-950/5">
+                    Run your pipeline to push scan results to the Config API.
+                  </li>
+                  <li className="rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-50 via-white to-slate-100 px-4 py-3 shadow-inner shadow-slate-950/5">
+                    Return to the Dashboard tab to monitor quality gates, repositories, and findings in real time.
+                  </li>
                 </ol>
               </section>
 

@@ -27,7 +27,7 @@ export const RepositoryOverview: React.FC<RepositoryOverviewProps> = ({ reposito
   const runningRuns = repository.scans.filter((scan) => scan.status === 'running').length;
 
   return (
-    <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/40">
+    <section className="rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-xl shadow-slate-300/40">
       <div className="flex flex-wrap items-start justify-between gap-6">
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Repository overview</p>
@@ -90,13 +90,13 @@ type RepositoryStatProps = {
 };
 
 const toneStyles: Record<NonNullable<RepositoryStatProps['tone']>, string> = {
-  default: 'border-slate-200 bg-white text-slate-900',
+  default: 'border-slate-200 bg-gradient-to-br from-white via-slate-50 to-slate-100 text-slate-900',
   success:
-    'border-success/40 bg-success/10 text-success',
+    'border-success/40 bg-gradient-to-br from-success/10 via-success/10 to-white text-success',
   danger:
-    'border-danger/40 bg-danger/10 text-danger',
+    'border-danger/40 bg-gradient-to-br from-danger/10 via-danger/5 to-white text-danger',
   warning:
-    'border-warning/40 bg-warning/10 text-warning',
+    'border-warning/40 bg-gradient-to-br from-warning/10 via-warning/5 to-white text-warning',
 };
 
 const iconToneStyles: Record<NonNullable<RepositoryStatProps['tone']>, string> = {
@@ -107,7 +107,7 @@ const iconToneStyles: Record<NonNullable<RepositoryStatProps['tone']>, string> =
 };
 
 const RepositoryStat: React.FC<RepositoryStatProps> = ({ icon, label, value, helper, tone = 'default' }) => (
-  <div className={`rounded-3xl border p-5 shadow-lg shadow-slate-950/30 ${toneStyles[tone]}`}>
+  <div className={`rounded-3xl border p-5 shadow-lg shadow-slate-950/20 ${toneStyles[tone]}`}>
     <div className={`mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl ${iconToneStyles[tone]}`}>
       <Icon name={icon} width={18} height={18} />
     </div>
