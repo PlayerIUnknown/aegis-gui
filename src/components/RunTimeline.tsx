@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import type { ScanDetailsView, ScanView } from '../types/domain';
 import { StatusPill } from './StatusPill';
 import { ToolFindingsPanel } from './ToolFindingsPanel';
-import { Icon } from './Icon';
+import { Icon, type IconName } from './Icon';
 import { formatTimestamp, timestampToValue } from '../utils/timestamps';
 
 type RunTimelineProps = {
@@ -131,14 +131,34 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
               {isOpen && (
                 <div className="mt-6 space-y-6">
                   <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                    <DetailStat label="Packages" value={run.summary.packagesFound} />
-                    <DetailStat label="Vulnerable packages" value={run.summary.vulnerabilitiesInPackages} />
-                    <DetailStat label="Code findings" value={run.summary.codeVulnerabilities} />
-                    <DetailStat label="Secrets" value={run.summary.secretsFound} />
-                    <DetailStat label="Low" value={run.summary.lowSeverity} />
-                    <DetailStat label="Medium" value={run.summary.mediumSeverity} />
-                    <DetailStat label="High" value={run.summary.highSeverity} />
-                    <DetailStat label="Critical" value={run.summary.criticalSeverity} />
+                    <DetailStat
+                      label="Packages"
+                      value={run.summary.packagesFound}
+                      tone="accent"
+                      icon="package"
+                    />
+                    <DetailStat
+                      label="Vulnerable packages"
+                      value={run.summary.vulnerabilitiesInPackages}
+                      tone="warning"
+                      icon="package-export"
+                    />
+                    <DetailStat
+                      label="Code findings"
+                      value={run.summary.codeVulnerabilities}
+                      tone="neutral"
+                      icon="code"
+                    />
+                    <DetailStat
+                      label="Secrets"
+                      value={run.summary.secretsFound}
+                      tone="danger"
+                      icon="key"
+                    />
+                    <DetailStat label="Low" value={run.summary.lowSeverity} tone="success" icon="sparkle" />
+                    <DetailStat label="Medium" value={run.summary.mediumSeverity} tone="warning" icon="sun" />
+                    <DetailStat label="High" value={run.summary.highSeverity} tone="danger" icon="alert" />
+                    <DetailStat label="Critical" value={run.summary.criticalSeverity} tone="danger" icon="x-circle" />
                   </div>
                   {isLoading && (
                     <p className="rounded-2xl border-2 border-accent/40 bg-slate-100 p-4 text-sm text-slate-600">
@@ -164,11 +184,36 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
 type DetailStatProps = {
   label: string;
   value: number | string;
+  tone: 'neutral' | 'accent' | 'warning' | 'danger' | 'success';
+  icon: IconName;
 };
 
-const DetailStat: React.FC<DetailStatProps> = ({ label, value }) => (
-  <div className="rounded-2xl border-2 border-accent/40 bg-gradient-to-br from-white via-slate-50 to-white p-4 shadow-[0_20px_45px_-35px_rgba(99,102,241,0.7)]">
-    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p>
-    <p className="mt-1 text-xl font-semibold text-slate-900">{value}</p>
+const statBackgroundByTone: Record<DetailStatProps['tone'], string> = {
+  neutral: 'bg-gradient-to-br from-white via-slate-50 to-white text-slate-900',
+  accent: 'bg-gradient-to-br from-accent/10 via-accent/5 to-white text-slate-900',
+  warning: 'bg-gradient-to-br from-warning/10 via-warning/5 to-white text-slate-900',
+  danger: 'bg-gradient-to-br from-danger/10 via-danger/5 to-white text-slate-900',
+  success: 'bg-gradient-to-br from-success/10 via-success/5 to-white text-slate-900',
+};
+
+const statIconBackgroundByTone: Record<DetailStatProps['tone'], string> = {
+  neutral: 'bg-white text-accent shadow-[0_0_0_1px_rgba(99,102,241,0.15)]',
+  accent: 'bg-white text-accent shadow-[0_0_0_1px_rgba(99,102,241,0.2)]',
+  warning: 'bg-white text-warning shadow-[0_0_0_1px_rgba(99,102,241,0.18)]',
+  danger: 'bg-white text-danger shadow-[0_0_0_1px_rgba(99,102,241,0.18)]',
+  success: 'bg-white text-success shadow-[0_0_0_1px_rgba(99,102,241,0.18)]',
+};
+
+const DetailStat: React.FC<DetailStatProps> = ({ label, value, tone, icon }) => (
+  <div
+    className={`flex h-full min-h-[128px] min-w-0 flex-col justify-between gap-4 rounded-3xl border-2 border-accent/30 p-4 shadow-[0_20px_45px_-35px_rgba(99,102,241,0.7)] transition hover:-translate-y-0.5 hover:shadow-[0_28px_60px_-30px_rgba(99,102,241,0.75)] ${statBackgroundByTone[tone]}`}
+  >
+    <div className="flex items-center gap-3">
+      <span className={`flex h-10 w-10 items-center justify-center rounded-2xl ${statIconBackgroundByTone[tone]}`}>
+        <Icon name={icon} width={18} height={18} />
+      </span>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">{label}</p>
+    </div>
+    <p className="text-lg font-semibold text-slate-900 sm:text-xl">{value}</p>
   </div>
 );

@@ -1,4 +1,5 @@
 import { useEffect, useState, type ChangeEvent, type FC, type FormEvent } from 'react';
+import clsx from 'clsx';
 import type { QualityGateConfig } from '../api/types';
 
 type QualityGateFormProps = {
@@ -121,25 +122,25 @@ type ToggleFieldProps = {
 };
 
 const ToggleField: FC<ToggleFieldProps> = ({ label, description, checked, onToggle }) => (
-  <div className="rounded-2xl border-2 border-accent/40 bg-slate-50 p-4 shadow-[0_20px_40px_-35px_rgba(99,102,241,0.6)]">
-    <div className="flex items-start justify-between gap-4">
-      <div>
-        <p className="text-sm font-semibold text-slate-900">{label}</p>
-        <p className="mt-1 text-xs text-slate-600">{description}</p>
-      </div>
-      <button
-        type="button"
-        onClick={onToggle}
-        className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-          checked ? 'bg-accent/90' : 'bg-slate-300'
-        }`}
-        aria-pressed={checked}
-      >
-        <span
-          className={`inline-block h-5 w-5 transform rounded-full bg-white transition ${checked ? 'translate-x-5' : 'translate-x-1'}`}
-        />
-      </button>
+  <div className="flex h-full flex-col justify-between gap-4 rounded-3xl border-2 border-accent/40 bg-slate-50/95 p-5 shadow-[0_20px_40px_-35px_rgba(99,102,241,0.6)]">
+    <div className="space-y-2">
+      <p className="text-sm font-semibold leading-snug text-slate-900">{label}</p>
+      <p className="text-xs leading-relaxed text-slate-600">{description}</p>
     </div>
+    <button
+      type="button"
+      onClick={onToggle}
+      className={clsx(
+        'flex h-7 w-14 shrink-0 items-center rounded-full px-1 transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40',
+        checked
+          ? 'justify-end bg-accent/90 text-white shadow-[0_18px_36px_-20px_rgba(99,102,241,0.8)]'
+          : 'justify-start bg-slate-300/80 text-slate-600',
+      )}
+      aria-pressed={checked}
+    >
+      <span className="sr-only">Toggle {label}</span>
+      <span className="h-5 w-5 rounded-full bg-white shadow transition-all duration-300" />
+    </button>
   </div>
 );
 
@@ -150,7 +151,7 @@ type NumberFieldProps = {
 };
 
 const NumberField: FC<NumberFieldProps> = ({ label, value, onChange }) => (
-  <label className="flex flex-col gap-2 rounded-2xl border-2 border-accent/40 bg-slate-50 p-4 shadow-[0_20px_40px_-35px_rgba(99,102,241,0.6)]">
+  <label className="flex h-full min-h-[128px] flex-col justify-between gap-3 rounded-3xl border-2 border-accent/40 bg-slate-50/95 p-4 shadow-[0_20px_40px_-35px_rgba(99,102,241,0.6)]">
     <span className="text-xs font-semibold uppercase tracking-wide text-slate-600">{label}</span>
     <input
       type="number"

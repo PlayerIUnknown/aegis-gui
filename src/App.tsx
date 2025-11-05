@@ -68,6 +68,7 @@ function App() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'setup'>('dashboard');
   const [activeRepositoryId, setActiveRepositoryId] = useState<string | null>(null);
   const [copyMessage, setCopyMessage] = useState<string | null>(null);
+  const [snippetCopyMessage, setSnippetCopyMessage] = useState<string | null>(null);
   const [isSavingQualityGates, setIsSavingQualityGates] = useState(false);
   const [qualityGateMessage, setQualityGateMessage] = useState<
     { type: 'success' | 'error'; text: string } | null
@@ -292,6 +293,17 @@ function App() {
       setTimeout(() => setCopyMessage(null), 2500);
     }
   }, [profile]);
+
+  const handleCopyActionsSnippet = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(actionsSnippet);
+      setSnippetCopyMessage('Workflow snippet copied to clipboard.');
+    } catch (copyError) {
+      setSnippetCopyMessage('Unable to copy workflow snippet.');
+    } finally {
+      setTimeout(() => setSnippetCopyMessage(null), 2500);
+    }
+  }, [actionsSnippet]);
 
   const handleSaveQualityGates = useCallback(
     async (config: QualityGateConfig) => {
@@ -646,13 +658,32 @@ function App() {
                   </div>
 
                   <div className="rounded-3xl border-2 border-accent/40 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_30px_70px_-50px_rgba(99,102,241,0.85)]">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">GitHub Actions snippet</p>
-                    <p className="mt-2 text-sm text-slate-600">
-                      Add this step to your workflow and store the API key as <code className="font-mono text-slate-800">AEGIS_API_KEY</code>.
-                    </p>
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                      <div className="space-y-2">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">GitHub Actions snippet</p>
+                        <p className="text-sm text-slate-600">
+                          Add this step to your workflow and store the API key as <code className="font-mono text-slate-800">AEGIS_API_KEY</code>.
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          Copy the workflow as-is and paste it into your CI configuration. Update the image tag or target path whenever needed.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleCopyActionsSnippet}
+                        className="inline-flex items-center gap-2 rounded-full border-2 border-accent/40 bg-white px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-700 transition hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+                      >
+                        <Icon name="link" width={14} height={14} /> Copy snippet
+                      </button>
+                    </div>
                     <pre className="mt-4 max-h-[420px] overflow-auto rounded-2xl border-2 border-accent/40 bg-slate-50 p-4 text-xs text-slate-700 shadow-[0_25px_55px_-35px_rgba(99,102,241,0.75)]">
 {actionsSnippet}
                     </pre>
+                    {snippetCopyMessage && (
+                      <p className="mt-3 rounded-2xl border-2 border-accent/30 bg-slate-100 px-3 py-2 text-xs text-slate-600 shadow-[0_12px_24px_-18px_rgba(99,102,241,0.6)]">
+                        {snippetCopyMessage}
+                      </p>
+                    )}
                   </div>
                 </div>
 
