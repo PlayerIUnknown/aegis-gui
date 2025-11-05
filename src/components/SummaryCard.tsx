@@ -9,7 +9,7 @@ type SummaryCardProps = {
 };
 
 const intentStyles: Record<NonNullable<SummaryCardProps['intent']>, string> = {
-  neutral: 'bg-slate-900/60 border-slate-800/60',
+  neutral: 'bg-white border-slate-200 text-slate-900 dark:bg-slate-900/60 dark:border-slate-800/60 dark:text-slate-100',
   success: 'bg-success/10 border-success/30 text-success',
   warning: 'bg-warning/10 border-warning/30 text-warning',
   danger: 'bg-danger/10 border-danger/30 text-danger'
@@ -23,14 +23,14 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
 }) => (
   <div
     className={clsx(
-      'flex h-full flex-col justify-between rounded-2xl border p-4 shadow-lg shadow-slate-950/30',
+      'flex h-full flex-col justify-between rounded-2xl border p-4 shadow-lg shadow-slate-200/40 dark:shadow-slate-950/30',
       intentStyles[intent]
     )}
   >
     <div>
-      <p className="text-xs font-medium uppercase tracking-wide text-slate-400">{title}</p>
-      <p className="mt-2 text-2xl font-semibold text-slate-100">{value}</p>
+      <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">{title}</p>
+      <p className="mt-2 text-2xl font-semibold text-inherit">{value}</p>
     </div>
-    {subtitle && <p className="mt-4 text-xs text-slate-400">{subtitle}</p>}
+    {subtitle && <p className="mt-4 text-xs text-slate-500 dark:text-slate-400">{subtitle}</p>}
   </div>
 );
