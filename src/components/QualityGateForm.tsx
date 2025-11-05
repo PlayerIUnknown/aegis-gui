@@ -121,7 +121,7 @@ type ToggleFieldProps = {
 };
 
 const ToggleField: FC<ToggleFieldProps> = ({ label, description, checked, onToggle }) => (
-  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 shadow-sm">
+  <div className="rounded-2xl border-2 border-accent/40 bg-slate-50 p-4 shadow-[0_20px_40px_-35px_rgba(99,102,241,0.6)]">
     <div className="flex items-start justify-between gap-4">
       <div>
         <p className="text-sm font-semibold text-slate-900">{label}</p>
@@ -150,14 +150,14 @@ type NumberFieldProps = {
 };
 
 const NumberField: FC<NumberFieldProps> = ({ label, value, onChange }) => (
-  <label className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-4 shadow-sm">
+  <label className="flex flex-col gap-2 rounded-2xl border-2 border-accent/40 bg-slate-50 p-4 shadow-[0_20px_40px_-35px_rgba(99,102,241,0.6)]">
     <span className="text-xs font-semibold uppercase tracking-wide text-slate-600">{label}</span>
     <input
       type="number"
       min={0}
       value={value}
       onChange={onChange}
-      className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30"
+      className="w-full rounded-2xl border-2 border-accent/40 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30"
     />
   </label>
 );

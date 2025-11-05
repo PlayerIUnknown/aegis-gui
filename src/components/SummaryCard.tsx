@@ -9,13 +9,13 @@ type SummaryCardProps = {
 };
 
 const intentStyles: Record<NonNullable<SummaryCardProps['intent']>, string> = {
-  neutral: 'bg-gradient-to-br from-white via-slate-50 to-white border-slate-200 text-slate-900',
+  neutral: 'bg-gradient-to-br from-white via-slate-50 to-white text-slate-900',
   success:
-    'bg-gradient-to-br from-success/10 via-success/5 to-white border-success/40 text-success',
+    'bg-gradient-to-br from-success/10 via-success/5 to-white text-success',
   warning:
-    'bg-gradient-to-br from-warning/10 via-warning/5 to-white border-warning/40 text-warning',
+    'bg-gradient-to-br from-warning/10 via-warning/5 to-white text-warning',
   danger:
-    'bg-gradient-to-br from-danger/10 via-danger/5 to-white border-danger/40 text-danger'
+    'bg-gradient-to-br from-danger/10 via-danger/5 to-white text-danger'
 };
 
 export const SummaryCard: React.FC<SummaryCardProps> = ({
@@ -26,7 +26,7 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
 }) => (
   <div
     className={clsx(
-      'flex h-full flex-col justify-between rounded-2xl border p-4 shadow-lg shadow-slate-200/30',
+      'flex h-full flex-col justify-between rounded-2xl border-2 border-accent/40 p-4 shadow-[0_20px_45px_-30px_rgba(99,102,241,0.6)]',
       intentStyles[intent]
     )}
   >

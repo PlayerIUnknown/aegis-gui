@@ -376,7 +376,7 @@ function App() {
     <div
       className="flex min-h-svh flex-col bg-gradient-to-br from-slate-100 via-slate-100 to-slate-200 text-slate-900 transition-colors duration-300 lg:flex-row"
     >
-      <aside className="border-b border-slate-200 bg-white/80 backdrop-blur lg:sticky lg:top-0 lg:h-svh lg:w-72 lg:border-b-0 lg:border-r">
+      <aside className="border-b border-accent/30 bg-white/80 backdrop-blur lg:sticky lg:top-0 lg:h-svh lg:w-72 lg:border-b-0 lg:border-r lg:border-accent/30">
         <div className="flex h-full flex-col gap-8 overflow-y-auto px-6 py-8">
           <div className="space-y-4">
             <div className="flex items-center gap-3">
@@ -403,10 +403,10 @@ function App() {
                   key={item.key}
                   type="button"
                   onClick={() => setActiveTab(item.key as 'dashboard' | 'setup')}
-                  className={`w-full rounded-2xl border px-4 py-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 ${
+                  className={`w-full rounded-2xl border-2 px-4 py-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 ${
                     isActive
                       ? 'border-accent/60 bg-accent/10 text-slate-900 shadow-lg shadow-accent/10'
-                      : 'border-slate-200 bg-white/70 text-slate-600 hover:border-slate-300 hover:bg-white'
+                      : 'border-accent/20 bg-white/70 text-slate-600 hover:border-accent/40 hover:bg-white'
                   }`}
                   aria-pressed={isActive}
                 >
@@ -430,14 +430,14 @@ function App() {
             })}
           </nav>
           <div className="mt-auto space-y-4">
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 text-xs text-slate-500 shadow-sm">
+            <div className="rounded-2xl border-2 border-accent/40 bg-white p-4 text-xs text-slate-500 shadow-[0_20px_40px_-35px_rgba(99,102,241,0.65)]">
               <p className="font-semibold uppercase tracking-wide text-slate-600">Signed in as</p>
               <p className="mt-1 break-all text-sm text-slate-900">{profile?.email ?? '—'}</p>
             </div>
             <button
               type="button"
               onClick={signOut}
-              className="w-full rounded-2xl border border-slate-200 bg-white py-3 text-sm font-semibold uppercase tracking-wide text-slate-700 transition hover:border-danger/60 hover:bg-danger/10 hover:text-danger"
+              className="w-full rounded-2xl border-2 border-accent/40 bg-white py-3 text-sm font-semibold uppercase tracking-wide text-slate-700 transition hover:border-danger/60 hover:bg-danger/10 hover:text-danger"
             >
               Sign out
             </button>
@@ -461,7 +461,7 @@ function App() {
                 {headerBadges.map((badge) => (
                   <span
                     key={badge.key}
-                    className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 shadow-sm"
+                    className="inline-flex items-center gap-2 rounded-full border-2 border-accent/40 bg-white px-3 py-1.5 text-slate-600 shadow-[0_12px_30px_-20px_rgba(99,102,241,0.6)]"
                   >
                     <Icon name={badge.icon} width={14} height={14} />
                     {badge.label}
@@ -482,14 +482,14 @@ function App() {
                       value={search}
                       onChange={(event) => setSearch(event.target.value)}
                       placeholder="Filter by repository name"
-                      className="w-full rounded-2xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-900 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30"
+                      className="w-full rounded-2xl border-2 border-accent/40 bg-white py-3 pl-11 pr-4 text-sm text-slate-900 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30"
                     />
                   </div>
                 )}
                 <button
                   type="button"
                   onClick={handleRefresh}
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-700 transition hover:border-accent/60 hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-accent/40 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-700 transition hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
                 >
                   <Icon name="refresh" width={16} height={16} /> Refresh data
                 </button>
@@ -497,21 +497,21 @@ function App() {
             </div>
           </header>
 
-          {error && <p className="rounded-2xl border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">{error}</p>}
+          {error && <p className="rounded-2xl border-2 border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">{error}</p>}
 
           {activeTab === 'dashboard' ? (
             <div className="space-y-10">
-              <section className="rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-xl shadow-slate-950/30">
+              <section className="rounded-3xl border-2 border-accent/40 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_45px_90px_-55px_rgba(99,102,241,0.85)]">
                 <GlobalSummary summary={dashboardSummary} />
               </section>
 
               {isLoadingData && (
-                <p className="rounded-3xl border border-slate-200 bg-white p-6 text-sm text-slate-600">
+                <p className="rounded-3xl border-2 border-accent/40 bg-white p-6 text-sm text-slate-600 shadow-[0_20px_45px_-35px_rgba(99,102,241,0.6)]">
                   Refreshing data from Config API…
                 </p>
               )}
 
-              <section className="space-y-6 rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-xl shadow-slate-950/30">
+              <section className="space-y-6 rounded-3xl border-2 border-accent/40 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_45px_90px_-55px_rgba(99,102,241,0.85)]">
                 <div className="space-y-2">
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Scans</p>
                   <h2 className="text-xl font-semibold text-slate-900">Explore repository history</h2>
@@ -522,7 +522,7 @@ function App() {
 
                 <div className="grid gap-8 xl:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
                   <div className="space-y-6">
-                    <div className="rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-50 via-white to-slate-100 p-5 shadow-inner shadow-slate-950/10">
+                    <div className="rounded-3xl border-2 border-accent/40 bg-gradient-to-br from-slate-50 via-white to-slate-100 p-5 shadow-[inset_0_0_0_1px_rgba(99,102,241,0.15),0_25px_55px_-40px_rgba(99,102,241,0.75)]">
                       <div className="flex flex-col gap-3">
                         <div>
                           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Repositories</p>
@@ -542,7 +542,7 @@ function App() {
                                 className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-wide transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 ${
                                   isActive
                                     ? 'border-accent/60 bg-accent/10 text-accent'
-                                    : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900'
+                                    : 'border-accent/25 bg-white text-slate-600 hover:border-accent/50 hover:text-slate-900'
                                 }`}
                                 aria-pressed={isActive}
                               >
@@ -568,7 +568,7 @@ function App() {
                         <RepositoryOverview repository={activeRepository} />
 
                         {activeRepository.scans.length > 0 ? (
-                          <div className="space-y-4 rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-50 via-white to-slate-100 p-6 shadow-inner shadow-slate-950/10">
+                          <div className="space-y-4 rounded-3xl border-2 border-accent/40 bg-gradient-to-br from-slate-50 via-white to-slate-100 p-6 shadow-[inset_0_0_0_1px_rgba(99,102,241,0.12),0_35px_70px_-50px_rgba(99,102,241,0.85)]">
                             <div className="space-y-1">
                               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Pipeline runs</p>
                               <h3 className="text-lg font-semibold text-slate-900">Commit activity &amp; findings</h3>
@@ -584,13 +584,13 @@ function App() {
                             />
                           </div>
                         ) : (
-                          <p className="rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-50 via-white to-slate-100 p-6 text-sm text-slate-600 shadow-inner shadow-slate-950/5">
+                          <p className="rounded-3xl border-2 border-accent/40 bg-gradient-to-br from-slate-50 via-white to-slate-100 p-6 text-sm text-slate-600 shadow-[inset_0_0_0_1px_rgba(99,102,241,0.12),0_25px_55px_-40px_rgba(99,102,241,0.75)]">
                             When your first scan completes it will appear here with detailed findings.
                           </p>
                         )}
                       </>
                     ) : (
-                      <p className="rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-50 via-white to-slate-100 p-6 text-sm text-slate-600 shadow-inner shadow-slate-950/5">
+                      <p className="rounded-3xl border-2 border-accent/40 bg-gradient-to-br from-slate-50 via-white to-slate-100 p-6 text-sm text-slate-600 shadow-[inset_0_0_0_1px_rgba(99,102,241,0.12),0_25px_55px_-40px_rgba(99,102,241,0.75)]">
                         Connect a repository or adjust your filters to begin exploring scan history.
                       </p>
                     )}
@@ -600,7 +600,7 @@ function App() {
             </div>
           ) : (
             <div className="space-y-10">
-              <section className="space-y-6 rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-xl shadow-slate-950/30">
+              <section className="space-y-6 rounded-3xl border-2 border-accent/40 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_45px_90px_-55px_rgba(99,102,241,0.85)]">
                 <div className="space-y-2">
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Tenant onboarding</p>
                   <h2 className="text-xl font-semibold text-slate-900">Connect your scanners</h2>
@@ -611,7 +611,7 @@ function App() {
 
                 <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
                   <div className="space-y-6">
-                    <div className="rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-white p-5 shadow-lg shadow-slate-950/30">
+                    <div className="rounded-3xl border-2 border-accent/40 bg-gradient-to-br from-white via-slate-50 to-white p-5 shadow-[0_30px_70px_-50px_rgba(99,102,241,0.85)]">
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Scanner API key</p>
@@ -622,17 +622,17 @@ function App() {
                         <button
                           type="button"
                           onClick={handleCopyApiKey}
-                          className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-700 transition hover:border-accent/60 hover:text-accent"
+                          className="inline-flex items-center gap-2 rounded-full border-2 border-accent/40 bg-white px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-700 transition hover:text-accent"
                         >
                           <Icon name="link" width={14} height={14} /> Copy
                         </button>
                       </div>
                       {copyMessage && (
-                        <p className="mt-3 rounded-2xl bg-slate-100 px-3 py-2 text-xs text-slate-600">{copyMessage}</p>
+                        <p className="mt-3 rounded-2xl border-2 border-accent/30 bg-slate-100 px-3 py-2 text-xs text-slate-600 shadow-[0_12px_24px_-18px_rgba(99,102,241,0.6)]">{copyMessage}</p>
                       )}
                     </div>
 
-                    <div className="rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-white p-5 shadow-lg shadow-slate-950/30">
+                    <div className="rounded-3xl border-2 border-accent/40 bg-gradient-to-br from-white via-slate-50 to-white p-5 shadow-[0_30px_70px_-50px_rgba(99,102,241,0.85)]">
                       <div className="space-y-2">
                         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Quality gate defaults</p>
                         <p className="text-sm text-slate-600">
@@ -650,35 +650,35 @@ function App() {
                     </div>
                   </div>
 
-                  <div className="rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-lg shadow-slate-950/30">
+                  <div className="rounded-3xl border-2 border-accent/40 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_30px_70px_-50px_rgba(99,102,241,0.85)]">
                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">GitHub Actions snippet</p>
                     <p className="mt-2 text-sm text-slate-600">
                       Add this step to your workflow and store the API key as <code className="font-mono text-slate-800">AEGIS_API_KEY</code>.
                     </p>
-                    <pre className="mt-4 max-h-[420px] overflow-auto rounded-2xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-700">
+                    <pre className="mt-4 max-h-[420px] overflow-auto rounded-2xl border-2 border-accent/40 bg-slate-50 p-4 text-xs text-slate-700 shadow-[0_25px_55px_-35px_rgba(99,102,241,0.75)]">
 {actionsSnippet}
                     </pre>
                   </div>
                 </div>
 
                 <ol className="list-decimal space-y-3 pl-5 text-sm text-slate-600 marker:text-slate-400">
-                  <li className="rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-50 via-white to-slate-100 px-4 py-3 shadow-inner shadow-slate-950/5">
+                  <li className="rounded-2xl border-2 border-accent/40 bg-gradient-to-r from-slate-50 via-white to-slate-100 px-4 py-3 shadow-[inset_0_0_0_1px_rgba(99,102,241,0.12),0_20px_45px_-35px_rgba(99,102,241,0.7)]">
                     Copy the tenant API key and store it as an encrypted secret in your repository.
                   </li>
-                  <li className="rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-50 via-white to-slate-100 px-4 py-3 shadow-inner shadow-slate-950/5">
+                  <li className="rounded-2xl border-2 border-accent/40 bg-gradient-to-r from-slate-50 via-white to-slate-100 px-4 py-3 shadow-[inset_0_0_0_1px_rgba(99,102,241,0.12),0_20px_45px_-35px_rgba(99,102,241,0.7)]">
                     Paste the workflow snippet into your CI configuration, updating the path or image tags as needed.
                   </li>
-                  <li className="rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-50 via-white to-slate-100 px-4 py-3 shadow-inner shadow-slate-950/5">
+                  <li className="rounded-2xl border-2 border-accent/40 bg-gradient-to-r from-slate-50 via-white to-slate-100 px-4 py-3 shadow-[inset_0_0_0_1px_rgba(99,102,241,0.12),0_20px_45px_-35px_rgba(99,102,241,0.7)]">
                     Run your pipeline to push scan results to the Config API.
                   </li>
-                  <li className="rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-50 via-white to-slate-100 px-4 py-3 shadow-inner shadow-slate-950/5">
+                  <li className="rounded-2xl border-2 border-accent/40 bg-gradient-to-r from-slate-50 via-white to-slate-100 px-4 py-3 shadow-[inset_0_0_0_1px_rgba(99,102,241,0.12),0_20px_45px_-35px_rgba(99,102,241,0.7)]">
                     Return to the Dashboard tab to monitor quality gates, repositories, and findings in real time.
                   </li>
                 </ol>
               </section>
 
               {isLoadingData && (
-                <p className="rounded-3xl border border-slate-200 bg-white p-6 text-sm text-slate-600">
+                <p className="rounded-3xl border-2 border-accent/40 bg-white p-6 text-sm text-slate-600 shadow-[0_20px_45px_-35px_rgba(99,102,241,0.6)]">
                   Fetching tenant profile details…
                 </p>
               )}

@@ -54,24 +54,24 @@ type SummaryTileProps = {
 };
 
 const backgroundByTone: Record<SummaryTileProps['tone'], string> = {
-  neutral: 'border-slate-200 bg-gradient-to-br from-white via-slate-50 to-white text-slate-900',
+  neutral: 'bg-gradient-to-br from-white via-slate-50 to-white text-slate-900',
   success:
-    'border-success/40 bg-gradient-to-br from-success/10 via-success/5 to-white text-success',
+    'bg-gradient-to-br from-success/10 via-success/5 to-white text-success',
   danger:
-    'border-danger/40 bg-gradient-to-br from-danger/10 via-danger/5 to-white text-danger',
+    'bg-gradient-to-br from-danger/10 via-danger/5 to-white text-danger',
   accent:
-    'border-accent/40 bg-gradient-to-br from-accent/10 via-accent/5 to-white text-accent',
+    'bg-gradient-to-br from-accent/10 via-accent/5 to-white text-accent',
 };
 
 const iconBackgroundByTone: Record<SummaryTileProps['tone'], string> = {
-  neutral: 'bg-slate-100 text-slate-500 shadow-inner',
-  success: 'bg-success/20 text-success shadow-inner',
-  danger: 'bg-danger/20 text-danger shadow-inner',
-  accent: 'bg-accent/20 text-accent shadow-inner',
+  neutral: 'bg-white text-accent shadow-[0_0_0_1px_rgba(99,102,241,0.2)]',
+  success: 'bg-white text-success shadow-[0_0_0_1px_rgba(99,102,241,0.2)]',
+  danger: 'bg-white text-danger shadow-[0_0_0_1px_rgba(99,102,241,0.2)]',
+  accent: 'bg-white text-accent shadow-[0_0_0_1px_rgba(99,102,241,0.2)]',
 };
 
 const tileBaseClasses =
-  'flex flex-col gap-3 rounded-3xl border p-5 shadow-lg shadow-slate-200/40 transition hover:-translate-y-0.5 hover:shadow-2xl';
+  'flex flex-col gap-3 rounded-3xl border-2 border-accent/50 p-5 shadow-[0_20px_45px_-25px_rgba(99,102,241,0.55)] transition hover:-translate-y-0.5 hover:shadow-[0_25px_55px_-20px_rgba(99,102,241,0.65)]';
 
 const SummaryTile: React.FC<SummaryTileProps> = ({ title, value, icon, tone, helper }) => (
   <div className={`${tileBaseClasses} ${backgroundByTone[tone]}`}>
