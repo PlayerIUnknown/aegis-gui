@@ -37,7 +37,7 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
     <div className="relative space-y-6">
       <span
         aria-hidden
-        className="pointer-events-none absolute left-4 top-8 bottom-8 hidden w-px bg-slate-800/60 md:block"
+        className="pointer-events-none absolute left-6 top-12 bottom-12 hidden w-px bg-slate-800/60 md:block"
       />
       {sortedRuns.map((run) => {
         const isOpen = run.id === openRunId;
@@ -52,11 +52,11 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
         };
 
         return (
-          <div key={run.id} className="relative pl-0 md:pl-14">
+          <div key={run.id} className="relative pl-0 md:pl-20">
             <span
               aria-hidden
               className={clsx(
-                'pointer-events-none absolute left-3 top-8 hidden h-3 w-3 rounded-full border-2 border-slate-950 md:block',
+                'pointer-events-none absolute left-5 top-11 hidden h-3 w-3 rounded-full border-2 border-slate-950 md:block',
                 run.qualityGatePassed === true
                   ? 'bg-success border-success/50 shadow-[0_0_0_4px_rgba(34,197,94,0.15)]'
                   : run.qualityGatePassed === false

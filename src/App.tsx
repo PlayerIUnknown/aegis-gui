@@ -13,11 +13,10 @@ import {
 import { BASE_URL } from './api/client';
 import { RepositoryList } from './components/RepositoryList';
 import { GlobalSummary } from './components/GlobalSummary';
-import { StatusPill } from './components/StatusPill';
-import { SummaryCard } from './components/SummaryCard';
 import { RunTimeline } from './components/RunTimeline';
 import { AuthWindow } from './components/AuthWindow';
 import { Icon } from './components/Icon';
+import { RepositoryOverview } from './components/RepositoryOverview';
 import {
   mapScan,
   mapScanDetails,
@@ -142,11 +141,15 @@ function App() {
     [processApiError],
   );
 
-  useEffect(() => {
+  const handleRefresh = useCallback(() => {
     if (token) {
       fetchInitialData(token);
     }
   }, [token, fetchInitialData]);
+
+  useEffect(() => {
+    handleRefresh();
+  }, [handleRefresh]);
 
   const repositories = useMemo<RepositoryGroup[]>(() => {
     const repoMap = new Map<string, RepositoryGroup>();
@@ -233,8 +236,6 @@ function App() {
 
     return filteredRepositories.find((repo) => repo.id === activeRepositoryId) ?? filteredRepositories[0];
   }, [filteredRepositories, activeRepositoryId]);
-
-  const latestRun = activeRepository?.latestScan;
 
   const handleLoadScanDetails = useCallback(
     async (scanId: string) => {
@@ -340,9 +341,9 @@ function App() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-950 via-slate-950 to-slate-900 lg:flex-row">
-      <aside className="border-b border-slate-800/70 bg-slate-950/80 backdrop-blur lg:h-auto lg:w-72 lg:border-b-0 lg:border-r">
-        <div className="flex h-full flex-col gap-8 px-6 py-8">
+    <div className="flex min-h-svh flex-col bg-gradient-to-br from-slate-950 via-slate-950 to-slate-900 lg:flex-row">
+      <aside className="border-b border-slate-800/70 bg-slate-950/80 backdrop-blur lg:sticky lg:top-0 lg:h-svh lg:w-72 lg:border-b-0 lg:border-r">
+        <div className="flex h-full flex-col gap-8 overflow-y-auto px-6 py-8">
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/10 text-accent">
@@ -408,8 +409,8 @@ function App() {
         </div>
       </aside>
 
-      <main className="flex-1 overflow-x-hidden">
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-6 py-8">
+      <main className="flex flex-1 flex-col overflow-hidden lg:h-svh">
+        <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-10 overflow-y-auto px-6 py-8">
           <header className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="space-y-3">
               <p className="text-xs font-semibold uppercase tracking-[0.32em] text-accent">Security Posture Command Center</p>
@@ -431,23 +432,32 @@ function App() {
                   </span>
                 ))}
               </div>
-              {activeTab === 'dashboard' && (
-                <div className="relative w-full">
-                  <Icon
-                    name="search"
-                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
-                    width={18}
-                    height={18}
-                  />
-                  <input
-                    id="repo-search"
-                    value={search}
-                    onChange={(event) => setSearch(event.target.value)}
-                    placeholder="Filter by repository name"
-                    className="w-full rounded-2xl border border-slate-700/60 bg-slate-900/70 py-3 pl-11 pr-4 text-sm text-slate-100 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/40"
-                  />
-                </div>
-              )}
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+                {activeTab === 'dashboard' && (
+                  <div className="relative w-full sm:max-w-xs">
+                    <Icon
+                      name="search"
+                      className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
+                      width={18}
+                      height={18}
+                    />
+                    <input
+                      id="repo-search"
+                      value={search}
+                      onChange={(event) => setSearch(event.target.value)}
+                      placeholder="Filter by repository name"
+                      className="w-full rounded-2xl border border-slate-700/60 bg-slate-900/70 py-3 pl-11 pr-4 text-sm text-slate-100 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/40"
+                    />
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={handleRefresh}
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-700/60 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-300 transition hover:border-accent/60 hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent/40"
+                >
+                  <Icon name="refresh" width={16} height={16} /> Refresh data
+                </button>
+              </div>
             </div>
           </header>
 
@@ -510,78 +520,13 @@ function App() {
                 <div className="space-y-8">
                   {activeRepository ? (
                     <>
-                      {latestRun ? (
-                        <div className="rounded-3xl border border-slate-800/70 bg-slate-950/70 p-8 shadow-xl shadow-slate-950/40">
-                          <div className="flex flex-wrap items-start justify-between gap-6">
-                            <div className="max-w-2xl space-y-3">
-                              <div className="flex items-center gap-3">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/10 text-lg font-bold text-accent">
-                                  {activeRepository.repoName.slice(0, 2)}
-                                </div>
-                                <div>
-                                  <p className="text-sm font-semibold text-slate-100">{activeRepository.repoName}</p>
-                                  <p className="text-xs text-slate-400">
-                                    {activeRepository.scans.length} total {activeRepository.scans.length === 1 ? 'scan' : 'scans'} tracked
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
-                                {latestRun.repository.branch && (
-                                  <span className="inline-flex items-center gap-2 rounded-full border border-slate-700/60 bg-slate-900/60 px-3 py-1">
-                                    <Icon name="git-branch" width={14} height={14} /> Default branch · {latestRun.repository.branch}
-                                  </span>
-                                )}
-                                <span className="inline-flex items-center gap-2 rounded-full border border-slate-700/60 bg-slate-900/60 px-3 py-1">
-                                  <Icon name="clock" width={14} height={14} /> Last run • {dayjs(latestRun.timestamp).format('MMM D, YYYY h:mm A')}
-                                </span>
-                                {latestRun.repository.commitHash && (
-                                  <span className="inline-flex items-center gap-2 rounded-full border border-slate-700/60 bg-slate-900/60 px-3 py-1">
-                                    <Icon name="hash" width={14} height={14} /> #{latestRun.repository.commitHash.slice(0, 8)}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                            <StatusPill qualityGatePassed={latestRun.qualityGatePassed} />
-                          </div>
-
-                          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                            <SummaryCard
-                              title="Code Vulnerabilities"
-                              value={latestRun.summary.codeVulnerabilities}
-                              intent={latestRun.summary.codeVulnerabilities > 0 ? 'danger' : 'neutral'}
-                              subtitle="Static analysis findings across the latest scan."
-                            />
-                            <SummaryCard
-                              title="Supply Chain Findings"
-                              value={latestRun.summary.vulnerabilitiesInPackages}
-                              intent={latestRun.summary.vulnerabilitiesInPackages > 0 ? 'warning' : 'neutral'}
-                              subtitle="Dependencies breaching the quality gate."
-                            />
-                            <SummaryCard
-                              title="Secrets Detected"
-                              value={latestRun.summary.secretsFound}
-                              intent={latestRun.summary.secretsFound > 0 ? 'danger' : 'neutral'}
-                              subtitle="Hard-coded secrets flagged by the pipeline."
-                            />
-                            <SummaryCard
-                              title="Packages Cataloged"
-                              value={latestRun.summary.packagesFound}
-                              intent="neutral"
-                              subtitle="Inventory derived from SBOM scans."
-                            />
-                          </div>
-                        </div>
-                      ) : (
-                        <p className="rounded-3xl border border-slate-800/70 bg-slate-950/60 p-6 text-sm text-slate-400">
-                          No scans recorded for this repository yet.
-                        </p>
-                      )}
+                      <RepositoryOverview repository={activeRepository} />
 
                       {activeRepository.scans.length > 0 ? (
                         <div className="space-y-4">
                           <div>
-                            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Activity</p>
-                            <h2 className="text-xl font-semibold text-slate-100">Pipeline history</h2>
+                            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Commit history</p>
+                            <h2 className="text-xl font-semibold text-slate-100">Pipeline runs</h2>
                             <p className="mt-2 text-sm text-slate-400">
                               Expand a run to inspect tool findings and quality gate outcomes for each commit.
                             </p>

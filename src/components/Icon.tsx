@@ -17,6 +17,7 @@ export type IconName =
   | 'link'
   | 'package'
   | 'package-export'
+  | 'refresh'
   | 'search'
   | 'shield'
   | 'check-circle'
@@ -132,6 +133,12 @@ const iconPaths: Record<IconName, JSX.Element> = {
       <path d="M12 21V11" />
       <path d="m3 7 9 5 9-5-9-5-9 5z" />
       <polyline points="12 3 12 8 15 6.5" />
+    </>
+  ),
+  refresh: (
+    <>
+      <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+      <polyline points="23 4 21 6 19 4" />
     </>
   ),
   search: (
