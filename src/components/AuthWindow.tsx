@@ -52,12 +52,12 @@ export function AuthWindow({ onAuthenticated }: AuthWindowProps) {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-100 via-slate-200 to-slate-300 px-6 py-10 dark:from-charcoal dark:via-slate-950 dark:to-slate-900">
-      <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-10 shadow-2xl shadow-slate-200/40 dark:border-slate-800/60 dark:bg-slate-950/70 dark:shadow-black/30">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-100 via-slate-200 to-slate-300 px-6 py-10">
+      <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-10 shadow-2xl shadow-slate-200/40">
         <div className="mb-8 text-center">
           <p className="text-xs uppercase tracking-[0.4em] text-accent">Aegis</p>
-          <h1 className="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">Security Command Center</h1>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+          <h1 className="mt-2 text-2xl font-semibold text-slate-900">Security Command Center</h1>
+          <p className="mt-2 text-sm text-slate-600">
             Sign in with your Config API credentials to explore scan data for your tenant.
           </p>
         </div>
@@ -69,7 +69,7 @@ export function AuthWindow({ onAuthenticated }: AuthWindowProps) {
             className={`rounded-full px-4 py-2 text-sm font-medium transition ${
               mode === 'signin'
                 ? 'bg-accent text-slate-950 shadow shadow-accent/40'
-                : 'bg-slate-100 text-slate-600 hover:text-slate-900 dark:bg-transparent dark:text-slate-400 dark:hover:text-slate-200'
+                : 'bg-slate-100 text-slate-600 hover:text-slate-900'
             }`}
           >
             Sign in
@@ -80,7 +80,7 @@ export function AuthWindow({ onAuthenticated }: AuthWindowProps) {
             className={`rounded-full px-4 py-2 text-sm font-medium transition ${
               mode === 'signup'
                 ? 'bg-accent text-slate-950 shadow shadow-accent/40'
-                : 'bg-slate-100 text-slate-600 hover:text-slate-900 dark:bg-transparent dark:text-slate-400 dark:hover:text-slate-200'
+                : 'bg-slate-100 text-slate-600 hover:text-slate-900'
             }`}
           >
             Sign up
@@ -90,13 +90,13 @@ export function AuthWindow({ onAuthenticated }: AuthWindowProps) {
         <form className="space-y-5" onSubmit={handleSubmit}>
           {mode === 'signup' && (
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Name</label>
+              <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Name</label>
               <input
                 type="text"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
                 placeholder="Your name"
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30 dark:border-slate-800/70 dark:bg-slate-900/80 dark:text-slate-100 dark:focus:ring-accent/40"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30"
                 autoComplete="name"
                 required
               />
@@ -104,26 +104,26 @@ export function AuthWindow({ onAuthenticated }: AuthWindowProps) {
           )}
 
           <div>
-            <label className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Email</label>
+            <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Email</label>
             <input
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="you@example.com"
-              className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30 dark:border-slate-800/70 dark:bg-slate-900/80 dark:text-slate-100 dark:focus:ring-accent/40"
+              className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30"
               autoComplete={mode === 'signin' ? 'email' : 'new-email'}
               required
             />
           </div>
 
           <div>
-            <label className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Password</label>
+            <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Password</label>
             <input
               type="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               placeholder="Enter your password"
-              className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30 dark:border-slate-800/70 dark:bg-slate-900/80 dark:text-slate-100 dark:focus:ring-accent/40"
+              className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30"
               autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
               required
             />
@@ -131,21 +131,21 @@ export function AuthWindow({ onAuthenticated }: AuthWindowProps) {
 
           {mode === 'signup' && (
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Confirm Password</label>
+              <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Confirm Password</label>
               <input
                 type="password"
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
                 placeholder="Confirm your password"
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30 dark:border-slate-800/70 dark:bg-slate-900/80 dark:text-slate-100 dark:focus:ring-accent/40"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30"
                 autoComplete="new-password"
                 required
               />
             </div>
           )}
 
-          {error && <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-transparent dark:bg-red-500/10 dark:text-red-300">{error}</p>}
-          {message && <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-600 dark:border-transparent dark:bg-emerald-500/10 dark:text-emerald-300">{message}</p>}
+          {error && <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">{error}</p>}
+          {message && <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-600">{message}</p>}
 
           <button
             type="submit"
