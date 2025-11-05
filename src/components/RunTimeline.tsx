@@ -54,7 +54,7 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
     <div className="relative space-y-6 overflow-hidden">
       <span
         aria-hidden
-        className="pointer-events-none absolute left-6 top-12 bottom-12 hidden w-px bg-slate-200 md:block"
+        className="pointer-events-none absolute left-6 top-12 bottom-12 hidden w-px bg-accent/30 md:block"
       />
       {sortedRuns.map((run) => {
         const isOpen = run.id === openRunId;
@@ -81,7 +81,7 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                   : 'bg-warning/80 border-warning/60 shadow-[0_0_0_4px_rgba(250,204,21,0.12)]',
               )}
             />
-            <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/40">
+            <div className="overflow-hidden rounded-3xl border-2 border-accent/40 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_45px_90px_-50px_rgba(99,102,241,0.8)]">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/10 text-accent">
@@ -115,7 +115,7 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                   <StatusPill qualityGatePassed={run.qualityGatePassed} />
                   <button
                     onClick={handleToggle}
-                    className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-700 transition hover:border-accent/60 hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
+                    className="flex items-center gap-2 rounded-full border-2 border-accent/40 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-700 transition hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
                     aria-expanded={isOpen}
                     type="button"
                   >
@@ -141,7 +141,7 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                     <DetailStat label="Critical" value={run.summary.criticalSeverity} />
                   </div>
                   {isLoading && (
-                    <p className="rounded-2xl border border-slate-200 bg-slate-100 p-4 text-sm text-slate-600">
+                    <p className="rounded-2xl border-2 border-accent/40 bg-slate-100 p-4 text-sm text-slate-600">
                       Loading tool results…
                     </p>
                   )}
@@ -167,7 +167,7 @@ type DetailStatProps = {
 };
 
 const DetailStat: React.FC<DetailStatProps> = ({ label, value }) => (
-  <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+  <div className="rounded-2xl border-2 border-accent/40 bg-gradient-to-br from-white via-slate-50 to-white p-4 shadow-[0_20px_45px_-35px_rgba(99,102,241,0.7)]">
     <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p>
     <p className="mt-1 text-xl font-semibold text-slate-900">{value}</p>
   </div>

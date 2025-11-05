@@ -10,7 +10,7 @@ type RepositoryOverviewProps = {
 export const RepositoryOverview: React.FC<RepositoryOverviewProps> = ({ repository }) => {
   if (!repository) {
     return (
-      <p className="rounded-3xl border border-slate-200 bg-white p-6 text-sm text-slate-600 shadow-sm">
+      <p className="rounded-3xl border-2 border-accent/40 bg-white p-6 text-sm text-slate-600 shadow-[0_20px_40px_-30px_rgba(99,102,241,0.55)]">
         Select a repository on the left to view its recent activity.
       </p>
     );
@@ -27,7 +27,7 @@ export const RepositoryOverview: React.FC<RepositoryOverviewProps> = ({ reposito
   const runningRuns = repository.scans.filter((scan) => scan.status === 'running').length;
 
   return (
-    <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/40">
+    <section className="space-y-5 rounded-3xl border-2 border-accent/40 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_40px_80px_-45px_rgba(99,102,241,0.75)]">
       <div className="flex flex-wrap items-start justify-between gap-6">
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Repository overview</p>
@@ -36,6 +36,13 @@ export const RepositoryOverview: React.FC<RepositoryOverviewProps> = ({ reposito
         </div>
         {latestRun && <StatusPill qualityGatePassed={latestRun.qualityGatePassed} />}
       </div>
+
+      {latestRun && (
+        <div className="flex items-center gap-3 rounded-2xl border-2 border-accent/40 bg-accent/5 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-accent">
+          <Icon name="shield" width={16} height={16} />
+          Quality gate snapshot · {latestRun.qualityGatePassed === true ? 'Passed' : latestRun.qualityGatePassed === false ? 'Failed' : 'Pending'} · Status {latestRun.status}
+        </div>
+      )}
 
       <dl className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <RepositoryStat icon="activity" label="Total runs" value={totalRuns} />
@@ -90,13 +97,14 @@ type RepositoryStatProps = {
 };
 
 const toneStyles: Record<NonNullable<RepositoryStatProps['tone']>, string> = {
-  default: 'border-slate-200 bg-white text-slate-900',
+  default:
+    'border-accent/40 bg-gradient-to-br from-white via-slate-50 to-slate-100 text-slate-900',
   success:
-    'border-success/40 bg-success/10 text-success',
+    'border-accent/40 bg-gradient-to-br from-success/10 via-success/10 to-white text-success',
   danger:
-    'border-danger/40 bg-danger/10 text-danger',
+    'border-accent/40 bg-gradient-to-br from-danger/10 via-danger/5 to-white text-danger',
   warning:
-    'border-warning/40 bg-warning/10 text-warning',
+    'border-accent/40 bg-gradient-to-br from-warning/10 via-warning/5 to-white text-warning',
 };
 
 const iconToneStyles: Record<NonNullable<RepositoryStatProps['tone']>, string> = {
@@ -107,7 +115,7 @@ const iconToneStyles: Record<NonNullable<RepositoryStatProps['tone']>, string> =
 };
 
 const RepositoryStat: React.FC<RepositoryStatProps> = ({ icon, label, value, helper, tone = 'default' }) => (
-  <div className={`rounded-3xl border p-5 shadow-lg shadow-slate-950/30 ${toneStyles[tone]}`}>
+  <div className={`rounded-3xl border-2 p-5 shadow-[0_25px_50px_-35px_rgba(99,102,241,0.7)] ${toneStyles[tone]}`}>
     <div className={`mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl ${iconToneStyles[tone]}`}>
       <Icon name={icon} width={18} height={18} />
     </div>
