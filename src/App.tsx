@@ -379,14 +379,9 @@ function App() {
       <aside className="border-b border-accent/30 bg-white/80 backdrop-blur lg:sticky lg:top-0 lg:h-svh lg:w-72 lg:border-b-0 lg:border-r lg:border-accent/30">
         <div className="flex h-full flex-col gap-8 overflow-y-auto px-6 py-8">
           <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/10 text-accent">
-                <Icon name="shield" width={22} height={22} />
-              </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.32em] text-accent">Aegis</p>
-                <p className="text-sm font-semibold text-slate-900">Security Posture</p>
-              </div>
+            <div className="space-y-1">
+              <p className="text-sm font-semibold uppercase tracking-[0.32em] text-accent">Aegis</p>
+              <p className="text-lg font-semibold text-slate-900">Security Posture</p>
             </div>
             <p className="text-xs text-slate-500">
               Monitor scan activity, track quality gate performance, and configure CI ingestion for your tenant.
