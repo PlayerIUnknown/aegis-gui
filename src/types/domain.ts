@@ -51,11 +51,33 @@ export const mapSummary = (summary: ScanSummary): ScanSummaryView => ({
   lowSeverity: summary.low_severity,
 });
 
+const normalizeQualityGateValue = (value: unknown): boolean | null => {
+  if (value === true) {
+    return true;
+  }
+
+  if (value === false) {
+    return false;
+  }
+
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === 'passed' || normalized === 'pass' || normalized === 'success') {
+      return true;
+    }
+    if (normalized === 'failed' || normalized === 'fail' || normalized === 'error') {
+      return false;
+    }
+  }
+
+  return null;
+};
+
 export const mapScan = (scan: ScanListItem): ScanView => ({
   id: scan.id,
   timestamp: scan.timestamp,
   status: scan.status,
-  qualityGatePassed: scan.quality_gate_passed,
+  qualityGatePassed: normalizeQualityGateValue(scan.quality_gate_passed),
   qualityGateReasons: scan.quality_gate_reasons,
   summary: mapSummary(scan.summary),
   repository: {
@@ -71,7 +93,7 @@ export const mapScanDetails = (details: ScanDetailsResponse): ScanDetailsView =>
   id: details.id,
   timestamp: details.timestamp,
   status: details.status_text,
-  qualityGatePassed: details.quality_gate_passed,
+  qualityGatePassed: normalizeQualityGateValue(details.quality_gate_passed),
   qualityGateReasons: details.quality_gate_reasons,
   summary: mapSummary(details.summary),
   repository: {
