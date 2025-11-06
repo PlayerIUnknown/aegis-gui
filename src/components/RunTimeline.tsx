@@ -130,7 +130,7 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
               </div>
               {isOpen && (
                 <div className="mt-6 space-y-6">
-                  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     <DetailStat
                       label="Packages"
                       value={run.summary.packagesFound}
@@ -206,7 +206,7 @@ const statIconBackgroundByTone: Record<DetailStatProps['tone'], string> = {
 
 const DetailStat: React.FC<DetailStatProps> = ({ label, value, tone, icon }) => (
   <div
-    className={`flex h-full min-h-[128px] min-w-0 flex-col justify-between gap-4 rounded-3xl border-2 border-accent/30 p-4 shadow-[0_20px_45px_-35px_rgba(99,102,241,0.7)] transition hover:-translate-y-0.5 hover:shadow-[0_28px_60px_-30px_rgba(99,102,241,0.75)] ${statBackgroundByTone[tone]}`}
+    className={`flex h-full min-w-0 flex-col gap-5 rounded-3xl border-2 border-accent/30 p-4 shadow-[0_20px_45px_-35px_rgba(99,102,241,0.7)] transition hover:-translate-y-0.5 hover:shadow-[0_28px_60px_-30px_rgba(99,102,241,0.75)] ${statBackgroundByTone[tone]}`}
   >
     <div className="flex items-center gap-3">
       <span className={`flex h-10 w-10 items-center justify-center rounded-2xl ${statIconBackgroundByTone[tone]}`}>
