@@ -498,7 +498,7 @@ function App() {
                   onClick={handleRefresh}
                   className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-accent/40 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-700 transition hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
                 >
-                  <Icon name="refresh" width={16} height={16} /> Refresh data
+                  <Icon name="refresh" width={16} height={16} /> Refresh
                 </button>
               </div>
             </div>

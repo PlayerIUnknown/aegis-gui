@@ -2,8 +2,11 @@ import { useState } from 'react';
 import type { JSX } from 'react';
 import { Icon } from './Icon';
 
+export type ToolCategoryFilter = 'packages' | 'packageVulnerabilities' | 'codeFindings' | 'secrets';
+
 type ToolFindingsPanelProps = {
   tools?: Record<string, { output: unknown[] }>;
+  activeFilter?: ToolCategoryFilter | null;
 };
 
 const toolIconMap: Record<string, JSX.Element> = {
@@ -95,7 +98,19 @@ const formatFixVersions = (fix: unknown): string | null => {
   return null;
 };
 
-export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools }) => {
+const filterMatchers: Record<ToolCategoryFilter, string[]> = {
+  packages: ['sbom'],
+  packageVulnerabilities: ['sca', 'package'],
+  codeFindings: ['vulnerability'],
+  secrets: ['secret'],
+};
+
+const matchesFilter = (toolName: string, filter: ToolCategoryFilter) => {
+  const normalizedName = toolName.toLowerCase();
+  return filterMatchers[filter].some((matcher) => normalizedName.includes(matcher));
+};
+
+export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, activeFilter }) => {
   const [expandedSnippets, setExpandedSnippets] = useState<Record<string, boolean>>({});
 
   if (!tools || Object.keys(tools).length === 0) {
@@ -112,9 +127,18 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools }) =
 
   const isSnippetExpanded = (key: string) => Boolean(expandedSnippets[key]);
 
+  const entries = Object.entries(tools);
+  const filteredEntries = activeFilter ? entries.filter(([toolName]) => matchesFilter(toolName, activeFilter)) : entries;
+  const entriesToRender = filteredEntries;
+
   return (
     <div className="space-y-4">
-      {Object.entries(tools).map(([toolName, toolData]) => (
+      {entriesToRender.length === 0 && activeFilter && (
+        <p className="rounded-2xl border-2 border-accent/30 bg-slate-100 p-4 text-sm text-slate-600 shadow-[0_20px_40px_-30px_rgba(99,102,241,0.65)]">
+          No tool results match the selected summary filter.
+        </p>
+      )}
+      {entriesToRender.map(([toolName, toolData]) => (
         <div
           key={toolName}
           className="max-w-full overflow-hidden rounded-3xl border-2 border-accent/40 bg-white p-6 shadow-[0_30px_65px_-45px_rgba(99,102,241,0.8)]"

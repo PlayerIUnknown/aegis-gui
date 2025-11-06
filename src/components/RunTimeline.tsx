@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import type { ScanDetailsView, ScanView } from '../types/domain';
 import { StatusPill } from './StatusPill';
-import { ToolFindingsPanel } from './ToolFindingsPanel';
+import { ToolFindingsPanel, type ToolCategoryFilter } from './ToolFindingsPanel';
 import { Icon, type IconName } from './Icon';
 import { formatTimestamp, timestampToValue } from '../utils/timestamps';
 
@@ -24,6 +24,7 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
     [runs],
   );
   const [openRunId, setOpenRunId] = useState<string | undefined>(sortedRuns[0]?.id);
+  const [activeToolFilter, setActiveToolFilter] = useState<ToolCategoryFilter | null>(null);
 
   useEffect(() => {
     if (sortedRuns.length === 0) {
@@ -63,9 +64,14 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
         const handleToggle = () => {
           const nextOpen = isOpen ? undefined : run.id;
           setOpenRunId(nextOpen);
+          setActiveToolFilter(null);
           if (!isOpen && !details) {
             onLoadDetails(run.id);
           }
+        };
+
+        const handleFilterToggle = (filter: ToolCategoryFilter) => {
+          setActiveToolFilter((current) => (current === filter ? null : filter));
         };
 
         return (
@@ -136,24 +142,32 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                       value={run.summary.packagesFound}
                       tone="accent"
                       icon="package"
+                      isActive={activeToolFilter === 'packages'}
+                      onClick={() => handleFilterToggle('packages')}
                     />
                     <DetailStat
-                      label="Vulnerable packages"
+                      label="Package vulnerabilities"
                       value={run.summary.vulnerabilitiesInPackages}
                       tone="warning"
                       icon="package-export"
+                      isActive={activeToolFilter === 'packageVulnerabilities'}
+                      onClick={() => handleFilterToggle('packageVulnerabilities')}
                     />
                     <DetailStat
                       label="Code findings"
                       value={run.summary.codeVulnerabilities}
                       tone="neutral"
                       icon="code"
+                      isActive={activeToolFilter === 'codeFindings'}
+                      onClick={() => handleFilterToggle('codeFindings')}
                     />
                     <DetailStat
                       label="Secrets"
                       value={run.summary.secretsFound}
                       tone="danger"
                       icon="key"
+                      isActive={activeToolFilter === 'secrets'}
+                      onClick={() => handleFilterToggle('secrets')}
                     />
                     <DetailStat label="Low" value={run.summary.lowSeverity} tone="success" icon="sparkle" />
                     <DetailStat label="Medium" value={run.summary.mediumSeverity} tone="warning" icon="sun" />
@@ -165,7 +179,7 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                       Loading tool results…
                     </p>
                   )}
-                  {!isLoading && <ToolFindingsPanel tools={details?.tools} />}
+                  {!isLoading && <ToolFindingsPanel tools={details?.tools} activeFilter={activeToolFilter} />}
                   {run.targetPath && (
                     <p className="text-xs text-slate-500">
                       Target path: <span className="font-mono text-slate-800">{run.targetPath}</span>
@@ -186,6 +200,8 @@ type DetailStatProps = {
   value: number | string;
   tone: 'neutral' | 'accent' | 'warning' | 'danger' | 'success';
   icon: IconName;
+  isActive?: boolean;
+  onClick?: () => void;
 };
 
 const statBackgroundByTone: Record<DetailStatProps['tone'], string> = {
@@ -204,16 +220,45 @@ const statIconBackgroundByTone: Record<DetailStatProps['tone'], string> = {
   success: 'bg-white text-success shadow-[0_0_0_1px_rgba(99,102,241,0.18)]',
 };
 
-const DetailStat: React.FC<DetailStatProps> = ({ label, value, tone, icon }) => (
-  <div
-    className={`flex h-full min-w-0 flex-col gap-5 rounded-3xl border-2 border-accent/30 p-4 shadow-[0_20px_45px_-35px_rgba(99,102,241,0.7)] transition hover:-translate-y-0.5 hover:shadow-[0_28px_60px_-30px_rgba(99,102,241,0.75)] ${statBackgroundByTone[tone]}`}
-  >
-    <div className="flex items-center gap-3">
-      <span className={`flex h-10 w-10 items-center justify-center rounded-2xl ${statIconBackgroundByTone[tone]}`}>
-        <Icon name={icon} width={18} height={18} />
-      </span>
-      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">{label}</p>
+const DetailStat: React.FC<DetailStatProps> = ({ label, value, tone, icon, isActive = false, onClick }) => {
+  const content = (
+    <>
+      <div className="flex items-center gap-3">
+        <span className={clsx('flex h-10 w-10 items-center justify-center rounded-2xl', statIconBackgroundByTone[tone])}>
+          <Icon name={icon} width={18} height={18} />
+        </span>
+        <p className="text-[11px] font-semibold uppercase leading-4 tracking-[0.18em] text-slate-500">{label}</p>
+      </div>
+      <p className="break-words text-lg font-semibold leading-tight text-slate-900 sm:text-xl">{value}</p>
+    </>
+  );
+
+  if (typeof onClick === 'function') {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className={clsx(
+          'flex h-full min-w-0 flex-col justify-between gap-4 rounded-3xl border-2 border-accent/30 p-4 text-left shadow-[0_20px_45px_-35px_rgba(99,102,241,0.7)] transition focus:outline-none focus:ring-2 focus:ring-accent/30 focus:ring-offset-2',
+          statBackgroundByTone[tone],
+          'cursor-pointer hover:-translate-y-0.5 hover:shadow-[0_28px_60px_-30px_rgba(99,102,241,0.75)]',
+          isActive && 'border-accent/70 shadow-[0_30px_65px_-40px_rgba(99,102,241,0.85)] ring-2 ring-inset ring-accent/20',
+        )}
+        aria-pressed={isActive}
+      >
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <div
+      className={clsx(
+        'flex h-full min-w-0 flex-col justify-between gap-4 rounded-3xl border-2 border-accent/30 p-4 text-left shadow-[0_20px_45px_-35px_rgba(99,102,241,0.7)]',
+        statBackgroundByTone[tone],
+      )}
+    >
+      {content}
     </div>
-    <p className="text-lg font-semibold text-slate-900 sm:text-xl">{value}</p>
-  </div>
-);
+  );
+};
