@@ -229,7 +229,9 @@ const DetailStat: React.FC<DetailStatProps> = ({ label, value, tone, icon, isAct
         </span>
         <p className="text-[11px] font-semibold uppercase leading-4 tracking-[0.18em] text-slate-500">{label}</p>
       </div>
-      <p className="break-words text-lg font-semibold leading-tight text-slate-900 sm:text-xl">{value}</p>
+      <p className="break-words text-[clamp(1.125rem,1.6vw+0.5rem,1.75rem)] font-semibold leading-tight text-slate-900">
+        {value}
+      </p>
     </>
   );
 
