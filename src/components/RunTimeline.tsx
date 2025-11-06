@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import type { ScanDetailsView, ScanView } from '../types/domain';
 import { StatusPill } from './StatusPill';
 import { ToolFindingsPanel, type ToolCategoryFilter } from './ToolFindingsPanel';
-import { Icon, type IconName } from './Icon';
+import { Icon } from './Icon';
 import { formatTimestamp, timestampToValue } from '../utils/timestamps';
 
 type RunTimelineProps = {
@@ -141,7 +141,6 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                       label="Packages"
                       value={run.summary.packagesFound}
                       tone="accent"
-                      icon="package"
                       isActive={activeToolFilter === 'packages'}
                       onClick={() => handleFilterToggle('packages')}
                     />
@@ -149,7 +148,6 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                       label="Package vulnerabilities"
                       value={run.summary.vulnerabilitiesInPackages}
                       tone="warning"
-                      icon="package-export"
                       isActive={activeToolFilter === 'packageVulnerabilities'}
                       onClick={() => handleFilterToggle('packageVulnerabilities')}
                     />
@@ -157,7 +155,6 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                       label="Code findings"
                       value={run.summary.codeVulnerabilities}
                       tone="neutral"
-                      icon="code"
                       isActive={activeToolFilter === 'codeFindings'}
                       onClick={() => handleFilterToggle('codeFindings')}
                     />
@@ -165,14 +162,13 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                       label="Secrets"
                       value={run.summary.secretsFound}
                       tone="danger"
-                      icon="key"
                       isActive={activeToolFilter === 'secrets'}
                       onClick={() => handleFilterToggle('secrets')}
                     />
-                    <DetailStat label="Low" value={run.summary.lowSeverity} tone="success" icon="sparkle" />
-                    <DetailStat label="Medium" value={run.summary.mediumSeverity} tone="warning" icon="sun" />
-                    <DetailStat label="High" value={run.summary.highSeverity} tone="danger" icon="alert" />
-                    <DetailStat label="Critical" value={run.summary.criticalSeverity} tone="danger" icon="x-circle" />
+                    <DetailStat label="Low" value={run.summary.lowSeverity} tone="success" />
+                    <DetailStat label="Medium" value={run.summary.mediumSeverity} tone="warning" />
+                    <DetailStat label="High" value={run.summary.highSeverity} tone="danger" />
+                    <DetailStat label="Critical" value={run.summary.criticalSeverity} tone="danger" />
                   </div>
                   {isLoading && (
                     <p className="rounded-2xl border-2 border-accent/40 bg-slate-100 p-4 text-sm text-slate-600">
@@ -199,7 +195,6 @@ type DetailStatProps = {
   label: string;
   value: number | string;
   tone: 'neutral' | 'accent' | 'warning' | 'danger' | 'success';
-  icon: IconName;
   isActive?: boolean;
   onClick?: () => void;
 };
@@ -212,25 +207,12 @@ const statBackgroundByTone: Record<DetailStatProps['tone'], string> = {
   success: 'bg-gradient-to-br from-success/10 via-success/5 to-white text-slate-900',
 };
 
-const statIconBackgroundByTone: Record<DetailStatProps['tone'], string> = {
-  neutral: 'bg-white text-accent shadow-[0_0_0_1px_rgba(99,102,241,0.15)]',
-  accent: 'bg-white text-accent shadow-[0_0_0_1px_rgba(99,102,241,0.2)]',
-  warning: 'bg-white text-warning shadow-[0_0_0_1px_rgba(99,102,241,0.18)]',
-  danger: 'bg-white text-danger shadow-[0_0_0_1px_rgba(99,102,241,0.18)]',
-  success: 'bg-white text-success shadow-[0_0_0_1px_rgba(99,102,241,0.18)]',
-};
-
-const DetailStat: React.FC<DetailStatProps> = ({ label, value, tone, icon, isActive = false, onClick }) => {
+const DetailStat: React.FC<DetailStatProps> = ({ label, value, tone, isActive = false, onClick }) => {
   const content = (
     <>
-      <div className="flex min-w-0 items-center gap-3">
-        <span className={clsx('flex h-10 w-10 items-center justify-center rounded-2xl', statIconBackgroundByTone[tone])}>
-          <Icon name={icon} width={18} height={18} />
-        </span>
-        <p className="min-w-0 flex-1 break-words text-[11px] font-semibold uppercase leading-4 tracking-[0.18em] text-slate-500">
-          {label}
-        </p>
-      </div>
+      <p className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[11px] font-semibold uppercase leading-4 tracking-[0.18em] text-slate-500">
+        {label}
+      </p>
       <p className="break-words text-[clamp(1.125rem,1.6vw+0.5rem,1.75rem)] font-semibold leading-tight text-slate-900">
         {value}
       </p>
