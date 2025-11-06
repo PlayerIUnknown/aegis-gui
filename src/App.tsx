@@ -618,24 +618,26 @@ function App() {
 
                 <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
                   <div className="space-y-6">
-                    <div className="rounded-3xl border-2 border-accent/50 bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-800 p-5 text-white shadow-[0_30px_70px_-50px_rgba(30,41,59,0.85)]">
+                    <div className="rounded-3xl border-2 border-accent/40 bg-gradient-to-br from-white via-slate-50 to-white p-5 shadow-[0_30px_70px_-50px_rgba(99,102,241,0.85)]">
                       <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <p className="text-xs font-semibold uppercase tracking-wide text-indigo-100">Scanner API key</p>
-                          <p className="mt-2 break-all font-mono text-sm text-white">
-                            {profile?.api_key ?? 'Not provisioned yet'}
-                          </p>
+                        <div className="flex-1 space-y-3">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Scanner API key</p>
+                          <div className="rounded-2xl border border-indigo-600/50 bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-800 px-4 py-3 text-white shadow-[0_18px_45px_-35px_rgba(30,41,59,0.85)]">
+                            <p className="break-all font-mono text-sm text-white">
+                              {profile?.api_key ?? 'Not provisioned yet'}
+                            </p>
+                          </div>
                         </div>
                         <button
                           type="button"
                           onClick={handleCopyApiKey}
-                          className="inline-flex items-center gap-2 rounded-full border-2 border-accent/40 bg-indigo-800/80 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-white transition hover:border-accent/60 hover:text-accent"
+                          className="inline-flex items-center gap-2 rounded-full border-2 border-accent/30 bg-white/80 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-indigo-700 transition hover:border-accent/60 hover:text-accent"
                         >
                           <Icon name="link" width={14} height={14} /> Copy
                         </button>
                       </div>
                       {copyMessage && (
-                        <p className="mt-3 rounded-2xl border-2 border-accent/30 bg-indigo-900 px-3 py-2 text-xs text-indigo-100 shadow-[0_12px_24px_-18px_rgba(30,41,59,0.6)]">{copyMessage}</p>
+                        <p className="mt-3 rounded-2xl border border-accent/30 bg-indigo-900 px-3 py-2 text-xs text-indigo-100 shadow-[0_12px_24px_-18px_rgba(30,41,59,0.6)]">{copyMessage}</p>
                       )}
                     </div>
 
@@ -657,30 +659,30 @@ function App() {
                     </div>
                   </div>
 
-                  <div className="rounded-3xl border-2 border-accent/50 bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-800 p-6 text-white shadow-[0_30px_70px_-50px_rgba(30,41,59,0.85)]">
+                  <div className="rounded-3xl border-2 border-accent/40 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_30px_70px_-50px_rgba(99,102,241,0.85)]">
                     <div className="flex flex-wrap items-start justify-between gap-4">
-                      <div className="space-y-2">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-indigo-100">GitHub Actions snippet</p>
-                        <p className="text-sm text-indigo-100">
-                          Add this step to your workflow and store the API key as <code className="font-mono text-white">AEGIS_API_KEY</code>.
+                      <div className="space-y-2 text-slate-600">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">GitHub Actions snippet</p>
+                        <p className="text-sm">
+                          Add this step to your workflow and store the API key as <code className="font-mono text-indigo-900">AEGIS_API_KEY</code>.
                         </p>
-                        <p className="text-xs text-indigo-100/90">
+                        <p className="text-xs">
                           Copy the workflow as-is and paste it into your CI configuration. Update the image tag or target path whenever needed.
                         </p>
                       </div>
                       <button
                         type="button"
                         onClick={handleCopyActionsSnippet}
-                        className="inline-flex items-center gap-2 rounded-full border-2 border-accent/40 bg-indigo-800/80 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-white transition hover:border-accent/60 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+                        className="inline-flex items-center gap-2 rounded-full border-2 border-accent/30 bg-white/80 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-indigo-700 transition hover:border-accent/60 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
                       >
                         <Icon name="link" width={14} height={14} /> Copy snippet
                       </button>
                     </div>
-                    <pre className="mt-4 max-h-[420px] overflow-auto rounded-2xl border-2 border-indigo-700 bg-indigo-950 p-4 text-xs text-white shadow-[0_25px_55px_-35px_rgba(30,41,59,0.75)]">
+                    <pre className="mt-4 max-h-[420px] overflow-auto rounded-2xl border border-indigo-600/60 bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-800 p-4 text-xs text-white shadow-[0_25px_55px_-35px_rgba(30,41,59,0.75)]">
 {actionsSnippet}
                     </pre>
                     {snippetCopyMessage && (
-                      <p className="mt-3 rounded-2xl border-2 border-accent/30 bg-indigo-900 px-3 py-2 text-xs text-indigo-100 shadow-[0_12px_24px_-18px_rgba(30,41,59,0.6)]">
+                      <p className="mt-3 rounded-2xl border border-accent/30 bg-indigo-900 px-3 py-2 text-xs text-indigo-100 shadow-[0_12px_24px_-18px_rgba(30,41,59,0.6)]">
                         {snippetCopyMessage}
                       </p>
                     )}
