@@ -235,11 +235,11 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools }) =
                         <Icon name={expanded ? 'chevron-up' : 'chevron-down'} width={12} height={12} />
                       </button>
                       {expanded && (
-                        <div className="space-y-2 rounded-2xl border border-slate-800 bg-slate-900/95 p-4 text-xs text-slate-100">
-                          <p className="font-mono text-[11px] uppercase tracking-wide text-slate-400">
+                        <div className="space-y-2 rounded-2xl border border-indigo-600/60 bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-800 p-4 text-xs text-indigo-100 shadow-[0_25px_55px_-35px_rgba(30,41,59,0.75)]">
+                          <p className="font-mono text-[11px] uppercase tracking-wide text-indigo-200">
                             {finding.file ?? 'Unknown file'}:{finding.line ?? '—'}
                           </p>
-                          <pre className="whitespace-pre-wrap break-all font-mono text-xs text-slate-100">{finding.match}</pre>
+                          <pre className="whitespace-pre-wrap break-all font-mono text-xs text-indigo-100">{finding.match}</pre>
                         </div>
                       )}
                     </div>
@@ -274,11 +274,11 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools }) =
                         <Icon name={expanded ? 'chevron-up' : 'chevron-down'} width={12} height={12} />
                       </button>
                       {expanded && (
-                        <div className="space-y-2 rounded-2xl border border-slate-800 bg-slate-900/95 p-4 text-xs text-slate-100">
-                          <p className="font-mono text-[11px] uppercase tracking-wide text-slate-400">
+                        <div className="space-y-2 rounded-2xl border border-indigo-600/60 bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-800 p-4 text-xs text-indigo-100 shadow-[0_25px_55px_-35px_rgba(30,41,59,0.75)]">
+                          <p className="font-mono text-[11px] uppercase tracking-wide text-indigo-200">
                             {finding.file ?? 'Unknown file'}:{finding.line ?? '—'}-{finding.end_line ?? finding.line ?? '—'}
                           </p>
-                          <pre className="whitespace-pre-wrap break-all font-mono text-xs text-slate-100">
+                          <pre className="whitespace-pre-wrap break-all font-mono text-xs text-indigo-100">
                             {finding.code_snippet ?? 'Snippet unavailable.'}
                           </pre>
                         </div>
