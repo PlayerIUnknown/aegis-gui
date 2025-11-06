@@ -84,26 +84,6 @@ const formatSeverity = (severity?: string) => {
   return normalized.charAt(0).toUpperCase() + normalized.slice(1);
 };
 
-const severityBadgeBaseClasses =
-  'inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide shadow-[0_12px_28px_-20px_rgba(15,23,42,0.75)]';
-
-const severityBadgeVariants: Record<string, string> = {
-  critical: 'border-rose-500/60 bg-rose-500/15 text-rose-100',
-  high: 'border-orange-500/60 bg-orange-500/15 text-orange-100',
-  medium: 'border-amber-400/60 bg-amber-400/15 text-amber-100',
-  low: 'border-emerald-400/60 bg-emerald-400/15 text-emerald-100',
-  info: 'border-sky-400/60 bg-sky-400/15 text-sky-100',
-  default: 'border-slate-600/60 bg-slate-700/30 text-slate-200',
-};
-
-const getSeverityBadgeClasses = (severity?: string) => {
-  if (!severity) {
-    return `${severityBadgeBaseClasses} ${severityBadgeVariants.default}`;
-  }
-  const normalized = severity.toLowerCase();
-  return `${severityBadgeBaseClasses} ${severityBadgeVariants[normalized] ?? severityBadgeVariants.default}`;
-};
-
 const formatFixVersions = (fix: unknown): string | null => {
   if (Array.isArray(fix)) {
     const fixes = fix.filter((value): value is string => typeof value === 'string');
@@ -170,31 +150,31 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools }) =
                   return (
                     <div
                       key={key}
-                      className="space-y-3 rounded-2xl border border-slate-700 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-4 text-sm text-slate-200 shadow-[0_28px_55px_-40px_rgba(15,23,42,0.85)]"
+                      className="space-y-3 rounded-2xl border-2 border-accent/30 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_15px_30px_-25px_rgba(99,102,241,0.7)]"
                     >
                       <div className="flex flex-wrap items-center justify-between gap-3">
-                        <p className="text-sm font-semibold text-white">{finding.id ?? 'Untracked vulnerability'}</p>
-                        <span className={getSeverityBadgeClasses(finding.severity)}>
+                        <p className="text-sm font-semibold text-slate-900">{finding.id ?? 'Untracked vulnerability'}</p>
+                        <span className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
                           <Icon name="alert" width={12} height={12} /> {severity}
                         </span>
                       </div>
                       <dl className="grid gap-3 sm:grid-cols-2">
                         <div>
-                          <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Package</dt>
-                          <dd className="mt-1 font-medium text-slate-100">{packageName}</dd>
+                          <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Package</dt>
+                          <dd className="mt-1 font-medium text-slate-900">{packageName}</dd>
                         </div>
                         <div>
-                          <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Version</dt>
-                          <dd className="mt-1 font-medium text-slate-100">{packageVersion}</dd>
+                          <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Version</dt>
+                          <dd className="mt-1 font-medium text-slate-900">{packageVersion}</dd>
                         </div>
                         <div className="sm:col-span-2">
-                          <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Description</dt>
-                          <dd className="mt-1 text-sm text-slate-300">{finding.description ?? 'No description available.'}</dd>
+                          <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Description</dt>
+                          <dd className="mt-1 text-sm text-slate-700">{finding.description ?? 'No description available.'}</dd>
                         </div>
                         {fixVersions && (
                           <div className="sm:col-span-2">
-                            <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Fix version</dt>
-                            <dd className="mt-1 font-medium text-slate-100">{fixVersions}</dd>
+                            <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Fix version</dt>
+                            <dd className="mt-1 font-medium text-slate-900">{fixVersions}</dd>
                           </div>
                         )}
                       </dl>
@@ -206,21 +186,21 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools }) =
                   return (
                     <div
                       key={key}
-                      className="space-y-2 rounded-2xl border border-slate-700 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-4 text-sm text-slate-200 shadow-[0_28px_55px_-40px_rgba(15,23,42,0.85)]"
+                      className="space-y-2 rounded-2xl border-2 border-accent/30 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_15px_30px_-25px_rgba(99,102,241,0.7)]"
                     >
-                      <p className="text-sm font-semibold text-white">{finding.name ?? 'Unnamed component'}</p>
+                      <p className="text-sm font-semibold text-slate-900">{finding.name ?? 'Unnamed component'}</p>
                       <dl className="grid gap-3 sm:grid-cols-2">
                         <div>
-                          <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Package name</dt>
-                          <dd className="mt-1 font-medium text-slate-100">{finding.name ?? 'Unknown'}</dd>
+                          <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Package name</dt>
+                          <dd className="mt-1 font-medium text-slate-900">{finding.name ?? 'Unknown'}</dd>
                         </div>
                         <div>
-                          <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Type</dt>
-                          <dd className="mt-1 font-medium text-slate-100">{finding.type ?? 'Unknown'}</dd>
+                          <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Type</dt>
+                          <dd className="mt-1 font-medium text-slate-900">{finding.type ?? 'Unknown'}</dd>
                         </div>
                         <div>
-                          <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Version</dt>
-                          <dd className="mt-1 font-medium text-slate-100">{finding.version ?? 'Unknown'}</dd>
+                          <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Version</dt>
+                          <dd className="mt-1 font-medium text-slate-900">{finding.version ?? 'Unknown'}</dd>
                         </div>
                       </dl>
                     </div>
@@ -232,30 +212,30 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools }) =
                   return (
                     <div
                       key={key}
-                      className="space-y-3 rounded-2xl border border-slate-700 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-4 text-sm text-slate-200 shadow-[0_28px_55px_-40px_rgba(15,23,42,0.85)]"
+                      className="space-y-3 rounded-2xl border-2 border-accent/30 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_15px_30px_-25px_rgba(99,102,241,0.7)]"
                     >
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div>
-                          <p className="text-sm font-semibold text-white">
+                          <p className="text-sm font-semibold text-slate-900">
                             {finding.description ? `${finding.description} exposed` : 'Secret exposed'}
                           </p>
-                          <p className="mt-1 text-xs text-slate-400">Match: {finding.match}</p>
+                          <p className="mt-1 text-xs text-slate-500">Match: {finding.match}</p>
                         </div>
-                        <span className={getSeverityBadgeClasses(finding.severity)}>
+                        <span className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
                           <Icon name="alert" width={12} height={12} /> {formatSeverity(finding.severity)}
                         </span>
                       </div>
                       <button
                         type="button"
                         onClick={() => toggleSnippet(key)}
-                        className="inline-flex items-center gap-2 rounded-full border border-slate-600/70 bg-slate-800/80 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-100 transition hover:border-accent/60 hover:text-accent"
+                        className="inline-flex items-center gap-2 rounded-full border-2 border-accent/30 bg-white px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-700 transition hover:text-accent"
                         aria-expanded={expanded}
                       >
                         {expanded ? 'Hide code snippet' : 'Show code snippet'}
                         <Icon name={expanded ? 'chevron-up' : 'chevron-down'} width={12} height={12} />
                       </button>
                       {expanded && (
-                        <div className="space-y-2 rounded-2xl border border-slate-700/70 bg-slate-950/95 p-4 text-xs text-slate-200">
+                        <div className="space-y-2 rounded-2xl border border-slate-800 bg-slate-900/95 p-4 text-xs text-slate-100">
                           <p className="font-mono text-[11px] uppercase tracking-wide text-slate-400">
                             {finding.file ?? 'Unknown file'}:{finding.line ?? '—'}
                           </p>
@@ -271,30 +251,30 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools }) =
                   return (
                     <div
                       key={key}
-                      className="space-y-3 rounded-2xl border border-slate-700 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-4 text-sm text-slate-200 shadow-[0_28px_55px_-40px_rgba(15,23,42,0.85)]"
+                      className="space-y-3 rounded-2xl border-2 border-accent/30 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_15px_30px_-25px_rgba(99,102,241,0.7)]"
                     >
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div>
-                          <p className="text-sm font-semibold text-white">{finding.message}</p>
-                          <p className="mt-1 text-xs text-slate-400">
+                          <p className="text-sm font-semibold text-slate-900">{finding.message}</p>
+                          <p className="mt-1 text-xs text-slate-500">
                             File: {finding.file ?? 'Unknown file'} • Line {finding.line ?? '—'}
                           </p>
                         </div>
-                        <span className={getSeverityBadgeClasses(finding.severity)}>
+                        <span className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
                           <Icon name="alert" width={12} height={12} /> {formatSeverity(finding.severity)}
                         </span>
                       </div>
                       <button
                         type="button"
                         onClick={() => toggleSnippet(key)}
-                        className="inline-flex items-center gap-2 rounded-full border border-slate-600/70 bg-slate-800/80 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-100 transition hover:border-accent/60 hover:text-accent"
+                        className="inline-flex items-center gap-2 rounded-full border-2 border-accent/30 bg-white px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-700 transition hover:text-accent"
                         aria-expanded={expanded}
                       >
                         {expanded ? 'Hide snippet' : 'Show snippet'}
                         <Icon name={expanded ? 'chevron-up' : 'chevron-down'} width={12} height={12} />
                       </button>
                       {expanded && (
-                        <div className="space-y-2 rounded-2xl border border-slate-700/70 bg-slate-950/95 p-4 text-xs text-slate-200">
+                        <div className="space-y-2 rounded-2xl border border-slate-800 bg-slate-900/95 p-4 text-xs text-slate-100">
                           <p className="font-mono text-[11px] uppercase tracking-wide text-slate-400">
                             {finding.file ?? 'Unknown file'}:{finding.line ?? '—'}-{finding.end_line ?? finding.line ?? '—'}
                           </p>
@@ -310,7 +290,7 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools }) =
                 return (
                   <div
                     key={key}
-                    className="rounded-2xl border border-slate-700 bg-slate-950 p-4 text-xs text-slate-200 shadow-[0_28px_55px_-40px_rgba(15,23,42,0.85)]"
+                    className="rounded-2xl border-2 border-accent/30 bg-slate-50 p-4 text-xs text-slate-700 shadow-[0_15px_30px_-25px_rgba(99,102,241,0.7)]"
                   >
                     <pre className="max-h-60 overflow-y-auto whitespace-pre-wrap break-all">{JSON.stringify(finding, null, 2)}</pre>
                   </div>
