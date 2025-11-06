@@ -223,11 +223,13 @@ const statIconBackgroundByTone: Record<DetailStatProps['tone'], string> = {
 const DetailStat: React.FC<DetailStatProps> = ({ label, value, tone, icon, isActive = false, onClick }) => {
   const content = (
     <>
-      <div className="flex items-center gap-3">
+      <div className="flex min-w-0 items-center gap-3">
         <span className={clsx('flex h-10 w-10 items-center justify-center rounded-2xl', statIconBackgroundByTone[tone])}>
           <Icon name={icon} width={18} height={18} />
         </span>
-        <p className="text-[11px] font-semibold uppercase leading-4 tracking-[0.18em] text-slate-500">{label}</p>
+        <p className="min-w-0 flex-1 break-words text-[11px] font-semibold uppercase leading-4 tracking-[0.18em] text-slate-500">
+          {label}
+        </p>
       </div>
       <p className="break-words text-[clamp(1.125rem,1.6vw+0.5rem,1.75rem)] font-semibold leading-tight text-slate-900">
         {value}
