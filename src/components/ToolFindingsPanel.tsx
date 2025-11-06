@@ -110,6 +110,58 @@ const matchesFilter = (toolName: string, filter: ToolCategoryFilter) => {
   return filterMatchers[filter].some((matcher) => normalizedName.includes(matcher));
 };
 
+const toolCategoryPriority: ToolCategoryFilter[] = [
+  'packages',
+  'packageVulnerabilities',
+  'secrets',
+  'codeFindings',
+];
+
+const resolveToolPriority = (toolName: string) => {
+  const normalizedName = toolName.toLowerCase();
+  const matchedCategory = toolCategoryPriority.find((category) =>
+    filterMatchers[category].some((matcher) => normalizedName.includes(matcher)),
+  );
+
+  if (!matchedCategory) {
+    return Number.MAX_SAFE_INTEGER;
+  }
+
+  return toolCategoryPriority.indexOf(matchedCategory);
+};
+
+const severityOrder: Record<string, number> = {
+  critical: 0,
+  high: 1,
+  medium: 2,
+  low: 3,
+};
+
+const normalizeSeverity = (severity?: string) => severity?.toLowerCase() ?? '';
+
+const getSeverityRank = (severity?: string) => {
+  const normalized = normalizeSeverity(severity);
+  return severityOrder[normalized] ?? Number.MAX_SAFE_INTEGER;
+};
+
+const shouldSortBySeverity = (toolName: string) =>
+  matchesFilter(toolName, 'packageVulnerabilities') ||
+  matchesFilter(toolName, 'secrets') ||
+  matchesFilter(toolName, 'codeFindings');
+
+const getFindingSeverity = (finding: unknown): string | undefined => {
+  if (isScaFinding(finding) || isSecretFinding(finding) || isVulnerabilityFinding(finding)) {
+    return finding.severity;
+  }
+
+  if (finding && typeof finding === 'object' && 'severity' in finding) {
+    const candidate = finding as { severity?: unknown };
+    return typeof candidate.severity === 'string' ? candidate.severity : undefined;
+  }
+
+  return undefined;
+};
+
 export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, activeFilter }) => {
   const [expandedSnippets, setExpandedSnippets] = useState<Record<string, boolean>>({});
 
@@ -128,7 +180,21 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
   const isSnippetExpanded = (key: string) => Boolean(expandedSnippets[key]);
 
   const entries = Object.entries(tools);
-  const filteredEntries = activeFilter ? entries.filter(([toolName]) => matchesFilter(toolName, activeFilter)) : entries;
+  const sortedEntries = [...entries].sort(([toolA], [toolB]) => {
+    const priorityA = resolveToolPriority(toolA);
+    const priorityB = resolveToolPriority(toolB);
+
+    if (priorityA === priorityB) {
+      return toolA.localeCompare(toolB);
+    }
+
+    return priorityA - priorityB;
+  });
+
+  const filteredEntries = activeFilter
+    ? sortedEntries.filter(([toolName]) => matchesFilter(toolName, activeFilter))
+    : sortedEntries;
+
   const entriesToRender = filteredEntries;
 
   return (
@@ -162,7 +228,15 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
           </div>
           {toolData.output.length > 0 ? (
             <div className="mt-4 space-y-3">
-              {toolData.output.map((finding, index) => {
+              {(
+                shouldSortBySeverity(toolName)
+                  ? [...toolData.output].sort(
+                      (findingA, findingB) =>
+                        getSeverityRank(getFindingSeverity(findingA)) -
+                        getSeverityRank(getFindingSeverity(findingB)),
+                    )
+                  : toolData.output
+              ).map((finding, index) => {
                 const key = `${toolName}-${index}`;
 
                 if (isScaFinding(finding)) {
