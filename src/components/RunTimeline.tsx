@@ -292,3 +292,87 @@ const DetailStat: React.FC<DetailStatProps> = ({
     </div>
   );
 };
+
+type InfoTooltipProps = {
+  tooltip: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+};
+
+const InfoTooltip: React.FC<InfoTooltipProps> = ({ tooltip, open, onOpenChange }) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = typeof open === 'boolean';
+  const isOpen = isControlled ? open : internalOpen;
+  const tooltipId = useId();
+
+  const setOpen = (value: boolean) => {
+    if (!isControlled) {
+      setInternalOpen(value);
+    }
+    onOpenChange?.(value);
+  };
+
+  const hide = () => setOpen(false);
+  const show = () => setOpen(true);
+  const hideIfUncontrolled = () => {
+    if (!isControlled) {
+      hide();
+    }
+  };
+
+  return (
+    <span className="relative inline-flex">
+      <button
+        type="button"
+        aria-label={tooltip}
+        aria-describedby={isOpen ? tooltipId : undefined}
+        onPointerEnter={show}
+        onPointerLeave={hideIfUncontrolled}
+        onMouseEnter={show}
+        onMouseLeave={hideIfUncontrolled}
+        onTouchStart={(event) => {
+          event.stopPropagation();
+          show();
+        }}
+        onTouchEnd={(event) => {
+          event.stopPropagation();
+          hideIfUncontrolled();
+        }}
+        onFocus={show}
+        onBlur={() => {
+          hideIfUncontrolled();
+        }}
+        onClick={(event) => event.stopPropagation()}
+        onMouseDown={(event) => event.stopPropagation()}
+        onPointerDown={(event) => event.stopPropagation()}
+        onKeyDown={(event) => event.stopPropagation()}
+        onTouchCancel={(event) => {
+          event.stopPropagation();
+          hideIfUncontrolled();
+        }}
+        className={clsx(
+          'inline-flex h-6 w-6 items-center justify-center rounded-full border border-accent/30 bg-white/80 text-accent shadow-sm transition hover:border-accent/50',
+          'focus:outline-none focus:ring-2 focus:ring-accent/40 focus:ring-offset-1 focus:ring-offset-white',
+        )}
+      >
+        <Icon name="info" width={14} height={14} />
+      </button>
+      <span
+        role="tooltip"
+        id={tooltipId}
+        className={clsx(
+          'pointer-events-auto absolute left-1/2 top-full z-20 w-64 -translate-x-1/2 rounded-2xl border border-accent/30 bg-slate-900/95 px-4 py-3 text-left text-[12px] leading-relaxed text-slate-100 shadow-[0_25px_60px_-25px_rgba(30,41,59,0.85)] backdrop-blur-sm transition duration-150',
+          isOpen
+            ? 'visible translate-y-3 opacity-100'
+            : 'invisible translate-y-2 opacity-0',
+        )}
+        onPointerEnter={show}
+        onPointerLeave={hideIfUncontrolled}
+        onMouseEnter={show}
+        onMouseLeave={hideIfUncontrolled}
+      >
+        {tooltip}
+      </span>
+    </span>
+  );
+};
