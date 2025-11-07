@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { JSX } from 'react';
 import { Icon } from './Icon';
 
-export type ToolCategoryFilter = 'packages' | 'packageVulnerabilities' | 'codeFindings' | 'secrets';
+export type ToolCategoryFilter = 'sbom' | 'sca' | 'vulnScan' | 'secrets';
 
 type ToolFindingsPanelProps = {
   tools?: Record<string, { output: unknown[] }>;
@@ -99,9 +99,9 @@ const formatFixVersions = (fix: unknown): string | null => {
 };
 
 const filterMatchers: Record<ToolCategoryFilter, string[]> = {
-  packages: ['sbom'],
-  packageVulnerabilities: ['sca', 'package'],
-  codeFindings: ['vulnerability'],
+  sbom: ['sbom'],
+  sca: ['sca', 'package'],
+  vulnScan: ['vulnerability'],
   secrets: ['secret'],
 };
 
@@ -110,12 +110,7 @@ const matchesFilter = (toolName: string, filter: ToolCategoryFilter) => {
   return filterMatchers[filter].some((matcher) => normalizedName.includes(matcher));
 };
 
-const toolCategoryPriority: ToolCategoryFilter[] = [
-  'packages',
-  'packageVulnerabilities',
-  'secrets',
-  'codeFindings',
-];
+const toolCategoryPriority: ToolCategoryFilter[] = ['sbom', 'sca', 'secrets', 'vulnScan'];
 
 const resolveToolPriority = (toolName: string) => {
   const normalizedName = toolName.toLowerCase();
@@ -145,9 +140,7 @@ const getSeverityRank = (severity?: string) => {
 };
 
 const shouldSortBySeverity = (toolName: string) =>
-  matchesFilter(toolName, 'packageVulnerabilities') ||
-  matchesFilter(toolName, 'secrets') ||
-  matchesFilter(toolName, 'codeFindings');
+  matchesFilter(toolName, 'sca') || matchesFilter(toolName, 'secrets') || matchesFilter(toolName, 'vulnScan');
 
 const getFindingSeverity = (finding: unknown): string | undefined => {
   if (isScaFinding(finding) || isSecretFinding(finding) || isVulnerabilityFinding(finding)) {
