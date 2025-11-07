@@ -257,29 +257,36 @@ const DetailStat: React.FC<DetailStatProps> = ({
     </>
   );
 
-  if (typeof onClick === 'function') {
-    return (
-      <button
-        type="button"
-        onClick={onClick}
-        className={clsx(
-          'flex h-full min-w-0 flex-col justify-between gap-4 rounded-3xl border-2 border-accent/30 p-4 text-left shadow-[0_20px_45px_-35px_rgba(99,102,241,0.7)] transition focus:outline-none focus:ring-2 focus:ring-accent/30 focus:ring-offset-2',
-          statBackgroundByTone[tone],
-          'cursor-pointer hover:-translate-y-0.5 hover:shadow-[0_28px_60px_-30px_rgba(99,102,241,0.75)]',
-          isActive && 'border-accent/70 shadow-[0_30px_65px_-40px_rgba(99,102,241,0.85)] ring-2 ring-inset ring-accent/20',
-        )}
-        aria-pressed={isActive}
-      >
-        {content}
-      </button>
-    );
-  }
+  const isInteractive = typeof onClick === 'function';
+
+  const handleActivate = () => {
+    if (isInteractive && onClick) {
+      onClick();
+    }
+  };
 
   return (
     <div
+      role={isInteractive ? 'button' : undefined}
+      tabIndex={isInteractive ? 0 : undefined}
+      onKeyDown={
+        isInteractive
+          ? (event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                handleActivate();
+              }
+            }
+          : undefined
+      }
+      onClick={isInteractive ? handleActivate : undefined}
+      aria-pressed={isInteractive ? isActive : undefined}
       className={clsx(
         'flex h-full min-w-0 flex-col justify-between gap-4 rounded-3xl border-2 border-accent/30 p-4 text-left shadow-[0_20px_45px_-35px_rgba(99,102,241,0.7)]',
         statBackgroundByTone[tone],
+        isInteractive &&
+          'cursor-pointer transition hover:-translate-y-0.5 hover:shadow-[0_28px_60px_-30px_rgba(99,102,241,0.75)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 focus-visible:ring-offset-2',
+        isActive && 'border-accent/70 shadow-[0_30px_65px_-40px_rgba(99,102,241,0.85)] ring-2 ring-inset ring-accent/20',
       )}
     >
       {content}
