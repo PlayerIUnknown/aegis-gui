@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import type { ScanDetailsView, ScanView } from '../types/domain';
 import { StatusPill } from './StatusPill';
@@ -52,7 +52,7 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
   }, [openRunId, detailsById, onLoadDetails]);
 
   return (
-    <div className="relative space-y-6 overflow-hidden">
+    <div className="relative space-y-6 overflow-visible">
       <span
         aria-hidden
         className="pointer-events-none absolute left-6 top-12 bottom-12 hidden w-px bg-accent/30 md:block"
@@ -87,7 +87,7 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                   : 'bg-warning/80 border-warning/60 shadow-[0_0_0_4px_rgba(250,204,21,0.12)]',
               )}
             />
-            <div className="overflow-hidden rounded-3xl border-2 border-accent/40 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_45px_90px_-50px_rgba(99,102,241,0.8)]">
+            <div className="relative overflow-visible rounded-3xl border-2 border-accent/40 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_45px_90px_-50px_rgba(99,102,241,0.8)]">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/10 text-accent">
@@ -138,28 +138,32 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                 <div className="mt-6 space-y-6">
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     <DetailStat
-                      label="Packages"
+                      label="SBOM"
+                      tooltip="Enumerates dependencies and components detected in the build."
                       value={run.summary.packagesFound}
                       tone="accent"
-                      isActive={activeToolFilter === 'packages'}
-                      onClick={() => handleFilterToggle('packages')}
+                      isActive={activeToolFilter === 'sbom'}
+                      onClick={() => handleFilterToggle('sbom')}
                     />
                     <DetailStat
-                      label="Package vulnerabilities"
+                      label="SCA"
+                      tooltip="Identifies known vulnerabilities affecting third-party packages."
                       value={run.summary.vulnerabilitiesInPackages}
                       tone="warning"
-                      isActive={activeToolFilter === 'packageVulnerabilities'}
-                      onClick={() => handleFilterToggle('packageVulnerabilities')}
+                      isActive={activeToolFilter === 'sca'}
+                      onClick={() => handleFilterToggle('sca')}
                     />
                     <DetailStat
-                      label="Code findings"
+                      label="Vuln Scan"
+                      tooltip="Surfaces security issues uncovered in application source code."
                       value={run.summary.codeVulnerabilities}
                       tone="neutral"
-                      isActive={activeToolFilter === 'codeFindings'}
-                      onClick={() => handleFilterToggle('codeFindings')}
+                      isActive={activeToolFilter === 'vulnScan'}
+                      onClick={() => handleFilterToggle('vulnScan')}
                     />
                     <DetailStat
                       label="Secrets"
+                      tooltip="Flags hardcoded credentials, tokens, and other sensitive values."
                       value={run.summary.secretsFound}
                       tone="danger"
                       isActive={activeToolFilter === 'secrets'}
@@ -197,6 +201,7 @@ type DetailStatProps = {
   tone: 'neutral' | 'accent' | 'warning' | 'danger' | 'success';
   isActive?: boolean;
   onClick?: () => void;
+  tooltip?: string;
 };
 
 const statBackgroundByTone: Record<DetailStatProps['tone'], string> = {
@@ -207,11 +212,30 @@ const statBackgroundByTone: Record<DetailStatProps['tone'], string> = {
   success: 'bg-gradient-to-br from-success/10 via-success/5 to-white text-slate-900',
 };
 
-const DetailStat: React.FC<DetailStatProps> = ({ label, value, tone, isActive = false, onClick }) => {
+const DetailStat: React.FC<DetailStatProps> = ({
+  label,
+  value,
+  tone,
+  isActive = false,
+  onClick,
+  tooltip,
+}) => {
+  const tooltipId = useId();
+
   const content = (
     <>
       <p className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[11px] font-semibold uppercase leading-4 tracking-[0.18em] text-slate-500">
-        {label}
+        <span className="inline-flex items-center gap-2">
+          <span className="truncate">{label}</span>
+          {tooltip && (
+            <span
+              aria-hidden
+              className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-accent/30 bg-white/80 text-accent shadow-sm"
+            >
+              <Icon name="info" width={14} height={14} />
+            </span>
+          )}
+        </span>
       </p>
       <p className="break-words text-[clamp(1.125rem,1.6vw+0.5rem,1.75rem)] font-semibold leading-tight text-slate-900">
         {value}
@@ -219,32 +243,52 @@ const DetailStat: React.FC<DetailStatProps> = ({ label, value, tone, isActive = 
     </>
   );
 
-  if (typeof onClick === 'function') {
-    return (
-      <button
-        type="button"
-        onClick={onClick}
-        className={clsx(
-          'flex h-full min-w-0 flex-col justify-between gap-4 rounded-3xl border-2 border-accent/30 p-4 text-left shadow-[0_20px_45px_-35px_rgba(99,102,241,0.7)] transition focus:outline-none focus:ring-2 focus:ring-accent/30 focus:ring-offset-2',
-          statBackgroundByTone[tone],
-          'cursor-pointer hover:-translate-y-0.5 hover:shadow-[0_28px_60px_-30px_rgba(99,102,241,0.75)]',
-          isActive && 'border-accent/70 shadow-[0_30px_65px_-40px_rgba(99,102,241,0.85)] ring-2 ring-inset ring-accent/20',
-        )}
-        aria-pressed={isActive}
-      >
-        {content}
-      </button>
-    );
-  }
+  const isInteractive = typeof onClick === 'function';
+
+  const handleActivate = () => {
+    if (isInteractive && onClick) {
+      onClick();
+    }
+  };
 
   return (
     <div
+      role={isInteractive ? 'button' : undefined}
+      tabIndex={isInteractive ? 0 : undefined}
+      aria-describedby={tooltip ? tooltipId : undefined}
+      onKeyDown={
+        isInteractive
+          ? (event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                handleActivate();
+              }
+            }
+          : undefined
+      }
+      onClick={isInteractive ? handleActivate : undefined}
+      aria-pressed={isInteractive ? isActive : undefined}
       className={clsx(
-        'flex h-full min-w-0 flex-col justify-between gap-4 rounded-3xl border-2 border-accent/30 p-4 text-left shadow-[0_20px_45px_-35px_rgba(99,102,241,0.7)]',
+        'group relative flex h-full min-w-0 flex-col justify-between gap-4 rounded-3xl border-2 border-accent/30 p-4 text-left shadow-[0_20px_45px_-35px_rgba(99,102,241,0.7)]',
         statBackgroundByTone[tone],
+        isInteractive &&
+          'cursor-pointer transition hover:-translate-y-0.5 hover:shadow-[0_28px_60px_-30px_rgba(99,102,241,0.75)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 focus-visible:ring-offset-2',
+        isActive && 'border-accent/70 shadow-[0_30px_65px_-40px_rgba(99,102,241,0.85)] ring-2 ring-inset ring-accent/20',
       )}
     >
       {content}
+      {tooltip && (
+        <div
+          role="tooltip"
+          id={tooltipId}
+          className={clsx(
+            'pointer-events-none absolute left-1/2 top-full z-20 w-64 -translate-x-1/2 rounded-2xl border border-accent/40 bg-white/95 px-5 py-4 text-left text-[12px] leading-relaxed text-slate-700 shadow-[0_35px_80px_-35px_rgba(15,23,42,0.55)] backdrop-blur-md transition duration-150',
+            'invisible translate-y-2 opacity-0 group-hover:visible group-hover:translate-y-3 group-hover:opacity-100 group-focus-visible:visible group-focus-visible:translate-y-3 group-focus-visible:opacity-100',
+          )}
+        >
+          {tooltip}
+        </div>
+      )}
     </div>
   );
 };
