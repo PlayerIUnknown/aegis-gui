@@ -282,7 +282,7 @@ const DetailStat: React.FC<DetailStatProps> = ({
           role="tooltip"
           id={tooltipId}
           className={clsx(
-            'pointer-events-none absolute left-1/2 top-full z-20 w-64 -translate-x-1/2 rounded-2xl border border-accent/30 bg-slate-900/95 px-4 py-3 text-left text-[12px] leading-relaxed text-slate-100 shadow-[0_25px_60px_-25px_rgba(30,41,59,0.85)] backdrop-blur-sm transition duration-150',
+            'pointer-events-none absolute left-1/2 top-full z-20 w-64 -translate-x-1/2 rounded-2xl border border-accent/40 bg-white/95 px-5 py-4 text-left text-[12px] leading-relaxed text-slate-700 shadow-[0_35px_80px_-35px_rgba(15,23,42,0.55)] backdrop-blur-md transition duration-150',
             'invisible translate-y-2 opacity-0 group-hover:visible group-hover:translate-y-3 group-hover:opacity-100 group-focus-visible:visible group-focus-visible:translate-y-3 group-focus-visible:opacity-100',
           )}
         >
