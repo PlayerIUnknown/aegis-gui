@@ -1,4 +1,11 @@
-import { useEffect, useId, useMemo, useState } from 'react';
+import {
+  useEffect,
+  useId,
+  useMemo,
+  useState,
+  type FocusEventHandler,
+  type PointerEventHandler,
+} from 'react';
 import clsx from 'clsx';
 import type { ScanDetailsView, ScanView } from '../types/domain';
 import { StatusPill } from './StatusPill';
@@ -220,12 +227,44 @@ const DetailStat: React.FC<DetailStatProps> = ({
   onClick,
   tooltip,
 }) => {
+  const [isTooltipOpen, setIsTooltipOpen] = useState(false);
+
+  const showTooltip = () => {
+    if (tooltip) {
+      setIsTooltipOpen(true);
+    }
+  };
+
+  const handlePointerLeave: PointerEventHandler<HTMLDivElement> = (event) => {
+    if (!tooltip) {
+      return;
+    }
+
+    const nextTarget = event.relatedTarget as Node | null;
+    if (nextTarget && event.currentTarget.contains(nextTarget)) {
+      return;
+    }
+
+    setIsTooltipOpen(false);
+  };
+
+  const handleBlur: FocusEventHandler<HTMLDivElement> = (event) => {
+    if (!tooltip) {
+      return;
+    }
+
+    const nextFocus = event.relatedTarget as Node | null;
+    if (!event.currentTarget.contains(nextFocus)) {
+      setIsTooltipOpen(false);
+    }
+  };
+
   const content = (
     <>
       <p className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[11px] font-semibold uppercase leading-4 tracking-[0.18em] text-slate-500">
         <span className="inline-flex items-center gap-2">
           <span className="truncate">{label}</span>
-          {tooltip && <InfoTooltip tooltip={tooltip} />}
+          {tooltip && <InfoTooltip tooltip={tooltip} open={isTooltipOpen} onOpenChange={setIsTooltipOpen} />}
         </span>
       </p>
       <p className="break-words text-[clamp(1.125rem,1.6vw+0.5rem,1.75rem)] font-semibold leading-tight text-slate-900">
@@ -258,6 +297,10 @@ const DetailStat: React.FC<DetailStatProps> = ({
       }
       onClick={isInteractive ? handleActivate : undefined}
       aria-pressed={isInteractive ? isActive : undefined}
+      onPointerEnter={tooltip ? showTooltip : undefined}
+      onPointerLeave={tooltip ? handlePointerLeave : undefined}
+      onFocus={tooltip ? showTooltip : undefined}
+      onBlur={tooltip ? handleBlur : undefined}
       className={clsx(
         'flex h-full min-w-0 flex-col justify-between gap-4 rounded-3xl border-2 border-accent/30 p-4 text-left shadow-[0_20px_45px_-35px_rgba(99,102,241,0.7)]',
         statBackgroundByTone[tone],
@@ -273,14 +316,30 @@ const DetailStat: React.FC<DetailStatProps> = ({
 
 type InfoTooltipProps = {
   tooltip: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
-const InfoTooltip: React.FC<InfoTooltipProps> = ({ tooltip }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const InfoTooltip: React.FC<InfoTooltipProps> = ({ tooltip, open, onOpenChange }) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = typeof open === 'boolean';
+  const isOpen = isControlled ? open : internalOpen;
   const tooltipId = useId();
 
-  const hide = () => setIsOpen(false);
-  const show = () => setIsOpen(true);
+  const setOpen = (value: boolean) => {
+    if (!isControlled) {
+      setInternalOpen(value);
+    }
+    onOpenChange?.(value);
+  };
+
+  const hide = () => setOpen(false);
+  const show = () => setOpen(true);
+  const hideIfUncontrolled = () => {
+    if (!isControlled) {
+      hide();
+    }
+  };
 
   return (
     <span className="relative inline-flex">
@@ -289,26 +348,28 @@ const InfoTooltip: React.FC<InfoTooltipProps> = ({ tooltip }) => {
         aria-label={tooltip}
         aria-describedby={isOpen ? tooltipId : undefined}
         onPointerEnter={show}
-        onPointerLeave={hide}
+        onPointerLeave={hideIfUncontrolled}
         onMouseEnter={show}
-        onMouseLeave={hide}
+        onMouseLeave={hideIfUncontrolled}
         onTouchStart={(event) => {
           event.stopPropagation();
           show();
         }}
         onTouchEnd={(event) => {
           event.stopPropagation();
-          hide();
+          hideIfUncontrolled();
         }}
         onFocus={show}
-        onBlur={hide}
+        onBlur={() => {
+          hideIfUncontrolled();
+        }}
         onClick={(event) => event.stopPropagation()}
         onMouseDown={(event) => event.stopPropagation()}
         onPointerDown={(event) => event.stopPropagation()}
         onKeyDown={(event) => event.stopPropagation()}
         onTouchCancel={(event) => {
           event.stopPropagation();
-          hide();
+          hideIfUncontrolled();
         }}
         className={clsx(
           'inline-flex h-6 w-6 items-center justify-center rounded-full border border-accent/30 bg-white/80 text-accent shadow-sm transition hover:border-accent/50',
@@ -327,9 +388,9 @@ const InfoTooltip: React.FC<InfoTooltipProps> = ({ tooltip }) => {
             : 'invisible translate-y-2 opacity-0',
         )}
         onPointerEnter={show}
-        onPointerLeave={hide}
+        onPointerLeave={hideIfUncontrolled}
         onMouseEnter={show}
-        onMouseLeave={hide}
+        onMouseLeave={hideIfUncontrolled}
       >
         {tooltip}
       </span>
