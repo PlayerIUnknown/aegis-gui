@@ -200,18 +200,11 @@ function App() {
         return false;
       }
 
-      const hasFindings =
-        latest.summary.codeVulnerabilities > 0 ||
-        latest.summary.vulnerabilitiesInPackages > 0 ||
-        latest.summary.secretsFound > 0 ||
-        latest.summary.highSeverity > 0 ||
-        latest.summary.criticalSeverity > 0;
-
       if (riskFilter === 'healthy') {
-        return latest.qualityGatePassed === true && !hasFindings && latest.status === 'completed';
+        return latest.qualityGatePassed === true && latest.status === 'completed';
       }
 
-      return latest.qualityGatePassed === false || hasFindings || latest.status !== 'completed';
+      return latest.status !== 'completed' || latest.qualityGatePassed !== true;
     });
   }, [repositories, search, riskFilter]);
 
