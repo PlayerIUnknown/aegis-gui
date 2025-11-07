@@ -220,35 +220,12 @@ const DetailStat: React.FC<DetailStatProps> = ({
   onClick,
   tooltip,
 }) => {
-  const tooltipId = useId();
   const content = (
     <>
       <p className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[11px] font-semibold uppercase leading-4 tracking-[0.18em] text-slate-500">
         <span className="inline-flex items-center gap-2">
           <span className="truncate">{label}</span>
-          {tooltip && (
-            <button
-              type="button"
-              aria-label={tooltip}
-              aria-describedby={tooltip ? tooltipId : undefined}
-              className={clsx(
-                'group relative inline-flex h-6 w-6 items-center justify-center rounded-full border border-accent/30 bg-white/80 text-accent shadow-sm transition hover:border-accent/50',
-                'focus:outline-none focus:ring-2 focus:ring-accent/40 focus:ring-offset-1 focus:ring-offset-white',
-              )}
-            >
-              <Icon name="info" width={14} height={14} />
-              <span
-                role="tooltip"
-                id={tooltipId}
-                className={clsx(
-                  'pointer-events-none absolute left-1/2 top-full z-20 hidden w-64 -translate-x-1/2 translate-y-3 rounded-2xl border border-accent/30 bg-slate-900/95 px-4 py-3 text-left text-[12px] leading-relaxed text-slate-100 shadow-[0_25px_60px_-25px_rgba(30,41,59,0.85)] backdrop-blur-sm',
-                  'group-hover:block group-focus-visible:block',
-                )}
-              >
-                {tooltip}
-              </span>
-            </button>
-          )}
+          {tooltip && <InfoTooltip tooltip={tooltip} />}
         </span>
       </p>
       <p className="break-words text-[clamp(1.125rem,1.6vw+0.5rem,1.75rem)] font-semibold leading-tight text-slate-900">
@@ -291,5 +268,71 @@ const DetailStat: React.FC<DetailStatProps> = ({
     >
       {content}
     </div>
+  );
+};
+
+type InfoTooltipProps = {
+  tooltip: string;
+};
+
+const InfoTooltip: React.FC<InfoTooltipProps> = ({ tooltip }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const tooltipId = useId();
+
+  const hide = () => setIsOpen(false);
+  const show = () => setIsOpen(true);
+
+  return (
+    <span className="relative inline-flex">
+      <button
+        type="button"
+        aria-label={tooltip}
+        aria-describedby={isOpen ? tooltipId : undefined}
+        onPointerEnter={show}
+        onPointerLeave={hide}
+        onMouseEnter={show}
+        onMouseLeave={hide}
+        onTouchStart={(event) => {
+          event.stopPropagation();
+          show();
+        }}
+        onTouchEnd={(event) => {
+          event.stopPropagation();
+          hide();
+        }}
+        onFocus={show}
+        onBlur={hide}
+        onClick={(event) => event.stopPropagation()}
+        onMouseDown={(event) => event.stopPropagation()}
+        onPointerDown={(event) => event.stopPropagation()}
+        onKeyDown={(event) => event.stopPropagation()}
+        onTouchCancel={(event) => {
+          event.stopPropagation();
+          hide();
+        }}
+        className={clsx(
+          'inline-flex h-6 w-6 items-center justify-center rounded-full border border-accent/30 bg-white/80 text-accent shadow-sm transition hover:border-accent/50',
+          'focus:outline-none focus:ring-2 focus:ring-accent/40 focus:ring-offset-1 focus:ring-offset-white',
+        )}
+      >
+        <Icon name="info" width={14} height={14} />
+      </button>
+      <span
+        role="tooltip"
+        id={tooltipId}
+        className={clsx(
+          'pointer-events-auto absolute left-1/2 top-full z-20 w-64 -translate-x-1/2 rounded-2xl border border-accent/30 bg-slate-900/95 px-4 py-3 text-left text-[12px] leading-relaxed text-slate-100 shadow-[0_25px_60px_-25px_rgba(30,41,59,0.85)] backdrop-blur-sm transition duration-150',
+          isOpen
+            ? 'visible translate-y-3 opacity-100'
+            : 'invisible translate-y-2 opacity-0',
+        )}
+        onPointerEnter={show}
+        onPointerLeave={hide}
+        onMouseEnter={show}
+        onMouseLeave={hide}
+      >
+        {tooltip}
+      </span>
+    </span>
   );
 };
