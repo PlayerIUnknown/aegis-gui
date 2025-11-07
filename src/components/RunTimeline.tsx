@@ -138,28 +138,32 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                 <div className="mt-6 space-y-6">
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     <DetailStat
-                      label="Packages"
+                      label="SBOM"
+                      tooltip="Enumerates dependencies and components detected in the build."
                       value={run.summary.packagesFound}
                       tone="accent"
-                      isActive={activeToolFilter === 'packages'}
-                      onClick={() => handleFilterToggle('packages')}
+                      isActive={activeToolFilter === 'sbom'}
+                      onClick={() => handleFilterToggle('sbom')}
                     />
                     <DetailStat
-                      label="Package vulnerabilities"
+                      label="SCA"
+                      tooltip="Identifies known vulnerabilities affecting third-party packages."
                       value={run.summary.vulnerabilitiesInPackages}
                       tone="warning"
-                      isActive={activeToolFilter === 'packageVulnerabilities'}
-                      onClick={() => handleFilterToggle('packageVulnerabilities')}
+                      isActive={activeToolFilter === 'sca'}
+                      onClick={() => handleFilterToggle('sca')}
                     />
                     <DetailStat
-                      label="Code findings"
+                      label="Vuln Scan"
+                      tooltip="Surfaces security issues uncovered in application source code."
                       value={run.summary.codeVulnerabilities}
                       tone="neutral"
-                      isActive={activeToolFilter === 'codeFindings'}
-                      onClick={() => handleFilterToggle('codeFindings')}
+                      isActive={activeToolFilter === 'vulnScan'}
+                      onClick={() => handleFilterToggle('vulnScan')}
                     />
                     <DetailStat
                       label="Secrets"
+                      tooltip="Flags hardcoded credentials, tokens, and other sensitive values."
                       value={run.summary.secretsFound}
                       tone="danger"
                       isActive={activeToolFilter === 'secrets'}
@@ -197,6 +201,7 @@ type DetailStatProps = {
   tone: 'neutral' | 'accent' | 'warning' | 'danger' | 'success';
   isActive?: boolean;
   onClick?: () => void;
+  tooltip?: string;
 };
 
 const statBackgroundByTone: Record<DetailStatProps['tone'], string> = {
@@ -207,11 +212,29 @@ const statBackgroundByTone: Record<DetailStatProps['tone'], string> = {
   success: 'bg-gradient-to-br from-success/10 via-success/5 to-white text-slate-900',
 };
 
-const DetailStat: React.FC<DetailStatProps> = ({ label, value, tone, isActive = false, onClick }) => {
+const DetailStat: React.FC<DetailStatProps> = ({
+  label,
+  value,
+  tone,
+  isActive = false,
+  onClick,
+  tooltip,
+}) => {
   const content = (
     <>
       <p className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[11px] font-semibold uppercase leading-4 tracking-[0.18em] text-slate-500">
-        {label}
+        <span className="inline-flex items-center gap-1">
+          <span className="truncate">{label}</span>
+          {tooltip && (
+            <span
+              className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-slate-300 bg-white/70 text-slate-400 transition hover:border-accent/60 hover:text-accent"
+              title={tooltip}
+              aria-label={tooltip}
+            >
+              <Icon name="info" width={10} height={10} />
+            </span>
+          )}
+        </span>
       </p>
       <p className="break-words text-[clamp(1.125rem,1.6vw+0.5rem,1.75rem)] font-semibold leading-tight text-slate-900">
         {value}
