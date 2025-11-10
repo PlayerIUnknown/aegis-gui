@@ -339,6 +339,14 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
 
                 if (isVulnerabilityFinding(finding)) {
                   const expanded = isSnippetExpanded(key);
+                  const isSemgrepTool = toolName.toLowerCase().includes('semgrep');
+                  const message = finding.message ?? '';
+                  const [rawTitle, ...rawDescriptionLines] = message.split('\n');
+                  const title = (rawTitle?.trim() ?? '') || message;
+                  const description = rawDescriptionLines
+                    .map((line) => line.trim())
+                    .filter((line) => line.length > 0)
+                    .join('\n');
                   return (
                     <div
                       key={key}
@@ -346,7 +354,14 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                     >
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div>
-                          <p className="text-sm font-semibold text-slate-900">{finding.message}</p>
+                          {isSemgrepTool && description ? (
+                            <>
+                              <p className="text-sm font-semibold text-slate-900">{title}</p>
+                              <p className="mt-1 whitespace-pre-line text-xs text-slate-600">{description}</p>
+                            </>
+                          ) : (
+                            <p className="text-sm font-semibold text-slate-900 whitespace-pre-line">{finding.message}</p>
+                          )}
                           <p className="mt-1 text-xs text-slate-500">
                             File: {finding.file ?? 'Unknown file'} • Line {finding.line ?? '—'}
                           </p>
