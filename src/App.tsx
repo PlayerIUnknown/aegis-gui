@@ -445,8 +445,8 @@ function App() {
         </div>
       </aside>
 
-      <main className="flex min-w-0 flex-1 flex-col overflow-hidden lg:h-svh">
-        <div className="mx-auto flex w-full min-w-0 max-w-7xl flex-1 flex-col gap-10 overflow-y-auto overscroll-y-none px-6 py-8">
+      <main className="flex min-w-0 flex-1 flex-col">
+        <div className="mx-auto flex w-full min-w-0 max-w-7xl flex-1 flex-col gap-10 px-6 py-8">
           <header className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="space-y-3">
               <p className="text-xs font-semibold uppercase tracking-[0.32em] text-accent">Security Posture Command Center</p>
