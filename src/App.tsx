@@ -381,7 +381,7 @@ function App() {
     <div
       className="flex min-h-svh flex-col bg-gradient-to-br from-slate-100 via-slate-100 to-slate-200 text-slate-900 transition-colors duration-300 lg:flex-row"
     >
-      <aside className="border-b border-accent/30 bg-white/80 backdrop-blur lg:sticky lg:top-0 lg:h-svh lg:w-72 lg:border-b-0 lg:border-r lg:border-accent/30">
+      <aside className="border-b border-accent/30 bg-white/80 backdrop-blur lg:fixed lg:inset-y-0 lg:w-72 lg:border-b-0 lg:border-r lg:border-accent/30">
         <div className="flex h-full flex-col gap-8 overflow-y-auto px-6 py-8">
           <div className="space-y-4">
             <div className="space-y-1">
@@ -445,8 +445,8 @@ function App() {
         </div>
       </aside>
 
-      <main className="flex min-w-0 flex-1 flex-col overflow-hidden lg:h-svh">
-        <div className="mx-auto flex w-full min-w-0 max-w-7xl flex-1 flex-col gap-10 overflow-y-auto overscroll-y-none px-6 py-8">
+      <main className="flex min-w-0 flex-1 flex-col lg:ml-72">
+        <div className="mx-auto flex w-full min-w-0 max-w-7xl flex-1 flex-col gap-10 px-6 py-8">
           <header className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="space-y-3">
               <p className="text-xs font-semibold uppercase tracking-[0.32em] text-accent">Security Posture Command Center</p>
