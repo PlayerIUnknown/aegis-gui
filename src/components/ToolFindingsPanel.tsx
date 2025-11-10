@@ -339,6 +339,24 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
 
                 if (isVulnerabilityFinding(finding)) {
                   const expanded = isSnippetExpanded(key);
+                  const isSemgrepTool = toolName.toLowerCase().includes('semgrep');
+                  const message = finding.message ?? '';
+                  const normalizedMessage = message.replace(/\r\n/g, '\n').trim();
+                  const firstPeriodIndex = normalizedMessage.indexOf('.');
+                  let title = normalizedMessage;
+                  let description = '';
+
+                  if (firstPeriodIndex !== -1) {
+                    title = normalizedMessage.slice(0, firstPeriodIndex + 1).trim();
+                    description = normalizedMessage.slice(firstPeriodIndex + 1).trim();
+                  } else {
+                    const [rawTitle, ...rawDescriptionLines] = normalizedMessage.split('\n');
+                    title = (rawTitle?.trim() ?? '') || normalizedMessage;
+                    description = rawDescriptionLines
+                      .map((line) => line.trim())
+                      .filter((line) => line.length > 0)
+                      .join('\n');
+                  }
                   return (
                     <div
                       key={key}
@@ -346,7 +364,14 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                     >
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div>
-                          <p className="text-sm font-semibold text-slate-900">{finding.message}</p>
+                          {isSemgrepTool && description ? (
+                            <>
+                              <p className="text-sm font-semibold text-slate-900">{title}</p>
+                              <p className="mt-1 whitespace-pre-line text-xs text-slate-600">{description}</p>
+                            </>
+                          ) : (
+                            <p className="text-sm font-semibold text-slate-900 whitespace-pre-line">{finding.message}</p>
+                          )}
                           <p className="mt-1 text-xs text-slate-500">
                             File: {finding.file ?? 'Unknown file'} • Line {finding.line ?? '—'}
                           </p>
