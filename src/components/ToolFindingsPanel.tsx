@@ -341,13 +341,22 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                   const expanded = isSnippetExpanded(key);
                   const isSemgrepTool = toolName.toLowerCase().includes('semgrep');
                   const message = finding.message ?? '';
-                  const messageLines = message.split(/\r?\n/);
-                  const [rawTitle, ...rawDescriptionLines] = messageLines;
-                  const title = (rawTitle?.trim() ?? '') || message;
-                  const description = rawDescriptionLines
-                    .map((line) => line.trim())
-                    .filter((line) => line.length > 0)
-                    .join('\n');
+                  const normalizedMessage = message.replace(/\r\n/g, '\n').trim();
+                  const firstPeriodIndex = normalizedMessage.indexOf('.');
+                  let title = normalizedMessage;
+                  let description = '';
+
+                  if (firstPeriodIndex !== -1) {
+                    title = normalizedMessage.slice(0, firstPeriodIndex + 1).trim();
+                    description = normalizedMessage.slice(firstPeriodIndex + 1).trim();
+                  } else {
+                    const [rawTitle, ...rawDescriptionLines] = normalizedMessage.split('\n');
+                    title = (rawTitle?.trim() ?? '') || normalizedMessage;
+                    description = rawDescriptionLines
+                      .map((line) => line.trim())
+                      .filter((line) => line.length > 0)
+                      .join('\n');
+                  }
                   return (
                     <div
                       key={key}
