@@ -142,6 +142,34 @@ const getSeverityRank = (severity?: string) => {
 const shouldSortBySeverity = (toolName: string) =>
   matchesFilter(toolName, 'sca') || matchesFilter(toolName, 'secrets') || matchesFilter(toolName, 'vulnScan');
 
+const splitVulnerabilityMessage = (message: string) => {
+  const normalizedMessage = message.replace(/\r\n/g, '\n').trim();
+
+  if (!normalizedMessage) {
+    return { title: '', description: '' };
+  }
+
+  const firstPeriodIndex = normalizedMessage.indexOf('.');
+
+  if (firstPeriodIndex !== -1) {
+    const title = normalizedMessage.slice(0, firstPeriodIndex + 1).trim();
+    const description = normalizedMessage.slice(firstPeriodIndex + 1).trim();
+
+    if (title) {
+      return { title, description };
+    }
+  }
+
+  const [rawTitle, ...rawDescriptionLines] = normalizedMessage.split('\n');
+  const title = (rawTitle?.trim() ?? '') || normalizedMessage;
+  const description = rawDescriptionLines
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
+    .join('\n');
+
+  return { title, description };
+};
+
 const getFindingSeverity = (finding: unknown): string | undefined => {
   if (isScaFinding(finding) || isSecretFinding(finding) || isVulnerabilityFinding(finding)) {
     return finding.severity;
@@ -339,6 +367,11 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
 
                 if (isVulnerabilityFinding(finding)) {
                   const expanded = isSnippetExpanded(key);
+                  const message = finding.message ?? '';
+                  const { title, description } = splitVulnerabilityMessage(message);
+                  const hasDescription = description.length > 0;
+                  const displayTitle = title || message;
+                  const shouldShowDescription = hasDescription;
                   return (
                     <div
                       key={key}
@@ -346,7 +379,10 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                     >
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div>
-                          <p className="text-sm font-semibold text-slate-900">{finding.message}</p>
+                          <p className="text-sm font-semibold text-slate-900 whitespace-pre-line">{displayTitle}</p>
+                          {shouldShowDescription && (
+                            <p className="mt-1 whitespace-pre-line text-xs text-slate-600">{description}</p>
+                          )}
                           <p className="mt-1 text-xs text-slate-500">
                             File: {finding.file ?? 'Unknown file'} • Line {finding.line ?? '—'}
                           </p>
