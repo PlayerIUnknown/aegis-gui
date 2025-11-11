@@ -71,11 +71,11 @@ const iconBackgroundByTone: Record<SummaryTileProps['tone'], string> = {
 };
 
 const tileBaseClasses =
-  'flex flex-col gap-3 rounded-3xl border-2 border-accent/50 p-5 shadow-[0_20px_45px_-25px_rgba(99,102,241,0.55)] transition hover:-translate-y-0.5 hover:shadow-[0_25px_55px_-20px_rgba(99,102,241,0.65)]';
+  'flex flex-col gap-3 rounded-xl border-2 border-accent/50 p-5 shadow-[0_20px_45px_-25px_rgba(99,102,241,0.55)] transition hover:-translate-y-0.5 hover:shadow-[0_25px_55px_-20px_rgba(99,102,241,0.65)]';
 
 const SummaryTile: React.FC<SummaryTileProps> = ({ title, value, icon, tone, helper }) => (
   <div className={`${tileBaseClasses} ${backgroundByTone[tone]}`}>
-    <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${iconBackgroundByTone[tone]}`}>
+    <div className={`flex h-11 w-11 items-center justify-center rounded-lg ${iconBackgroundByTone[tone]}`}>
       {icon}
     </div>
     <div>

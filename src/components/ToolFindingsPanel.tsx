@@ -188,7 +188,7 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
 
   if (!tools || Object.keys(tools).length === 0) {
     return (
-      <p className="rounded-2xl border-2 border-accent/40 bg-white p-4 text-sm text-slate-600 shadow-[0_20px_40px_-30px_rgba(99,102,241,0.65)]">
+      <p className="rounded-lg border-2 border-accent/40 bg-white p-4 text-sm text-slate-600 shadow-[0_20px_40px_-30px_rgba(99,102,241,0.65)]">
         Tool results are not available for this scan yet.
       </p>
     );
@@ -221,18 +221,18 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
   return (
     <div className="space-y-4">
       {entriesToRender.length === 0 && activeFilter && (
-        <p className="rounded-2xl border-2 border-accent/30 bg-slate-100 p-4 text-sm text-slate-600 shadow-[0_20px_40px_-30px_rgba(99,102,241,0.65)]">
+        <p className="rounded-lg border-2 border-accent/30 bg-slate-100 p-4 text-sm text-slate-600 shadow-[0_20px_40px_-30px_rgba(99,102,241,0.65)]">
           No tool results match the selected summary filter.
         </p>
       )}
       {entriesToRender.map(([toolName, toolData]) => (
         <div
           key={toolName}
-          className="max-w-full overflow-hidden rounded-3xl border-2 border-accent/40 bg-white p-6 shadow-[0_30px_65px_-45px_rgba(99,102,241,0.8)]"
+          className="max-w-full overflow-hidden rounded-xl border-2 border-accent/40 bg-white p-6 shadow-[0_30px_65px_-45px_rgba(99,102,241,0.8)]"
         >
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/10 text-accent">
+              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-accent/10 text-accent">
                 {toolIconMap[toolName] ?? <Icon name="package" width={20} height={20} />}
               </div>
               <div>
@@ -269,7 +269,7 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                   return (
                     <div
                       key={key}
-                      className="space-y-3 rounded-2xl border-2 border-accent/30 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_15px_30px_-25px_rgba(99,102,241,0.7)]"
+                      className="space-y-3 rounded-lg border-2 border-accent/30 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_15px_30px_-25px_rgba(99,102,241,0.7)]"
                     >
                       <div className="flex flex-wrap items-center justify-between gap-3">
                         <p className="text-sm font-semibold text-slate-900">{finding.id ?? 'Untracked vulnerability'}</p>
@@ -305,7 +305,7 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                   return (
                     <div
                       key={key}
-                      className="space-y-2 rounded-2xl border-2 border-accent/30 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_15px_30px_-25px_rgba(99,102,241,0.7)]"
+                      className="space-y-2 rounded-lg border-2 border-accent/30 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_15px_30px_-25px_rgba(99,102,241,0.7)]"
                     >
                       <p className="text-sm font-semibold text-slate-900">{finding.name ?? 'Unnamed component'}</p>
                       <dl className="grid gap-3 sm:grid-cols-2">
@@ -331,7 +331,7 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                   return (
                     <div
                       key={key}
-                      className="space-y-3 rounded-2xl border-2 border-accent/30 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_15px_30px_-25px_rgba(99,102,241,0.7)]"
+                      className="space-y-3 rounded-lg border-2 border-accent/30 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_15px_30px_-25px_rgba(99,102,241,0.7)]"
                     >
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div>
@@ -354,7 +354,7 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                         <Icon name={expanded ? 'chevron-up' : 'chevron-down'} width={12} height={12} />
                       </button>
                       {expanded && (
-                        <div className="space-y-2 rounded-2xl border border-indigo-600/60 bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-800 p-4 text-xs text-indigo-100 shadow-[0_25px_55px_-35px_rgba(30,41,59,0.75)]">
+                        <div className="space-y-2 rounded-lg border border-indigo-600/60 bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-800 p-4 text-xs text-indigo-100 shadow-[0_25px_55px_-35px_rgba(30,41,59,0.75)]">
                           <p className="font-mono text-[11px] uppercase tracking-wide text-indigo-200">
                             {finding.file ?? 'Unknown file'}:{finding.line ?? '—'}
                           </p>
@@ -375,7 +375,7 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                   return (
                     <div
                       key={key}
-                      className="space-y-3 rounded-2xl border-2 border-accent/30 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_15px_30px_-25px_rgba(99,102,241,0.7)]"
+                      className="space-y-3 rounded-lg border-2 border-accent/30 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_15px_30px_-25px_rgba(99,102,241,0.7)]"
                     >
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div>
@@ -401,7 +401,7 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                         <Icon name={expanded ? 'chevron-up' : 'chevron-down'} width={12} height={12} />
                       </button>
                       {expanded && (
-                        <div className="space-y-2 rounded-2xl border border-indigo-600/60 bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-800 p-4 text-xs text-indigo-100 shadow-[0_25px_55px_-35px_rgba(30,41,59,0.75)]">
+                        <div className="space-y-2 rounded-lg border border-indigo-600/60 bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-800 p-4 text-xs text-indigo-100 shadow-[0_25px_55px_-35px_rgba(30,41,59,0.75)]">
                           <p className="font-mono text-[11px] uppercase tracking-wide text-indigo-200">
                             {finding.file ?? 'Unknown file'}:{finding.line ?? '—'}-{finding.end_line ?? finding.line ?? '—'}
                           </p>
@@ -417,7 +417,7 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                 return (
                   <div
                     key={key}
-                    className="rounded-2xl border-2 border-accent/30 bg-slate-50 p-4 text-xs text-slate-700 shadow-[0_15px_30px_-25px_rgba(99,102,241,0.7)]"
+                    className="rounded-lg border-2 border-accent/30 bg-slate-50 p-4 text-xs text-slate-700 shadow-[0_15px_30px_-25px_rgba(99,102,241,0.7)]"
                   >
                     <pre className="max-h-60 overflow-y-auto whitespace-pre-wrap break-all">{JSON.stringify(finding, null, 2)}</pre>
                   </div>
@@ -425,7 +425,7 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
               })}
             </div>
           ) : (
-            <p className="mt-4 rounded-2xl border-2 border-accent/30 bg-slate-100 p-4 text-xs text-slate-600 shadow-[0_15px_30px_-25px_rgba(99,102,241,0.7)]">
+            <p className="mt-4 rounded-lg border-2 border-accent/30 bg-slate-100 p-4 text-xs text-slate-600 shadow-[0_15px_30px_-25px_rgba(99,102,241,0.7)]">
               No findings reported.
             </p>
           )}

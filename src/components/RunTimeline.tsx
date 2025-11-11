@@ -87,10 +87,10 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                   : 'bg-warning/80 border-warning/60 shadow-[0_0_0_4px_rgba(250,204,21,0.12)]',
               )}
             />
-            <div className="relative overflow-visible rounded-3xl border-2 border-accent/40 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_45px_90px_-50px_rgba(99,102,241,0.8)]">
+            <div className="relative overflow-visible rounded-xl border-2 border-accent/40 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_45px_90px_-50px_rgba(99,102,241,0.8)]">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/10 text-accent">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-accent/10 text-accent">
                     <Icon name="git-commit" width={20} height={20} />
                   </div>
                   <div>
@@ -175,7 +175,7 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                     <DetailStat label="Critical" value={run.summary.criticalSeverity} tone="danger" />
                   </div>
                   {isLoading && (
-                    <p className="rounded-2xl border-2 border-accent/40 bg-slate-100 p-4 text-sm text-slate-600">
+                    <p className="rounded-lg border-2 border-accent/40 bg-slate-100 p-4 text-sm text-slate-600">
                       Loading tool results…
                     </p>
                   )}
@@ -269,7 +269,7 @@ const DetailStat: React.FC<DetailStatProps> = ({
       onClick={isInteractive ? handleActivate : undefined}
       aria-pressed={isInteractive ? isActive : undefined}
       className={clsx(
-        'group relative flex h-full min-w-0 flex-col justify-between gap-4 rounded-3xl border-2 border-accent/30 p-4 text-left shadow-[0_20px_45px_-35px_rgba(99,102,241,0.7)]',
+        'group relative flex h-full min-w-0 flex-col justify-between gap-4 rounded-xl border-2 border-accent/30 p-4 text-left shadow-[0_20px_45px_-35px_rgba(99,102,241,0.7)]',
         statBackgroundByTone[tone],
         isInteractive &&
           'cursor-pointer transition hover:-translate-y-0.5 hover:shadow-[0_28px_60px_-30px_rgba(99,102,241,0.75)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 focus-visible:ring-offset-2',
@@ -282,7 +282,7 @@ const DetailStat: React.FC<DetailStatProps> = ({
           role="tooltip"
           id={tooltipId}
           className={clsx(
-            'pointer-events-none absolute left-1/2 top-full z-20 w-64 -translate-x-1/2 rounded-2xl border border-slate-900/70 bg-slate-950 px-5 py-4 text-left text-[12px] leading-relaxed text-slate-100 shadow-[0_35px_80px_-35px_rgba(15,23,42,0.7)] transition duration-150',
+            'pointer-events-none absolute left-1/2 top-full z-20 w-64 -translate-x-1/2 rounded-lg border border-slate-900/70 bg-slate-950 px-5 py-4 text-left text-[12px] leading-relaxed text-slate-100 shadow-[0_35px_80px_-35px_rgba(15,23,42,0.7)] transition duration-150',
             'invisible translate-y-2 opacity-0 group-hover:visible group-hover:translate-y-3 group-hover:opacity-100 group-focus-visible:visible group-focus-visible:translate-y-3 group-focus-visible:opacity-100',
           )}
         >
@@ -361,7 +361,7 @@ const InfoTooltip: React.FC<InfoTooltipProps> = ({ tooltip, open, onOpenChange }
         role="tooltip"
         id={tooltipId}
         className={clsx(
-          'pointer-events-auto absolute left-1/2 top-full z-20 w-64 -translate-x-1/2 rounded-2xl border border-accent/30 bg-slate-900/95 px-4 py-3 text-left text-[12px] leading-relaxed text-slate-100 shadow-[0_25px_60px_-25px_rgba(30,41,59,0.85)] backdrop-blur-sm transition duration-150',
+          'pointer-events-auto absolute left-1/2 top-full z-20 w-64 -translate-x-1/2 rounded-lg border border-accent/30 bg-slate-900/95 px-4 py-3 text-left text-[12px] leading-relaxed text-slate-100 shadow-[0_25px_60px_-25px_rgba(30,41,59,0.85)] backdrop-blur-sm transition duration-150',
           isOpen
             ? 'visible translate-y-3 opacity-100'
             : 'invisible translate-y-2 opacity-0',
