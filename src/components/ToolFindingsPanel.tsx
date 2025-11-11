@@ -47,6 +47,18 @@ type VulnerabilityFinding = {
   end_line?: number;
 };
 
+type AiFixResult = {
+  fix_description?: string;
+  fixed_code?: string;
+  vulnerability_id?: string;
+};
+
+type AiFixState = {
+  status: 'idle' | 'loading' | 'success' | 'error';
+  result?: AiFixResult;
+  error?: string;
+};
+
 const isScaFinding = (value: unknown): value is ScaFinding => {
   if (!value || typeof value !== 'object') {
     return false;
@@ -185,6 +197,7 @@ const getFindingSeverity = (finding: unknown): string | undefined => {
 
 export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, activeFilter }) => {
   const [expandedSnippets, setExpandedSnippets] = useState<Record<string, boolean>>({});
+  const [aiFixStates, setAiFixStates] = useState<Record<string, AiFixState>>({});
 
   if (!tools || Object.keys(tools).length === 0) {
     return (
@@ -199,6 +212,66 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
   };
 
   const isSnippetExpanded = (key: string) => Boolean(expandedSnippets[key]);
+
+  const triggerAiFix = async (key: string, finding: VulnerabilityFinding) => {
+    const message = finding.message ?? '';
+    const codeSnippet = finding.code_snippet ?? '';
+    const language = finding.file ?? 'unknown';
+
+    if (!message && !codeSnippet) {
+      setAiFixStates((prev) => ({
+        ...prev,
+        [key]: {
+          status: 'error',
+          error: 'Unable to generate fix: missing vulnerability details.',
+        },
+      }));
+      return;
+    }
+
+    setAiFixStates((prev) => ({
+      ...prev,
+      [key]: { status: 'loading' },
+    }));
+
+    try {
+      const response = await fetch('https://aegis-ez33.onrender.com/analyze_vulnerability', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          vulnerability_id: crypto.randomUUID(),
+          description: message,
+          code_snippet: codeSnippet,
+          language,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+
+      const data = (await response.json()) as AiFixResult;
+
+      setAiFixStates((prev) => ({
+        ...prev,
+        [key]: {
+          status: 'success',
+          result: data,
+        },
+      }));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error occurred.';
+      setAiFixStates((prev) => ({
+        ...prev,
+        [key]: {
+          status: 'error',
+          error: message,
+        },
+      }));
+    }
+  };
 
   const entries = Object.entries(tools);
   const sortedEntries = [...entries].sort(([toolA], [toolB]) => {
@@ -367,6 +440,10 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
 
                 if (isVulnerabilityFinding(finding)) {
                   const expanded = isSnippetExpanded(key);
+                  const fixState = aiFixStates[key];
+                  const isLoadingFix = fixState?.status === 'loading';
+                  const hasFixError = fixState?.status === 'error';
+                  const hasFixResult = fixState?.status === 'success' && fixState.result;
                   const message = finding.message ?? '';
                   const { title, description } = splitVulnerabilityMessage(message);
                   const hasDescription = description.length > 0;
@@ -391,23 +468,59 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                           <Icon name="alert" width={12} height={12} /> {formatSeverity(finding.severity)}
                         </span>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => toggleSnippet(key)}
-                        className="inline-flex items-center gap-2 rounded-full border-2 border-accent/30 bg-white px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-700 transition hover:text-accent"
-                        aria-expanded={expanded}
-                      >
-                        {expanded ? 'Hide snippet' : 'Show snippet'}
-                        <Icon name={expanded ? 'chevron-up' : 'chevron-down'} width={12} height={12} />
-                      </button>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => toggleSnippet(key)}
+                          className="inline-flex items-center gap-2 rounded-full border-2 border-accent/30 bg-white px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-700 transition hover:text-accent"
+                          aria-expanded={expanded}
+                        >
+                          {expanded ? 'Hide snippet' : 'Show snippet'}
+                          <Icon name={expanded ? 'chevron-up' : 'chevron-down'} width={12} height={12} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => triggerAiFix(key, finding)}
+                          className="inline-flex items-center gap-2 rounded-full border-2 border-accent bg-accent px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-white shadow-[0_15px_30px_-20px_rgba(99,102,241,0.7)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-70"
+                          disabled={isLoadingFix}
+                          aria-busy={isLoadingFix}
+                        >
+                          <span aria-hidden="true">✨</span> Fix with AI
+                          {isLoadingFix && <Icon name="refresh" width={12} height={12} className="animate-spin" />}
+                        </button>
+                      </div>
                       {expanded && (
                         <div className="space-y-2 rounded-lg border border-indigo-600/60 bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-800 p-4 text-xs text-indigo-100 shadow-[0_25px_55px_-35px_rgba(30,41,59,0.75)]">
                           <p className="font-mono text-[11px] uppercase tracking-wide text-indigo-200">
                             {finding.file ?? 'Unknown file'}:{finding.line ?? '—'}-{finding.end_line ?? finding.line ?? '—'}
                           </p>
-                          <pre className="whitespace-pre-wrap break-all font-mono text-xs text-indigo-100">
-                            {finding.code_snippet ?? 'Snippet unavailable.'}
-                          </pre>
+                          <pre className="whitespace-pre-wrap break-all font-mono text-xs text-indigo-100">{finding.code_snippet ?? 'Snippet unavailable.'}</pre>
+                        </div>
+                      )}
+                      {isLoadingFix && (
+                        <p className="text-xs font-medium text-slate-500">Generating secure fix suggestion…</p>
+                      )}
+                      {hasFixError && fixState?.error && (
+                        <p className="rounded-lg border border-rose-400/60 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-600">
+                          Unable to generate fix: {fixState.error}
+                        </p>
+                      )}
+                      {hasFixResult && fixState?.result && (
+                        <div className="space-y-2 rounded-lg border border-emerald-500/60 bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-800 p-4 text-xs text-emerald-100 shadow-[0_25px_55px_-35px_rgba(16,185,129,0.6)]">
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="text-sm font-semibold text-emerald-100">
+                              {fixState.result.fix_description ?? 'Suggested remediation'}
+                            </p>
+                            {fixState.result.vulnerability_id && (
+                              <span className="rounded-full border border-emerald-400/40 bg-emerald-900/40 px-2 py-0.5 text-[10px] uppercase tracking-wide text-emerald-200">
+                                Ref: {fixState.result.vulnerability_id}
+                              </span>
+                            )}
+                          </div>
+                          <div className="space-y-1 rounded-lg border border-emerald-400/30 bg-emerald-900/40 p-3">
+                            <p className="font-mono text-[11px] uppercase tracking-wide text-emerald-200">AI Fixed Snippet</p>
+                            <pre className="whitespace-pre-wrap break-all font-mono text-xs text-emerald-100">{fixState.result.fixed_code ?? 'No updated code provided.'}</pre>
+                          </div>
                         </div>
                       )}
                     </div>
