@@ -490,11 +490,11 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                         </button>
                       </div>
                       {expanded && (
-                        <div className="space-y-2 rounded-lg border border-indigo-600/60 bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-800 p-4 text-xs text-indigo-100 shadow-[0_25px_55px_-35px_rgba(30,41,59,0.75)]">
-                          <p className="font-mono text-[11px] uppercase tracking-wide text-indigo-200">
+                        <div className="space-y-2 rounded-lg border border-rose-400/70 bg-gradient-to-br from-white via-rose-50 to-rose-100 p-4 text-xs text-rose-900 shadow-[0_25px_55px_-35px_rgba(244,63,94,0.35)]">
+                          <p className="font-mono text-[11px] uppercase tracking-wide text-rose-500">
                             {finding.file ?? 'Unknown file'}:{finding.line ?? '—'}-{finding.end_line ?? finding.line ?? '—'}
                           </p>
-                          <pre className="whitespace-pre-wrap break-all font-mono text-xs text-indigo-100">{finding.code_snippet ?? 'Snippet unavailable.'}</pre>
+                          <pre className="whitespace-pre-wrap break-all font-mono text-xs text-rose-950">{finding.code_snippet ?? 'Snippet unavailable.'}</pre>
                         </div>
                       )}
                       {isLoadingFix && (
@@ -506,20 +506,20 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                         </p>
                       )}
                       {hasFixResult && fixState?.result && (
-                        <div className="space-y-2 rounded-lg border border-emerald-500/60 bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-800 p-4 text-xs text-emerald-100 shadow-[0_25px_55px_-35px_rgba(16,185,129,0.6)]">
+                        <div className="space-y-2 rounded-lg border border-emerald-400/70 bg-gradient-to-br from-white via-emerald-50 to-emerald-100 p-4 text-xs text-emerald-900 shadow-[0_25px_55px_-35px_rgba(16,185,129,0.35)]">
                           <div className="flex items-start justify-between gap-2">
-                            <p className="text-sm font-semibold text-emerald-100">
+                            <p className="text-sm font-semibold text-emerald-900">
                               {fixState.result.fix_description ?? 'Suggested remediation'}
                             </p>
                             {fixState.result.vulnerability_id && (
-                              <span className="rounded-full border border-emerald-400/40 bg-emerald-900/40 px-2 py-0.5 text-[10px] uppercase tracking-wide text-emerald-200">
+                              <span className="rounded-full border border-emerald-300/70 bg-emerald-100/70 px-2 py-0.5 text-[10px] uppercase tracking-wide text-emerald-700">
                                 Ref: {fixState.result.vulnerability_id}
                               </span>
                             )}
                           </div>
-                          <div className="space-y-1 rounded-lg border border-emerald-400/30 bg-emerald-900/40 p-3">
-                            <p className="font-mono text-[11px] uppercase tracking-wide text-emerald-200">AI Fixed Snippet</p>
-                            <pre className="whitespace-pre-wrap break-all font-mono text-xs text-emerald-100">{fixState.result.fixed_code ?? 'No updated code provided.'}</pre>
+                          <div className="space-y-1 rounded-lg border border-emerald-300/70 bg-gradient-to-br from-white via-emerald-50 to-emerald-100 p-3">
+                            <p className="font-mono text-[11px] uppercase tracking-wide text-emerald-600">AI Fixed Snippet</p>
+                            <pre className="whitespace-pre-wrap break-all font-mono text-xs text-emerald-900">{fixState.result.fixed_code ?? 'No updated code provided.'}</pre>
                           </div>
                         </div>
                       )}
