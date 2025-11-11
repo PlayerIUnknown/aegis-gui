@@ -56,7 +56,7 @@ export function AuthWindow({ onAuthenticated }: AuthWindowProps) {
       <span aria-hidden="true" className="floating-blob" />
       <span aria-hidden="true" className="floating-blob" />
       <span aria-hidden="true" className="floating-blob" />
-      <div className="auth-card w-full max-w-md rounded-3xl p-10">
+      <div className="auth-card w-full max-w-md rounded-xl p-10">
         <div className="relative z-10">
           <div className="auth-header mb-8 text-center opacity-0">
             <p className="text-base font-semibold uppercase tracking-[0.6em] text-accent md:text-lg">AEGIS</p>

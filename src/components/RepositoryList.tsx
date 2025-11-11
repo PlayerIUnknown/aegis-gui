@@ -18,7 +18,7 @@ export const RepositoryList: React.FC<RepositoryListProps> = ({
   return (
     <div className="space-y-3">
       {repositories.length === 0 && (
-        <p className="rounded-2xl border-2 border-accent/40 bg-white p-6 text-sm text-slate-600 shadow-[0_20px_40px_-35px_rgba(99,102,241,0.6)]">
+        <p className="rounded-lg border-2 border-accent/40 bg-white p-6 text-sm text-slate-600 shadow-[0_20px_40px_-35px_rgba(99,102,241,0.6)]">
           No repositories match the current filters.
         </p>
       )}
@@ -29,7 +29,7 @@ export const RepositoryList: React.FC<RepositoryListProps> = ({
             key={repo.id}
             onClick={() => onSelect(repo.id)}
             className={clsx(
-              'group w-full rounded-2xl border-2 p-5 text-left transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50',
+              'group w-full rounded-lg border-2 p-5 text-left transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50',
               'border-accent/40 bg-gradient-to-br from-white via-slate-50 to-white shadow-[0_20px_40px_-35px_rgba(99,102,241,0.65)] hover:-translate-y-0.5 hover:shadow-[0_25px_55px_-30px_rgba(99,102,241,0.75)]',
               activeRepositoryId === repo.id &&
                 'border-accent/70 bg-accent/10 text-slate-900 shadow-[0_25px_55px_-28px_rgba(99,102,241,0.85)] ring-2 ring-accent/30',
@@ -39,7 +39,7 @@ export const RepositoryList: React.FC<RepositoryListProps> = ({
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-accent/10 via-accent/5 to-white text-sm font-semibold uppercase text-accent shadow-inner">
+                <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-gradient-to-br from-accent/10 via-accent/5 to-white text-sm font-semibold uppercase text-accent shadow-inner">
                   {repo.repoName.slice(0, 2)}
                 </div>
                 <div>
