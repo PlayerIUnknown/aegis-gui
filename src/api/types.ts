@@ -48,6 +48,7 @@ export interface ScanRepositoryInfo {
 export interface ScanListItem {
   id: string;
   timestamp: string;
+  created_at?: string;
   scan_type: string;
   target_path: string | null;
   status: ScanStatus;

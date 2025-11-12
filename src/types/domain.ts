@@ -75,7 +75,7 @@ const normalizeQualityGateValue = (value: unknown): boolean | null => {
 
 export const mapScan = (scan: ScanListItem): ScanView => ({
   id: scan.id,
-  timestamp: scan.timestamp,
+  timestamp: scan.created_at ?? scan.timestamp,
   status: scan.status,
   qualityGatePassed: normalizeQualityGateValue(scan.quality_gate_passed),
   qualityGateReasons: scan.quality_gate_reasons,
@@ -91,7 +91,7 @@ export const mapScan = (scan: ScanListItem): ScanView => ({
 
 export const mapScanDetails = (details: ScanDetailsResponse): ScanDetailsView => ({
   id: details.id,
-  timestamp: details.timestamp,
+  timestamp: details.created_at ?? details.timestamp,
   status: details.status_text,
   qualityGatePassed: normalizeQualityGateValue(details.quality_gate_passed),
   qualityGateReasons: details.quality_gate_reasons,
