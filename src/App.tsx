@@ -357,12 +357,11 @@ function App() {
         icon: 'users',
         label: `${totalRepositories} connected ${totalRepositories === 1 ? 'workspace' : 'workspaces'}`,
       },
-      {
-        key: 'updated',
-        icon: 'clock',
-        label: formattedLastUpdated === '—' ? 'Awaiting first scan' : `Last updated • ${formattedLastUpdated}`,
-      },
     ];
+
+    if (formattedLastUpdated !== '—') {
+      badges.push({ key: 'updated', icon: 'clock', label: `Last updated • ${formattedLastUpdated}` });
+    }
 
     if (profile?.name) {
       badges.push({ key: 'owner', icon: 'user', label: profile.name });
@@ -512,9 +511,11 @@ function App() {
               )}
 
               <section className="space-y-6 rounded-2xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_40px_90px_-60px_rgba(15,23,42,0.85)]">
-                <div className="space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-300">Scans</p>
-                  <h2 className="text-xl font-semibold text-white">Explore repository history</h2>
+                <div className="space-y-1">
+                  <p className="inline-flex items-center rounded-md bg-accent px-3 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-white shadow-sm">
+                    Scans
+                  </p>
+                  <h2 className="text-2xl font-semibold text-white">Explore repository history</h2>
                   <p className="text-sm text-slate-300">
                     Select a workspace to review recent pipeline executions and quality gate outcomes.
                   </p>
