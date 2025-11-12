@@ -357,7 +357,7 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                         </div>
                         <div>
                           <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Version</dt>
-                          <dd className="mt-1 font-medium text-slate-900">{packageVersion}</dd>
+                          <dd className="mt-1 font-semibold text-rose-600">{packageVersion}</dd>
                         </div>
                         <div className="sm:col-span-2">
                           <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Description</dt>
@@ -366,7 +366,7 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                         {fixVersions && (
                           <div className="sm:col-span-2">
                             <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Fix version</dt>
-                            <dd className="mt-1 font-medium text-slate-900">{fixVersions}</dd>
+                            <dd className="mt-1 font-semibold text-emerald-600">{fixVersions}</dd>
                           </div>
                         )}
                       </dl>
@@ -427,12 +427,26 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                         <Icon name={expanded ? 'chevron-up' : 'chevron-down'} width={12} height={12} />
                       </button>
                       {expanded && (
-                        <div className="space-y-2 rounded-lg border border-indigo-600/60 bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-800 p-4 text-xs text-indigo-100 shadow-[0_25px_55px_-35px_rgba(30,41,59,0.75)]">
-                          <p className="font-mono text-[11px] uppercase tracking-wide text-indigo-200">
-                            {finding.file ?? 'Unknown file'}:{finding.line ?? '—'}
-                          </p>
-                          <pre className="whitespace-pre-wrap break-all font-mono text-xs text-indigo-100">{finding.match}</pre>
-                        </div>
+                        <>
+                          <div className="space-y-2 rounded-lg border border-rose-400/70 bg-gradient-to-br from-white via-rose-50 to-rose-100 p-4 text-xs text-rose-900 shadow-[0_25px_55px_-35px_rgba(244,63,94,0.35)]">
+                            <p className="font-mono text-[11px] uppercase tracking-wide text-rose-500">
+                              {finding.file ?? 'Unknown file'}:{finding.line ?? '—'}
+                            </p>
+                            <pre className="whitespace-pre-wrap break-all font-mono text-xs text-rose-950">{finding.match}</pre>
+                          </div>
+                          <div className="space-y-2 rounded-lg border border-emerald-400/70 bg-gradient-to-br from-white via-emerald-50 to-emerald-100 p-4 text-xs text-emerald-900 shadow-[0_25px_55px_-35px_rgba(16,185,129,0.35)]">
+                            <p className="text-sm font-semibold text-emerald-900">Recommended remediation</p>
+                            <ul className="list-disc space-y-1 pl-5 text-xs text-emerald-800">
+                              <li>
+                                Remove the exposed value from source control and reference it via a secrets manager or environment variable instead of hardcoding it.
+                              </li>
+                              <li>Rotate the compromised credential and audit recent usage for suspicious access.</li>
+                              <li>
+                                Update deployment pipelines to inject secrets at runtime and add automated scanning to prevent future commits with sensitive strings.
+                              </li>
+                            </ul>
+                          </div>
+                        </>
                       )}
                     </div>
                   );
@@ -485,7 +499,7 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                           disabled={isLoadingFix}
                           aria-busy={isLoadingFix}
                         >
-                          <span aria-hidden="true">✨</span> Fix with AI
+                          <span aria-hidden="true" className="text-white">✨</span> Fix with AI
                           {isLoadingFix && <Icon name="refresh" width={12} height={12} className="animate-spin" />}
                         </button>
                       </div>
