@@ -18,7 +18,7 @@ export const RepositoryList: React.FC<RepositoryListProps> = ({
   return (
     <div className="space-y-3">
       {repositories.length === 0 && (
-        <p className="rounded-lg border-2 border-accent/40 bg-white p-6 text-sm text-slate-600 shadow-[0_20px_40px_-35px_rgba(99,102,241,0.6)]">
+        <p className="rounded-lg border border-white/18 bg-gradient-to-br from-white/95 via-slate-100/90 to-white/95 p-6 text-sm text-slate-600 shadow-[0_18px_45px_-35px_rgba(15,23,42,0.45)]">
           No repositories match the current filters.
         </p>
       )}
@@ -29,10 +29,10 @@ export const RepositoryList: React.FC<RepositoryListProps> = ({
             key={repo.id}
             onClick={() => onSelect(repo.id)}
             className={clsx(
-              'group w-full rounded-lg border-2 p-5 text-left transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50',
-              'border-accent/40 bg-gradient-to-br from-white via-slate-50 to-white shadow-[0_20px_40px_-35px_rgba(99,102,241,0.65)] hover:-translate-y-0.5 hover:shadow-[0_25px_55px_-30px_rgba(99,102,241,0.75)]',
+              'group w-full rounded-lg border p-5 text-left transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40',
+              'border-white/15 bg-gradient-to-br from-white/95 via-slate-100/90 to-white/95 shadow-[0_20px_48px_-36px_rgba(15,23,42,0.45)] hover:-translate-y-0.5 hover:shadow-[0_26px_56px_-34px_rgba(15,23,42,0.52)]',
               activeRepositoryId === repo.id &&
-                'border-accent/70 bg-accent/10 text-slate-900 shadow-[0_25px_55px_-28px_rgba(99,102,241,0.85)] ring-2 ring-accent/30',
+                'border-accent/50 bg-gradient-to-br from-accent/15 via-accent/10 to-white text-slate-900 shadow-[0_26px_56px_-32px_rgba(15,23,42,0.55)] ring-2 ring-accent/25',
             )}
             aria-current={activeRepositoryId === repo.id}
             type="button"

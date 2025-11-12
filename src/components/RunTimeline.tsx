@@ -87,7 +87,7 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                   : 'bg-warning/80 border-warning/60 shadow-[0_0_0_4px_rgba(250,204,21,0.12)]',
               )}
             />
-            <div className="relative overflow-visible rounded-xl border-2 border-accent/40 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_45px_90px_-50px_rgba(99,102,241,0.8)]">
+            <div className="relative overflow-visible rounded-xl border border-white/20 bg-gradient-to-br from-white/95 via-slate-100/90 to-white/95 p-6 shadow-[0_32px_72px_-48px_rgba(15,23,42,0.55)]">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-accent/10 text-accent">
@@ -121,7 +121,7 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                   <StatusPill qualityGatePassed={run.qualityGatePassed} />
                   <button
                     onClick={handleToggle}
-                    className="flex items-center gap-2 rounded-full border-2 border-accent/40 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-700 transition hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
+                    className="flex items-center gap-2 rounded-full border border-accent/30 bg-white/90 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-700 transition hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
                     aria-expanded={isOpen}
                     type="button"
                   >
@@ -175,7 +175,7 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                     <DetailStat label="Critical" value={run.summary.criticalSeverity} tone="danger" />
                   </div>
                   {isLoading && (
-                    <p className="rounded-lg border-2 border-accent/40 bg-slate-100 p-4 text-sm text-slate-600">
+                    <p className="rounded-lg border border-white/18 bg-gradient-to-br from-white/95 via-slate-100/90 to-white/95 p-4 text-sm text-slate-600 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]">
                       Loading tool results…
                     </p>
                   )}
@@ -205,11 +205,11 @@ type DetailStatProps = {
 };
 
 const statBackgroundByTone: Record<DetailStatProps['tone'], string> = {
-  neutral: 'bg-gradient-to-br from-white via-slate-50 to-white text-slate-900',
-  accent: 'bg-gradient-to-br from-accent/10 via-accent/5 to-white text-slate-900',
-  warning: 'bg-gradient-to-br from-warning/10 via-warning/5 to-white text-slate-900',
-  danger: 'bg-gradient-to-br from-danger/10 via-danger/5 to-white text-slate-900',
-  success: 'bg-gradient-to-br from-success/10 via-success/5 to-white text-slate-900',
+  neutral: 'bg-gradient-to-br from-white/95 via-slate-100/90 to-white/95 text-slate-900',
+  accent: 'bg-gradient-to-br from-accent/15 via-accent/10 to-white/95 text-slate-900',
+  warning: 'bg-gradient-to-br from-warning/20 via-warning/10 to-white/95 text-slate-900',
+  danger: 'bg-gradient-to-br from-danger/20 via-danger/10 to-white/95 text-slate-900',
+  success: 'bg-gradient-to-br from-success/20 via-success/10 to-white/95 text-slate-900',
 };
 
 const DetailStat: React.FC<DetailStatProps> = ({
@@ -269,11 +269,11 @@ const DetailStat: React.FC<DetailStatProps> = ({
       onClick={isInteractive ? handleActivate : undefined}
       aria-pressed={isInteractive ? isActive : undefined}
       className={clsx(
-        'group relative flex h-full min-w-0 flex-col justify-between gap-4 rounded-xl border-2 border-accent/30 p-4 text-left shadow-[0_20px_45px_-35px_rgba(99,102,241,0.7)]',
+        'group relative flex h-full min-w-0 flex-col justify-between gap-4 rounded-xl border border-white/18 p-4 text-left shadow-[0_20px_48px_-36px_rgba(15,23,42,0.45)]',
         statBackgroundByTone[tone],
         isInteractive &&
-          'cursor-pointer transition hover:-translate-y-0.5 hover:shadow-[0_28px_60px_-30px_rgba(99,102,241,0.75)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 focus-visible:ring-offset-2',
-        isActive && 'border-accent/70 shadow-[0_30px_65px_-40px_rgba(99,102,241,0.85)] ring-2 ring-inset ring-accent/20',
+          'cursor-pointer transition hover:-translate-y-0.5 hover:shadow-[0_26px_60px_-34px_rgba(15,23,42,0.52)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 focus-visible:ring-offset-2',
+        isActive && 'border-accent/50 shadow-[0_28px_62px_-36px_rgba(15,23,42,0.55)] ring-2 ring-inset ring-accent/20',
       )}
     >
       {content}
