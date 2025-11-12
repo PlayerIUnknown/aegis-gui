@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ApiError,
   type AuthResponse,
@@ -79,6 +79,8 @@ function App() {
     }
     return window.innerWidth >= 1024;
   });
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement | null>(null);
   const actionsSnippet = useMemo(() => {
     const apiKey = profile?.api_key ?? '${{ secrets.AEGIS_API_KEY }}';
     return String.raw`- name: Run Aegis Security Scan
@@ -159,6 +161,19 @@ function App() {
       fetchInitialData(token);
     }
   }, [token, fetchInitialData]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setIsProfileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     handleRefresh();
@@ -397,8 +412,8 @@ function App() {
           </button>
           <div className="space-y-4 pt-4">
             <div className="space-y-1">
-              <p className="text-sm font-semibold uppercase tracking-[0.32em] text-accent">Aegis</p>
-              <p className="text-lg font-semibold text-slate-900">Security Posture</p>
+              <p className="text-lg font-semibold uppercase tracking-[0.32em] text-accent">Aegis</p>
+              <p className="text-xl font-semibold text-slate-900">Security Posture</p>
             </div>
             <p className="text-xs text-slate-500">
               Monitor scan activity, track quality gate performance, and configure CI ingestion for your tenant.
@@ -462,8 +477,8 @@ function App() {
           isSidebarOpen ? 'lg:ml-72' : 'lg:ml-0'
         }`}
       >
-        <div className="sticky top-0 z-30 border-b border-slate-200/70 bg-white/80 backdrop-blur">
-          <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center gap-3 px-6 py-4">
+        <div className="sticky top-0 z-30 border-b border-slate-200/70 bg-white/90 backdrop-blur">
+          <div className="flex h-20 w-full flex-wrap items-center gap-3 px-4 sm:px-6">
             <div className="flex items-center gap-3">
               {!isSidebarOpen && (
                 <button
@@ -476,7 +491,7 @@ function App() {
                 </button>
               )}
               {!isSidebarOpen && (
-                <p className="text-xs font-semibold uppercase tracking-[0.32em] text-accent">Aegis</p>
+                <p className="text-sm font-semibold uppercase tracking-[0.32em] text-accent">Aegis</p>
               )}
             </div>
             <div className="flex flex-1 flex-wrap items-center justify-end gap-3">
@@ -513,39 +528,87 @@ function App() {
               <button
                 type="button"
                 onClick={handleRefresh}
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200/70 bg-white/90 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-700 transition hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
+                className="inline-flex items-center gap-2 rounded-full border border-slate-200/70 bg-white/80 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-600 transition hover:border-accent/50 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
               >
-                <Icon name="refresh" width={16} height={16} /> Refresh
+                <Icon name="refresh" width={14} height={14} /> Refresh
               </button>
+              <div ref={profileMenuRef} className="relative ml-2">
+                <button
+                  type="button"
+                  onClick={() => setIsProfileMenuOpen((open) => !open)}
+                  className="inline-flex items-center gap-2 rounded-full border border-slate-200/70 bg-white/90 px-3 py-2 text-sm font-semibold text-slate-700 shadow-[0_14px_32px_-28px_rgba(15,23,42,0.35)] transition hover:border-accent/50 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+                  aria-haspopup="true"
+                  aria-expanded={isProfileMenuOpen}
+                >
+                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-accent/10 text-sm font-semibold uppercase text-accent">
+                    A
+                  </span>
+                  <span>Akash</span>
+                  <Icon
+                    name="chevron-down"
+                    width={16}
+                    height={16}
+                    className={`transition-transform ${isProfileMenuOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+                {isProfileMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-64 rounded-xl border border-slate-200/70 bg-white p-4 shadow-[0_22px_45px_-30px_rgba(15,23,42,0.45)]">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Connected workspaces</p>
+                    <ul className="mt-2 space-y-1">
+                      {repositories.length === 0 && (
+                        <li className="text-sm text-slate-500">No workspaces connected yet.</li>
+                      )}
+                      {repositories.slice(0, 5).map((repo) => (
+                        <li key={repo.id} className="truncate text-sm text-slate-700">
+                          {repo.repoName}
+                        </li>
+                      ))}
+                      {repositories.length > 5 && (
+                        <li className="text-xs text-slate-500">and {repositories.length - 5} more…</li>
+                      )}
+                    </ul>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsProfileMenuOpen(false);
+                        signOut();
+                      }}
+                      className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200/70 bg-white px-3 py-2 text-sm font-semibold text-danger transition hover:border-danger/50 hover:bg-danger/10"
+                    >
+                      <Icon name="log-out" width={16} height={16} /> Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="mx-auto flex w-full min-w-0 max-w-7xl flex-1 flex-col gap-10 px-6 py-8">
-          <header className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.32em] text-accent">Security Posture Command Center</p>
-            <h1 className="text-3xl font-semibold text-white">Stay ahead of every scan</h1>
-            <p className="max-w-xl text-sm text-white">
-              Search, filter, and drill into pipeline runs with confidence. Quality gate performance updates in real time from the
-              Config API.
-            </p>
-          </header>
+          <div className="flex w-full min-w-0 flex-1 flex-col gap-10 px-4 py-8 sm:px-6">
+            <header className="space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.32em] text-accent">Security Posture Command Center</p>
+              <h1 className="text-3xl font-semibold text-white">Stay ahead of every scan</h1>
+              <p className="max-w-xl text-sm text-white">
+                Search, filter, and drill into pipeline runs with confidence. Quality gate performance updates in real time from the
+                Config API.
+              </p>
+            </header>
 
-          {error && <p className="rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">{error}</p>}
+            {error && <p className="rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">{error}</p>}
 
-          {activeTab === 'dashboard' ? (
-            <div className="space-y-10">
-              <section className="rounded-2xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_40px_90px_-60px_rgba(15,23,42,0.85)]">
-                <GlobalSummary summary={dashboardSummary} />
-              </section>
+            {activeTab === 'dashboard' ? (
+              <div className="space-y-10">
+                <section className="rounded-2xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_40px_90px_-60px_rgba(15,23,42,0.85)]">
+                  <GlobalSummary summary={dashboardSummary} />
+                </section>
 
-              {isLoadingData && (
-                <p className="rounded-2xl border border-slate-200/70 bg-white p-6 text-sm text-slate-600 shadow-[0_25px_60px_-55px_rgba(15,23,42,0.7)]">
-                  Refreshing data from Config API…
-                </p>
-              )}
+                {isLoadingData && (
+                  <p className="rounded-2xl border border-slate-200/70 bg-white p-6 text-sm text-slate-600 shadow-[0_25px_60px_-55px_rgba(15,23,42,0.7)]">
+                    Refreshing data from Config API…
+                  </p>
+                )}
 
-              <section className="space-y-6 rounded-2xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_40px_90px_-60px_rgba(15,23,42,0.85)]">
+                <section className="space-y-6 rounded-2xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_40px_90px_-60px_rgba(15,23,42,0.85)]">
                 <div className="space-y-1">
                   <h2 className="text-2xl font-semibold text-slate-900">Explore repository history</h2>
                   <p className="text-sm text-slate-300">
@@ -636,7 +699,7 @@ function App() {
               <section className="space-y-6 rounded-2xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_40px_90px_-60px_rgba(15,23,42,0.85)]">
                 <div className="space-y-2">
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-300">Tenant onboarding</p>
-                  <h2 className="text-xl font-semibold text-white">Connect your scanners</h2>
+                  <h2 className="text-xl font-semibold text-black">Connect your scanners</h2>
                   <p className="text-sm text-slate-300">
                     Use the generated API key and workflow snippet to route CI scan results through the Config API.
                   </p>
