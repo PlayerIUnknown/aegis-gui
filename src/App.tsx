@@ -513,9 +513,9 @@ function App() {
 
               <section className="space-y-6 rounded-2xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_40px_90px_-60px_rgba(15,23,42,0.85)]">
                 <div className="space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Scans</p>
-                  <h2 className="text-xl font-semibold text-slate-900">Explore repository history</h2>
-                  <p className="text-sm text-slate-600">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-300">Scans</p>
+                  <h2 className="text-xl font-semibold text-white">Explore repository history</h2>
+                  <p className="text-sm text-slate-300">
                     Select a workspace to review recent pipeline executions and quality gate outcomes.
                   </p>
                 </div>
@@ -602,9 +602,9 @@ function App() {
             <div className="space-y-10">
               <section className="space-y-6 rounded-2xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_40px_90px_-60px_rgba(15,23,42,0.85)]">
                 <div className="space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Tenant onboarding</p>
-                  <h2 className="text-xl font-semibold text-slate-900">Connect your scanners</h2>
-                  <p className="text-sm text-slate-600">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-300">Tenant onboarding</p>
+                  <h2 className="text-xl font-semibold text-white">Connect your scanners</h2>
+                  <p className="text-sm text-slate-300">
                     Use the generated API key and workflow snippet to route CI scan results through the Config API.
                   </p>
                 </div>

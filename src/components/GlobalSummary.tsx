@@ -54,13 +54,13 @@ type SummaryTileProps = {
 };
 
 const backgroundByTone: Record<SummaryTileProps['tone'], string> = {
-  neutral: 'bg-gradient-to-br from-white via-slate-50 to-white text-slate-900',
+  neutral: 'bg-gradient-to-br from-white/95 via-slate-100/90 to-white/95 text-slate-900',
   success:
-    'bg-gradient-to-br from-success/10 via-success/5 to-white text-success',
+    'bg-gradient-to-br from-success/15 via-success/10 to-white/95 text-success',
   danger:
-    'bg-gradient-to-br from-danger/10 via-danger/5 to-white text-danger',
+    'bg-gradient-to-br from-danger/15 via-danger/10 to-white/95 text-danger',
   accent:
-    'bg-gradient-to-br from-accent/10 via-accent/5 to-white text-accent',
+    'bg-gradient-to-br from-accent/15 via-accent/10 to-white/95 text-accent',
 };
 
 const iconBackgroundByTone: Record<SummaryTileProps['tone'], string> = {

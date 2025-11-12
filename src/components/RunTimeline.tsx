@@ -205,11 +205,11 @@ type DetailStatProps = {
 };
 
 const statBackgroundByTone: Record<DetailStatProps['tone'], string> = {
-  neutral: 'bg-gradient-to-br from-white via-slate-50 to-white text-slate-900',
-  accent: 'bg-gradient-to-br from-accent/10 via-accent/5 to-white text-slate-900',
-  warning: 'bg-gradient-to-br from-warning/10 via-warning/5 to-white text-slate-900',
-  danger: 'bg-gradient-to-br from-danger/10 via-danger/5 to-white text-slate-900',
-  success: 'bg-gradient-to-br from-success/10 via-success/5 to-white text-slate-900',
+  neutral: 'bg-gradient-to-br from-white/95 via-slate-100/90 to-white/95 text-slate-900',
+  accent: 'bg-gradient-to-br from-accent/15 via-accent/10 to-white/95 text-slate-900',
+  warning: 'bg-gradient-to-br from-warning/20 via-warning/10 to-white/95 text-slate-900',
+  danger: 'bg-gradient-to-br from-danger/20 via-danger/10 to-white/95 text-slate-900',
+  success: 'bg-gradient-to-br from-success/20 via-success/10 to-white/95 text-slate-900',
 };
 
 const DetailStat: React.FC<DetailStatProps> = ({
