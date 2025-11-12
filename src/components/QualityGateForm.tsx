@@ -122,7 +122,7 @@ type ToggleFieldProps = {
 };
 
 const ToggleField: FC<ToggleFieldProps> = ({ label, description, checked, onToggle }) => (
-  <div className="flex h-full flex-col justify-between gap-4 rounded-xl border-2 border-accent/40 bg-slate-50/95 p-5 shadow-[0_20px_40px_-35px_rgba(99,102,241,0.6)]">
+  <div className="flex h-full flex-col justify-between gap-4 rounded-xl border border-white/18 bg-gradient-to-br from-white/95 via-slate-100/90 to-white/95 p-5 shadow-[0_22px_48px_-36px_rgba(15,23,42,0.42)]">
     <div className="space-y-2">
       <p className="text-sm font-semibold leading-snug text-slate-900">{label}</p>
       <p className="text-xs leading-relaxed text-slate-600">{description}</p>
@@ -151,14 +151,14 @@ type NumberFieldProps = {
 };
 
 const NumberField: FC<NumberFieldProps> = ({ label, value, onChange }) => (
-  <label className="flex h-full min-h-[128px] flex-col justify-between gap-3 rounded-xl border-2 border-accent/40 bg-slate-50/95 p-4 shadow-[0_20px_40px_-35px_rgba(99,102,241,0.6)]">
+  <label className="flex h-full min-h-[128px] flex-col justify-between gap-3 rounded-xl border border-white/18 bg-gradient-to-br from-white/95 via-slate-100/90 to-white/95 p-4 shadow-[0_22px_48px_-36px_rgba(15,23,42,0.42)]">
     <span className="text-xs font-semibold uppercase tracking-wide text-slate-600">{label}</span>
     <input
       type="number"
       min={0}
       value={value}
       onChange={onChange}
-      className="w-full rounded-lg border-2 border-accent/40 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30"
+      className="w-full rounded-lg border border-slate-200/70 bg-white/95 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30"
     />
   </label>
 );
