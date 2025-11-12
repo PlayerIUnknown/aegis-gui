@@ -26,7 +26,7 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
 }) => (
   <div
     className={clsx(
-      'flex h-full flex-col justify-between rounded-lg border-2 border-accent/40 p-4 shadow-[0_20px_45px_-30px_rgba(99,102,241,0.6)]',
+      'flex h-full flex-col justify-between rounded-lg border border-slate-200/70 p-4 shadow-[0_16px_40px_-28px_rgba(15,23,42,0.35)]',
       intentStyles[intent]
     )}
   >

@@ -100,7 +100,7 @@ export function AuthWindow({ onAuthenticated }: AuthWindowProps) {
                   value={name}
                   onChange={(event) => setName(event.target.value)}
                   placeholder="Your name"
-                  className="mt-2 w-full rounded-xl border-2 border-accent/40 bg-white/90 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30"
+                  className="mt-2 w-full rounded-xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30"
                   autoComplete="name"
                   required
                 />
@@ -114,7 +114,7 @@ export function AuthWindow({ onAuthenticated }: AuthWindowProps) {
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="you@example.com"
-                className="mt-2 w-full rounded-xl border-2 border-accent/40 bg-white/90 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30"
+                className="mt-2 w-full rounded-xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30"
                 autoComplete={mode === 'signin' ? 'email' : 'new-email'}
                 required
               />
@@ -127,7 +127,7 @@ export function AuthWindow({ onAuthenticated }: AuthWindowProps) {
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 placeholder="Enter your password"
-                className="mt-2 w-full rounded-xl border-2 border-accent/40 bg-white/90 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30"
+                className="mt-2 w-full rounded-xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30"
                 autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
                 required
               />
@@ -141,7 +141,7 @@ export function AuthWindow({ onAuthenticated }: AuthWindowProps) {
                   value={confirmPassword}
                   onChange={(event) => setConfirmPassword(event.target.value)}
                   placeholder="Confirm your password"
-                  className="mt-2 w-full rounded-xl border-2 border-accent/40 bg-white/90 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30"
+                  className="mt-2 w-full rounded-xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30"
                   autoComplete="new-password"
                   required
                 />

@@ -10,7 +10,7 @@ type RepositoryOverviewProps = {
 export const RepositoryOverview: React.FC<RepositoryOverviewProps> = ({ repository }) => {
   if (!repository) {
     return (
-      <p className="rounded-xl border-2 border-accent/40 bg-white p-6 text-sm text-slate-600 shadow-[0_20px_40px_-30px_rgba(99,102,241,0.55)]">
+      <p className="rounded-xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-6 text-sm text-slate-600 shadow-[0_20px_45px_-32px_rgba(15,23,42,0.4)]">
         Select a repository on the left to view its recent activity.
       </p>
     );
@@ -27,7 +27,7 @@ export const RepositoryOverview: React.FC<RepositoryOverviewProps> = ({ reposito
   const runningRuns = repository.scans.filter((scan) => scan.status === 'running').length;
 
   return (
-    <section className="space-y-5 rounded-xl border-2 border-accent/40 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_40px_80px_-45px_rgba(99,102,241,0.75)]">
+    <section className="space-y-5 rounded-xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_28px_68px_-44px_rgba(15,23,42,0.5)]">
       <div className="flex flex-wrap items-start justify-between gap-6">
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Repository overview</p>
@@ -38,7 +38,7 @@ export const RepositoryOverview: React.FC<RepositoryOverviewProps> = ({ reposito
       </div>
 
       {latestRun && (
-        <div className="flex items-center gap-3 rounded-lg border-2 border-accent/40 bg-accent/5 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-accent">
+        <div className="flex items-center gap-3 rounded-lg border border-accent/30 bg-accent/10 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-accent">
           <Icon name="shield" width={16} height={16} />
           Quality gate snapshot · {latestRun.qualityGatePassed === true ? 'Passed' : latestRun.qualityGatePassed === false ? 'Failed' : 'Pending'} · Status {latestRun.status}
         </div>
@@ -98,13 +98,13 @@ type RepositoryStatProps = {
 
 const toneStyles: Record<NonNullable<RepositoryStatProps['tone']>, string> = {
   default:
-    'border-accent/40 bg-gradient-to-br from-white via-slate-50 to-slate-100 text-slate-900',
+    'border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-slate-100 text-slate-900',
   success:
-    'border-accent/40 bg-gradient-to-br from-success/10 via-success/10 to-white text-success',
+    'border-slate-200/70 bg-gradient-to-br from-success/10 via-success/5 to-white text-success',
   danger:
-    'border-accent/40 bg-gradient-to-br from-danger/10 via-danger/5 to-white text-danger',
+    'border-slate-200/70 bg-gradient-to-br from-danger/10 via-danger/5 to-white text-danger',
   warning:
-    'border-accent/40 bg-gradient-to-br from-warning/10 via-warning/5 to-white text-warning',
+    'border-slate-200/70 bg-gradient-to-br from-warning/10 via-warning/5 to-white text-warning',
 };
 
 const iconToneStyles: Record<NonNullable<RepositoryStatProps['tone']>, string> = {
@@ -115,7 +115,7 @@ const iconToneStyles: Record<NonNullable<RepositoryStatProps['tone']>, string> =
 };
 
 const RepositoryStat: React.FC<RepositoryStatProps> = ({ icon, label, value, helper, tone = 'default' }) => (
-  <div className={`rounded-xl border-2 p-5 shadow-[0_25px_50px_-35px_rgba(99,102,241,0.7)] ${toneStyles[tone]}`}>
+  <div className={`rounded-xl border p-5 shadow-[0_22px_48px_-36px_rgba(15,23,42,0.42)] ${toneStyles[tone]}`}>
     <div className={`mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg ${iconToneStyles[tone]}`}>
       <Icon name={icon} width={18} height={18} />
     </div>

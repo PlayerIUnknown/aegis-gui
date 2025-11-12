@@ -64,14 +64,14 @@ const backgroundByTone: Record<SummaryTileProps['tone'], string> = {
 };
 
 const iconBackgroundByTone: Record<SummaryTileProps['tone'], string> = {
-  neutral: 'bg-white text-accent shadow-[0_0_0_1px_rgba(99,102,241,0.2)]',
-  success: 'bg-white text-success shadow-[0_0_0_1px_rgba(99,102,241,0.2)]',
-  danger: 'bg-white text-danger shadow-[0_0_0_1px_rgba(99,102,241,0.2)]',
-  accent: 'bg-white text-accent shadow-[0_0_0_1px_rgba(99,102,241,0.2)]',
+  neutral: 'bg-white text-accent shadow-[0_0_0_1px_rgba(15,23,42,0.08)]',
+  success: 'bg-white text-success shadow-[0_0_0_1px_rgba(15,23,42,0.08)]',
+  danger: 'bg-white text-danger shadow-[0_0_0_1px_rgba(15,23,42,0.08)]',
+  accent: 'bg-white text-accent shadow-[0_0_0_1px_rgba(15,23,42,0.08)]',
 };
 
 const tileBaseClasses =
-  'flex flex-col gap-3 rounded-xl border-2 border-accent/50 p-5 shadow-[0_20px_45px_-25px_rgba(99,102,241,0.55)] transition hover:-translate-y-0.5 hover:shadow-[0_25px_55px_-20px_rgba(99,102,241,0.65)]';
+  'flex flex-col gap-3 rounded-xl border border-slate-200/70 p-5 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.4)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_52px_-30px_rgba(15,23,42,0.5)]';
 
 const SummaryTile: React.FC<SummaryTileProps> = ({ title, value, icon, tone, helper }) => (
   <div className={`${tileBaseClasses} ${backgroundByTone[tone]}`}>
