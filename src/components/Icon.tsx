@@ -17,6 +17,7 @@ export type IconName =
   | 'key'
   | 'link'
   | 'moon'
+  | 'menu'
   | 'package'
   | 'package-export'
   | 'refresh'
@@ -27,6 +28,7 @@ export type IconName =
   | 'sparkle'
   | 'user'
   | 'users'
+  | 'x'
   | 'x-circle';
 
 type IconProps = SVGProps<SVGSVGElement> & {
@@ -133,6 +135,13 @@ const iconPaths: Record<IconName, JSX.Element> = {
   moon: (
     <path d="M21 12.79A9 9 0 0 1 11.21 3 7 7 0 1 0 21 12.79z" />
   ),
+  menu: (
+    <>
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="4" y1="12" x2="20" y2="12" />
+      <line x1="4" y1="18" x2="20" y2="18" />
+    </>
+  ),
   package: (
     <>
       <path d="m21 16-9 5-9-5 9-5 9 5" />
@@ -203,6 +212,12 @@ const iconPaths: Record<IconName, JSX.Element> = {
       <circle cx="9" cy="7" r="4" />
       <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
       <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </>
+  ),
+  x: (
+    <>
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
     </>
   ),
   'x-circle': (

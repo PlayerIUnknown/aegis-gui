@@ -73,6 +73,12 @@ function App() {
   const [qualityGateMessage, setQualityGateMessage] = useState<
     { type: 'success' | 'error'; text: string } | null
   >(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
+    if (typeof window === 'undefined') {
+      return true;
+    }
+    return window.innerWidth >= 1024;
+  });
   const actionsSnippet = useMemo(() => {
     const apiKey = profile?.api_key ?? '${{ secrets.AEGIS_API_KEY }}';
     return String.raw`- name: Run Aegis Security Scan
@@ -345,13 +351,8 @@ function App() {
 
   const totalRepositories = repositories.length;
 
-  const headerBadges = useMemo(() => {
-    const badges: Array<{ key: string; icon: 'globe' | 'users' | 'clock' | 'user'; label: string }> = [
-      {
-        key: 'tenant',
-        icon: 'globe',
-        label: tenantId ? `Tenant ${tenantId}` : 'Tenant unknown',
-      },
+  const statusBadges = useMemo(() => {
+    const badges: Array<{ key: string; icon: 'users' | 'clock' | 'user'; label: string }> = [
       {
         key: 'repos',
         icon: 'users',
@@ -368,7 +369,7 @@ function App() {
     }
 
     return badges;
-  }, [tenantId, totalRepositories, formattedLastUpdated, profile?.name]);
+  }, [totalRepositories, formattedLastUpdated, profile?.name]);
 
   const qualityGateConfig = profile?.quality_gates ?? null;
 
@@ -380,9 +381,21 @@ function App() {
     <div
       className="flex min-h-svh flex-col bg-gradient-to-br from-slate-100 via-slate-100 to-slate-200 text-slate-900 transition-colors duration-300 lg:flex-row"
     >
-      <aside className="border-b border-accent/30 bg-white/80 backdrop-blur lg:fixed lg:inset-y-0 lg:w-72 lg:border-b-0 lg:border-r lg:border-accent/30">
-        <div className="flex h-full flex-col gap-8 overflow-y-auto px-6 py-8">
-          <div className="space-y-4">
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 w-72 border-b border-accent/30 bg-white/90 shadow-[0_20px_45px_-30px_rgba(15,23,42,0.65)] backdrop-blur transition-transform duration-300 ${
+          isSidebarOpen ? 'pointer-events-auto translate-x-0' : 'pointer-events-none -translate-x-full'
+        } lg:border-b-0 lg:border-r lg:border-accent/30 lg:bg-white/80 lg:shadow-none`}
+      >
+        <div className="relative flex h-full flex-col gap-8 overflow-y-auto px-6 py-8">
+          <button
+            type="button"
+            onClick={() => setIsSidebarOpen(false)}
+            className="absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200/70 bg-white/80 text-slate-500 transition hover:border-accent/50 hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
+          >
+            <Icon name="x" width={16} height={16} />
+            <span className="sr-only">Collapse navigation</span>
+          </button>
+          <div className="space-y-4 pt-4">
             <div className="space-y-1">
               <p className="text-sm font-semibold uppercase tracking-[0.32em] text-accent">Aegis</p>
               <p className="text-lg font-semibold text-slate-900">Security Posture</p>
@@ -428,7 +441,7 @@ function App() {
               );
             })}
           </nav>
-          <div className="mt-auto space-y-4">
+          <div className="mt-auto space-y-4 pb-2">
             <div className="rounded-lg border border-slate-200/70 bg-white/90 p-4 text-xs text-slate-500 shadow-[0_16px_36px_-28px_rgba(15,23,42,0.25)]">
               <p className="font-semibold uppercase tracking-wide text-slate-600">Signed in as</p>
               <p className="mt-1 break-all text-sm text-slate-900">{profile?.email ?? '—'}</p>
@@ -444,56 +457,78 @@ function App() {
         </div>
       </aside>
 
-      <main className="flex min-w-0 flex-1 flex-col lg:ml-72">
-        <div className="mx-auto flex w-full min-w-0 max-w-7xl flex-1 flex-col gap-10 px-6 py-8">
-          <header className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-            <div className="space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.32em] text-accent">Security Posture Command Center</p>
-              <h1 className="text-3xl font-semibold text-white">Stay ahead of every scan</h1>
-              <p className="max-w-xl text-sm text-white">
-                Search, filter, and drill into pipeline runs with confidence. Quality gate performance updates in real time from
-                the Config API.
-              </p>
-            </div>
-            <div className="flex w-full flex-col gap-4 lg:max-w-md lg:items-end">
-              <div className="flex flex-wrap justify-end gap-2 text-xs text-slate-500">
-                {headerBadges.map((badge) => (
-                  <span
-                    key={badge.key}
-                    className="inline-flex items-center gap-2 rounded-full border border-slate-200/70 bg-white/90 px-3 py-1.5 text-slate-600 shadow-[0_14px_32px_-24px_rgba(15,23,42,0.32)]"
-                  >
-                    <Icon name={badge.icon} width={14} height={14} />
-                    {badge.label}
-                  </span>
-                ))}
-              </div>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
-                {activeTab === 'dashboard' && (
-                  <div className="relative w-full sm:max-w-xs">
-                    <Icon
-                      name="search"
-                      className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-                      width={18}
-                      height={18}
-                    />
-                    <input
-                      id="repo-search"
-                      value={search}
-                      onChange={(event) => setSearch(event.target.value)}
-                      placeholder="Filter by repository name"
-                      className="w-full rounded-lg border border-slate-200/70 bg-white py-3 pl-11 pr-4 text-sm text-slate-900 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30"
-                    />
-                  </div>
-                )}
+      <main
+        className={`flex min-w-0 flex-1 flex-col transition-[margin] duration-300 ${
+          isSidebarOpen ? 'lg:ml-72' : 'lg:ml-0'
+        }`}
+      >
+        <div className="sticky top-0 z-30 border-b border-slate-200/70 bg-white/80 backdrop-blur">
+          <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center gap-3 px-6 py-4">
+            <div className="flex items-center gap-3">
+              {!isSidebarOpen && (
                 <button
                   type="button"
-                  onClick={handleRefresh}
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200/70 bg-white/90 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-700 transition hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
+                  onClick={() => setIsSidebarOpen(true)}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/70 bg-white text-slate-600 transition hover:border-accent/50 hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
                 >
-                  <Icon name="refresh" width={16} height={16} /> Refresh
+                  <Icon name="menu" width={18} height={18} />
+                  <span className="sr-only">Expand navigation</span>
                 </button>
-              </div>
+              )}
+              {!isSidebarOpen && (
+                <p className="text-xs font-semibold uppercase tracking-[0.32em] text-accent">Aegis</p>
+              )}
             </div>
+            <div className="flex flex-1 flex-wrap items-center justify-end gap-3">
+              {statusBadges.length > 0 && (
+                <div className="flex min-w-0 flex-wrap items-center gap-2 text-xs text-slate-500">
+                  {statusBadges.map((badge) => (
+                    <span
+                      key={badge.key}
+                      className="inline-flex items-center gap-2 rounded-full border border-slate-200/70 bg-white/90 px-3 py-1.5 text-slate-600 shadow-[0_14px_32px_-28px_rgba(15,23,42,0.4)]"
+                    >
+                      <Icon name={badge.icon} width={14} height={14} />
+                      {badge.label}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {activeTab === 'dashboard' && (
+                <div className="relative w-full min-w-[200px] flex-1 sm:w-auto sm:flex-none sm:max-w-xs">
+                  <Icon
+                    name="search"
+                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                    width={18}
+                    height={18}
+                  />
+                  <input
+                    id="repo-search"
+                    value={search}
+                    onChange={(event) => setSearch(event.target.value)}
+                    placeholder="Filter by repository name"
+                    className="w-full rounded-lg border border-slate-200/70 bg-white py-3 pl-11 pr-4 text-sm text-slate-900 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30"
+                  />
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={handleRefresh}
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200/70 bg-white/90 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-700 transition hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
+              >
+                <Icon name="refresh" width={16} height={16} /> Refresh
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="mx-auto flex w-full min-w-0 max-w-7xl flex-1 flex-col gap-10 px-6 py-8">
+          <header className="space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.32em] text-accent">Security Posture Command Center</p>
+            <h1 className="text-3xl font-semibold text-white">Stay ahead of every scan</h1>
+            <p className="max-w-xl text-sm text-white">
+              Search, filter, and drill into pipeline runs with confidence. Quality gate performance updates in real time from the
+              Config API.
+            </p>
           </header>
 
           {error && <p className="rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">{error}</p>}
