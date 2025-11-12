@@ -350,25 +350,29 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                           <Icon name="alert" width={12} height={12} /> {severity}
                         </span>
                       </div>
-                      <dl className="grid gap-3 sm:grid-cols-2">
-                        <div>
+                      <dl className="grid gap-y-2 gap-x-6 sm:grid-cols-2">
+                        <div className="space-y-1">
                           <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Package</dt>
-                          <dd className="mt-1 font-medium text-slate-900">{packageName}</dd>
+                          <dd className="font-medium text-slate-900">{packageName}</dd>
                         </div>
-                        <div>
-                          <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Version</dt>
-                          <dd className="mt-1 font-semibold text-rose-600">{packageVersion}</dd>
-                        </div>
-                        <div className="sm:col-span-2">
-                          <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Description</dt>
-                          <dd className="mt-1 text-sm text-slate-700">{finding.description ?? 'No description available.'}</dd>
-                        </div>
-                        {fixVersions && (
-                          <div className="sm:col-span-2">
-                            <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Fix version</dt>
-                            <dd className="mt-1 font-semibold text-emerald-600">{fixVersions}</dd>
+                        <div className="space-y-2">
+                          <div className="space-y-1">
+                            <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Version</dt>
+                            <dd className="font-semibold text-rose-600">{packageVersion}</dd>
                           </div>
-                        )}
+                          {fixVersions && (
+                            <div className="space-y-1">
+                              <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                                Fix version
+                              </dt>
+                              <dd className="font-semibold text-emerald-600">{fixVersions}</dd>
+                            </div>
+                          )}
+                        </div>
+                        <div className="space-y-1 sm:col-span-2">
+                          <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Description</dt>
+                          <dd className="text-sm text-slate-700">{finding.description ?? 'No description available.'}</dd>
+                        </div>
                       </dl>
                     </div>
                   );
