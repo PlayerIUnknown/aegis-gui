@@ -87,7 +87,7 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                   : 'bg-warning/80 border-warning/60 shadow-[0_0_0_4px_rgba(250,204,21,0.12)]',
               )}
             />
-            <div className="relative overflow-visible rounded-xl border border-white/20 bg-gradient-to-br from-white/95 via-slate-100/90 to-white/95 p-6 shadow-[0_32px_72px_-48px_rgba(15,23,42,0.55)]">
+            <div className="relative overflow-visible rounded-xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_32px_72px_-48px_rgba(15,23,42,0.55)]">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-accent/10 text-accent">
@@ -175,7 +175,7 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                     <DetailStat label="Critical" value={run.summary.criticalSeverity} tone="danger" />
                   </div>
                   {isLoading && (
-                    <p className="rounded-lg border border-white/18 bg-gradient-to-br from-white/95 via-slate-100/90 to-white/95 p-4 text-sm text-slate-600 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]">
+                    <p className="rounded-lg border border-slate-200/70 bg-white p-4 text-sm text-slate-600 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]">
                       Loading tool results…
                     </p>
                   )}
@@ -269,7 +269,7 @@ const DetailStat: React.FC<DetailStatProps> = ({
       onClick={isInteractive ? handleActivate : undefined}
       aria-pressed={isInteractive ? isActive : undefined}
       className={clsx(
-        'group relative flex h-full min-w-0 flex-col justify-between gap-4 rounded-xl border border-white/18 p-4 text-left shadow-[0_20px_48px_-36px_rgba(15,23,42,0.45)]',
+        'group relative flex h-full min-w-0 flex-col justify-between gap-4 rounded-xl border border-slate-200/70 p-4 text-left shadow-[0_20px_48px_-36px_rgba(15,23,42,0.45)]',
         statBackgroundByTone[tone],
         isInteractive &&
           'cursor-pointer transition hover:-translate-y-0.5 hover:shadow-[0_26px_60px_-34px_rgba(15,23,42,0.52)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 focus-visible:ring-offset-2',

@@ -501,17 +501,17 @@ function App() {
 
           {activeTab === 'dashboard' ? (
             <div className="space-y-10">
-              <section className="rounded-2xl border border-slate-900/70 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 text-slate-200 shadow-[0_40px_90px_-60px_rgba(15,23,42,0.85)]">
+              <section className="rounded-2xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_40px_90px_-60px_rgba(15,23,42,0.85)]">
                 <GlobalSummary summary={dashboardSummary} />
               </section>
 
               {isLoadingData && (
-                <p className="rounded-2xl border border-slate-900/65 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 text-sm text-slate-200 shadow-[0_25px_60px_-55px_rgba(15,23,42,0.7)]">
+                <p className="rounded-2xl border border-slate-200/70 bg-white p-6 text-sm text-slate-600 shadow-[0_25px_60px_-55px_rgba(15,23,42,0.7)]">
                   Refreshing data from Config API…
                 </p>
               )}
 
-              <section className="space-y-6 rounded-2xl border border-slate-900/70 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 text-slate-200 shadow-[0_40px_90px_-60px_rgba(15,23,42,0.85)]">
+              <section className="space-y-6 rounded-2xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_40px_90px_-60px_rgba(15,23,42,0.85)]">
                 <div className="space-y-2">
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-300">Scans</p>
                   <h2 className="text-xl font-semibold text-white">Explore repository history</h2>
@@ -522,7 +522,7 @@ function App() {
 
                 <div className="grid gap-8 xl:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
                   <div className="space-y-6">
-                    <div className="rounded-xl border border-white/20 bg-gradient-to-br from-white/95 via-slate-100/90 to-white/95 p-5 shadow-[0_22px_55px_-40px_rgba(15,23,42,0.45)]">
+                    <div className="rounded-xl border border-slate-200/70 bg-gradient-to-br from-slate-50 via-white to-slate-100 p-5 shadow-[0_22px_55px_-40px_rgba(15,23,42,0.45)]">
                       <div className="flex flex-col gap-3">
                         <div>
                           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Repositories</p>
@@ -568,7 +568,7 @@ function App() {
                         <RepositoryOverview repository={activeRepository} />
 
                         {activeRepository.scans.length > 0 ? (
-                          <div className="space-y-4 rounded-xl border border-white/20 bg-gradient-to-br from-white/95 via-slate-100/90 to-white/95 p-6 shadow-[0_24px_60px_-45px_rgba(15,23,42,0.5)]">
+                          <div className="space-y-4 rounded-xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_24px_60px_-45px_rgba(15,23,42,0.5)]">
                             <div className="space-y-1">
                               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Pipeline runs</p>
                               <h3 className="text-lg font-semibold text-slate-900">Commit activity &amp; findings</h3>
@@ -584,13 +584,13 @@ function App() {
                             />
                           </div>
                         ) : (
-                          <p className="rounded-xl border border-white/20 bg-gradient-to-br from-white/95 via-slate-100/90 to-white/95 p-6 text-sm text-slate-600 shadow-[0_22px_50px_-40px_rgba(15,23,42,0.45)]">
+                          <p className="rounded-xl border border-slate-200/70 bg-gradient-to-br from-slate-50 via-white to-slate-100 p-6 text-sm text-slate-600 shadow-[0_22px_50px_-40px_rgba(15,23,42,0.45)]">
                             When your first scan completes it will appear here with detailed findings.
                           </p>
                         )}
                       </>
                     ) : (
-                      <p className="rounded-xl border border-white/20 bg-gradient-to-br from-white/95 via-slate-100/90 to-white/95 p-6 text-sm text-slate-600 shadow-[0_22px_50px_-40px_rgba(15,23,42,0.45)]">
+                      <p className="rounded-xl border border-slate-200/70 bg-gradient-to-br from-slate-50 via-white to-slate-100 p-6 text-sm text-slate-600 shadow-[0_22px_50px_-40px_rgba(15,23,42,0.45)]">
                         Connect a repository or adjust your filters to begin exploring scan history.
                       </p>
                     )}
@@ -600,7 +600,7 @@ function App() {
             </div>
           ) : (
             <div className="space-y-10">
-              <section className="space-y-6 rounded-2xl border border-slate-900/70 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 text-slate-200 shadow-[0_40px_90px_-60px_rgba(15,23,42,0.85)]">
+              <section className="space-y-6 rounded-2xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_40px_90px_-60px_rgba(15,23,42,0.85)]">
                 <div className="space-y-2">
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-300">Tenant onboarding</p>
                   <h2 className="text-xl font-semibold text-white">Connect your scanners</h2>
@@ -611,7 +611,7 @@ function App() {
 
                 <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
                   <div className="space-y-6">
-                    <div className="rounded-xl border border-white/20 bg-gradient-to-br from-white/95 via-slate-100/90 to-white/95 p-5 shadow-[0_24px_60px_-45px_rgba(15,23,42,0.5)]">
+                    <div className="rounded-xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-5 shadow-[0_24px_60px_-45px_rgba(15,23,42,0.5)]">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1 space-y-3">
                           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Scanner API key</p>
@@ -634,7 +634,7 @@ function App() {
                       )}
                     </div>
 
-                    <div className="rounded-xl border border-white/20 bg-gradient-to-br from-white/95 via-slate-100/90 to-white/95 p-5 shadow-[0_24px_60px_-45px_rgba(15,23,42,0.5)]">
+                    <div className="rounded-xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-5 shadow-[0_24px_60px_-45px_rgba(15,23,42,0.5)]">
                       <div className="space-y-2">
                         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Quality gate defaults</p>
                         <p className="text-sm text-slate-600">
@@ -652,7 +652,7 @@ function App() {
                     </div>
                   </div>
 
-                  <div className="rounded-xl border border-white/20 bg-gradient-to-br from-white/95 via-slate-100/90 to-white/95 p-6 shadow-[0_24px_60px_-45px_rgba(15,23,42,0.5)]">
+                  <div className="rounded-xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_24px_60px_-45px_rgba(15,23,42,0.5)]">
                     <div className="flex flex-wrap items-start justify-between gap-4">
                       <div className="space-y-2 text-slate-600">
                         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">GitHub Actions snippet</p>
@@ -682,24 +682,24 @@ function App() {
                   </div>
                 </div>
 
-                <ol className="list-decimal space-y-3 pl-5 text-sm text-slate-300 marker:text-slate-500">
-                  <li className="rounded-lg border border-white/15 bg-gradient-to-r from-white/95 via-slate-100/90 to-white/95 px-4 py-3 shadow-[0_18px_45px_-35px_rgba(15,23,42,0.45)]">
+                <ol className="list-decimal space-y-3 pl-5 text-sm text-slate-600 marker:text-slate-400">
+                  <li className="rounded-lg border border-slate-200/70 bg-gradient-to-r from-slate-50 via-white to-slate-100 px-4 py-3 shadow-[0_18px_45px_-35px_rgba(15,23,42,0.45)]">
                     Copy the tenant API key and store it as an encrypted secret in your repository.
                   </li>
-                  <li className="rounded-lg border border-white/15 bg-gradient-to-r from-white/95 via-slate-100/90 to-white/95 px-4 py-3 shadow-[0_18px_45px_-35px_rgba(15,23,42,0.45)]">
+                  <li className="rounded-lg border border-slate-200/70 bg-gradient-to-r from-slate-50 via-white to-slate-100 px-4 py-3 shadow-[0_18px_45px_-35px_rgba(15,23,42,0.45)]">
                     Paste the workflow snippet into your CI configuration, updating the path or image tags as needed.
                   </li>
-                  <li className="rounded-lg border border-white/15 bg-gradient-to-r from-white/95 via-slate-100/90 to-white/95 px-4 py-3 shadow-[0_18px_45px_-35px_rgba(15,23,42,0.45)]">
+                  <li className="rounded-lg border border-slate-200/70 bg-gradient-to-r from-slate-50 via-white to-slate-100 px-4 py-3 shadow-[0_18px_45px_-35px_rgba(15,23,42,0.45)]">
                     Run your pipeline to push scan results to the Config API.
                   </li>
-                  <li className="rounded-lg border border-white/15 bg-gradient-to-r from-white/95 via-slate-100/90 to-white/95 px-4 py-3 shadow-[0_18px_45px_-35px_rgba(15,23,42,0.45)]">
+                  <li className="rounded-lg border border-slate-200/70 bg-gradient-to-r from-slate-50 via-white to-slate-100 px-4 py-3 shadow-[0_18px_45px_-35px_rgba(15,23,42,0.45)]">
                     Return to the Dashboard tab to monitor quality gates, repositories, and findings in real time.
                   </li>
                 </ol>
               </section>
 
               {isLoadingData && (
-                <p className="rounded-2xl border border-slate-900/65 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 text-sm text-slate-200 shadow-[0_25px_60px_-55px_rgba(15,23,42,0.7)]">
+                <p className="rounded-2xl border border-slate-200/70 bg-white p-6 text-sm text-slate-600 shadow-[0_25px_60px_-55px_rgba(15,23,42,0.7)]">
                   Fetching tenant profile details…
                 </p>
               )}

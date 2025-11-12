@@ -10,7 +10,7 @@ type RepositoryOverviewProps = {
 export const RepositoryOverview: React.FC<RepositoryOverviewProps> = ({ repository }) => {
   if (!repository) {
     return (
-      <p className="rounded-xl border border-white/18 bg-gradient-to-br from-white/95 via-slate-100/90 to-white/95 p-6 text-sm text-slate-600 shadow-[0_20px_45px_-32px_rgba(15,23,42,0.4)]">
+      <p className="rounded-xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-6 text-sm text-slate-600 shadow-[0_20px_45px_-32px_rgba(15,23,42,0.4)]">
         Select a repository on the left to view its recent activity.
       </p>
     );
@@ -27,7 +27,7 @@ export const RepositoryOverview: React.FC<RepositoryOverviewProps> = ({ reposito
   const runningRuns = repository.scans.filter((scan) => scan.status === 'running').length;
 
   return (
-    <section className="space-y-5 rounded-xl border border-white/20 bg-gradient-to-br from-white/95 via-slate-100/90 to-white/95 p-6 shadow-[0_28px_68px_-44px_rgba(15,23,42,0.5)]">
+    <section className="space-y-5 rounded-xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_28px_68px_-44px_rgba(15,23,42,0.5)]">
       <div className="flex flex-wrap items-start justify-between gap-6">
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Repository overview</p>
@@ -98,13 +98,13 @@ type RepositoryStatProps = {
 
 const toneStyles: Record<NonNullable<RepositoryStatProps['tone']>, string> = {
   default:
-    'border-white/18 bg-gradient-to-br from-white/95 via-slate-100/90 to-white/95 text-slate-900',
+    'border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-slate-100 text-slate-900',
   success:
-    'border-white/18 bg-gradient-to-br from-success/20 via-success/15 to-white/95 text-success',
+    'border-slate-200/70 bg-gradient-to-br from-success/10 via-success/5 to-white text-success',
   danger:
-    'border-white/18 bg-gradient-to-br from-danger/20 via-danger/15 to-white/95 text-danger',
+    'border-slate-200/70 bg-gradient-to-br from-danger/10 via-danger/5 to-white text-danger',
   warning:
-    'border-white/18 bg-gradient-to-br from-warning/20 via-warning/15 to-white/95 text-warning',
+    'border-slate-200/70 bg-gradient-to-br from-warning/10 via-warning/5 to-white text-warning',
 };
 
 const iconToneStyles: Record<NonNullable<RepositoryStatProps['tone']>, string> = {
