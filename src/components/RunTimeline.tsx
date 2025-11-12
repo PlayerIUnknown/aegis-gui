@@ -282,7 +282,7 @@ const DetailStat: React.FC<DetailStatProps> = ({
           role="tooltip"
           id={tooltipId}
           className={clsx(
-            'pointer-events-none absolute left-1/2 top-full z-20 w-64 -translate-x-1/2 rounded-lg border border-slate-900 bg-slate-950 px-5 py-4 text-left text-[12px] leading-relaxed text-slate-100 shadow-[0_35px_80px_-35px_rgba(15,23,42,0.7)] transition duration-150',
+            'pointer-events-none absolute left-1/2 top-full z-20 w-64 -translate-x-1/2 rounded-lg border border-slate-900/80 bg-slate-950 bg-opacity-100 px-5 py-4 text-left text-[12px] leading-relaxed text-slate-100 shadow-[0_35px_80px_-35px_rgba(15,23,42,0.7)] transition duration-150',
             'invisible translate-y-2 opacity-0 group-hover:visible group-hover:translate-y-3 group-hover:opacity-100 group-focus-visible:visible group-focus-visible:translate-y-3 group-focus-visible:opacity-100',
           )}
         >
@@ -361,7 +361,7 @@ const InfoTooltip: React.FC<InfoTooltipProps> = ({ tooltip, open, onOpenChange }
         role="tooltip"
         id={tooltipId}
         className={clsx(
-          'pointer-events-auto absolute left-1/2 top-full z-20 w-64 -translate-x-1/2 rounded-lg border border-accent/30 bg-slate-900 px-4 py-3 text-left text-[12px] leading-relaxed text-slate-100 shadow-[0_25px_60px_-25px_rgba(30,41,59,0.85)] transition duration-150',
+          'pointer-events-auto absolute left-1/2 top-full z-20 w-64 -translate-x-1/2 rounded-lg border border-slate-900/80 bg-slate-950 bg-opacity-100 px-4 py-3 text-left text-[12px] leading-relaxed text-slate-100 shadow-[0_25px_60px_-25px_rgba(30,41,59,0.85)] transition duration-150',
           isOpen
             ? 'visible translate-y-3 opacity-100'
             : 'invisible translate-y-2 opacity-0',
