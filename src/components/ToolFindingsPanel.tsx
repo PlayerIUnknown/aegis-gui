@@ -207,6 +207,14 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
     );
   }
 
+  if (!activeFilter) {
+    return (
+      <p className="rounded-lg border border-slate-200/70 bg-white p-4 text-sm text-slate-600 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]">
+        Select a category to view scan results.
+      </p>
+    );
+  }
+
   const toggleSnippet = (key: string) => {
     setExpandedSnippets((prev) => ({ ...prev, [key]: !prev[key] }));
   };
@@ -285,9 +293,7 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
     return priorityA - priorityB;
   });
 
-  const filteredEntries = activeFilter
-    ? sortedEntries.filter(([toolName]) => matchesFilter(toolName, activeFilter))
-    : sortedEntries;
+  const filteredEntries = sortedEntries.filter(([toolName]) => matchesFilter(toolName, activeFilter));
 
   const entriesToRender = filteredEntries;
 
@@ -342,34 +348,34 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                   return (
                     <div
                       key={key}
-                      className="space-y-3 rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
+                      className="relative rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
                     >
-                      <div className="flex flex-wrap items-center justify-between gap-3">
+                      <span className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <Icon name="alert" width={12} height={12} /> {severity}
+                      </span>
+                      <div className="pr-24">
                         <p className="text-sm font-semibold text-slate-900">{finding.id ?? 'Untracked vulnerability'}</p>
-                        <span className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
-                          <Icon name="alert" width={12} height={12} /> {severity}
-                        </span>
-                      </div>
-                      <dl className="grid gap-y-1 gap-x-6 sm:grid-cols-2">
-                        <div className="space-y-1">
-                          <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Package</dt>
-                          <dd className="font-medium text-slate-900">{packageName}</dd>
-                        </div>
-                        <div className="space-y-1">
-                          <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Version</dt>
-                          <dd className="font-semibold text-rose-600">{packageVersion}</dd>
-                        </div>
-                        {fixVersions && (
-                          <div className="space-y-1 sm:col-start-2">
-                            <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Fix version</dt>
-                            <dd className="font-semibold text-emerald-600">{fixVersions}</dd>
+                        <dl className="mt-3 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)]">
+                          <div className="space-y-1">
+                            <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Package</dt>
+                            <dd className="font-medium text-slate-900 break-words">{packageName}</dd>
                           </div>
-                        )}
-                        <div className="space-y-1 sm:col-span-2">
-                          <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Description</dt>
-                          <dd className="text-sm text-slate-700">{finding.description ?? 'No description available.'}</dd>
-                        </div>
-                      </dl>
+                          <div className="space-y-1">
+                            <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Version</dt>
+                            <dd className="font-semibold text-rose-600 break-words">{packageVersion}</dd>
+                          </div>
+                          <div className="space-y-1 sm:col-start-3">
+                            <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Fix version</dt>
+                            <dd className="font-semibold text-emerald-600 break-words">{fixVersions ?? '—'}</dd>
+                          </div>
+                          <div className="space-y-1 sm:col-span-3">
+                            <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Description</dt>
+                            <dd className="text-sm text-slate-700 whitespace-pre-line">
+                              {finding.description ?? 'No description available.'}
+                            </dd>
+                          </div>
+                        </dl>
+                      </div>
                     </div>
                   );
                 }
@@ -378,21 +384,21 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                   return (
                     <div
                       key={key}
-                      className="space-y-2 rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
+                      className="rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
                     >
                       <p className="text-sm font-semibold text-slate-900">{finding.name ?? 'Unnamed component'}</p>
-                      <dl className="grid gap-3 sm:grid-cols-2">
-                        <div>
+                      <dl className="mt-2 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)]">
+                        <div className="space-y-1">
                           <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Package name</dt>
-                          <dd className="mt-1 font-medium text-slate-900">{finding.name ?? 'Unknown'}</dd>
+                          <dd className="font-medium text-slate-900 break-words">{finding.name ?? 'Unknown'}</dd>
                         </div>
-                        <div>
+                        <div className="space-y-1">
                           <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Type</dt>
-                          <dd className="mt-1 font-medium text-slate-900">{finding.type ?? 'Unknown'}</dd>
+                          <dd className="font-medium text-slate-900 break-words">{finding.type ?? 'Unknown'}</dd>
                         </div>
-                        <div>
+                        <div className="space-y-1">
                           <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Version</dt>
-                          <dd className="mt-1 font-medium text-slate-900">{finding.version ?? 'Unknown'}</dd>
+                          <dd className="font-medium text-slate-900 break-words">{finding.version ?? 'Unknown'}</dd>
                         </div>
                       </dl>
                     </div>
@@ -404,18 +410,16 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                   return (
                     <div
                       key={key}
-                      className="space-y-3 rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
+                      className="relative space-y-3 rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
                     >
-                      <div className="flex flex-wrap items-start justify-between gap-3">
-                        <div>
-                          <p className="text-sm font-semibold text-slate-900">
-                            {finding.description ? `${finding.description} exposed` : 'Secret exposed'}
-                          </p>
-                          <p className="mt-1 text-xs text-slate-500">Match: {finding.match}</p>
-                        </div>
-                        <span className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
-                          <Icon name="alert" width={12} height={12} /> {formatSeverity(finding.severity)}
-                        </span>
+                      <span className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <Icon name="alert" width={12} height={12} /> {formatSeverity(finding.severity)}
+                      </span>
+                      <div className="pr-24">
+                        <p className="text-sm font-semibold text-slate-900">
+                          {finding.description ? `${finding.description} exposed` : 'Secret exposed'}
+                        </p>
+                        <p className="mt-1 text-xs text-slate-500">Match: {finding.match}</p>
                       </div>
                       <button
                         type="button"
@@ -466,21 +470,19 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                   return (
                     <div
                       key={key}
-                      className="space-y-3 rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
+                      className="relative space-y-3 rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
                     >
-                      <div className="flex flex-wrap items-start justify-between gap-3">
-                        <div>
-                          <p className="text-sm font-semibold text-slate-900 whitespace-pre-line">{displayTitle}</p>
-                          {shouldShowDescription && (
-                            <p className="mt-1 whitespace-pre-line text-xs text-slate-600">{description}</p>
-                          )}
-                          <p className="mt-1 text-xs text-slate-500">
-                            File: {finding.file ?? 'Unknown file'} • Line {finding.line ?? '—'}
-                          </p>
-                        </div>
-                        <span className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
-                          <Icon name="alert" width={12} height={12} /> {formatSeverity(finding.severity)}
-                        </span>
+                      <span className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <Icon name="alert" width={12} height={12} /> {formatSeverity(finding.severity)}
+                      </span>
+                      <div className="pr-24">
+                        <p className="text-sm font-semibold text-slate-900 whitespace-pre-line">{displayTitle}</p>
+                        {shouldShowDescription && (
+                          <p className="mt-1 whitespace-pre-line text-xs text-slate-600">{description}</p>
+                        )}
+                        <p className="mt-1 text-xs text-slate-500">
+                          File: {finding.file ?? 'Unknown file'} • Line {finding.line ?? '—'}
+                        </p>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <button
