@@ -119,16 +119,21 @@ const filterMatchers: Record<ToolCategoryFilter, string[]> = {
 
 const matchesFilter = (toolName: string, filter: ToolCategoryFilter) => {
   const normalizedName = toolName.toLowerCase();
-  return filterMatchers[filter].some((matcher) => normalizedName.includes(matcher));
+  const tokens = normalizedName.split(/[^a-z0-9]+/).filter(Boolean);
+
+  return filterMatchers[filter].some((matcher) => {
+    if (matcher.includes(' ')) {
+      return normalizedName.includes(matcher);
+    }
+
+    return tokens.includes(matcher);
+  });
 };
 
 const toolCategoryPriority: ToolCategoryFilter[] = ['sbom', 'sca', 'secrets', 'vulnScan'];
 
 const resolveToolPriority = (toolName: string) => {
-  const normalizedName = toolName.toLowerCase();
-  const matchedCategory = toolCategoryPriority.find((category) =>
-    filterMatchers[category].some((matcher) => normalizedName.includes(matcher)),
-  );
+  const matchedCategory = toolCategoryPriority.find((category) => matchesFilter(toolName, category));
 
   if (!matchedCategory) {
     return Number.MAX_SAFE_INTEGER;
