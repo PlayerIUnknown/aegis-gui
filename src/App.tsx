@@ -365,26 +365,20 @@ function App() {
   const formattedLastUpdated = formatTimestamp(latestScanTimestamp);
 
   const totalRepositories = repositories.length;
+  const connectedWorkspacesLabel = useMemo(
+    () => `${totalRepositories} connected ${totalRepositories === 1 ? 'workspace' : 'workspaces'}`,
+    [totalRepositories],
+  );
 
   const statusBadges = useMemo(() => {
-    const badges: Array<{ key: string; icon: 'users' | 'clock' | 'user'; label: string }> = [
-      {
-        key: 'repos',
-        icon: 'users',
-        label: `${totalRepositories} connected ${totalRepositories === 1 ? 'workspace' : 'workspaces'}`,
-      },
-    ];
+    const badges: Array<{ key: string; icon: 'clock'; label: string }> = [];
 
     if (formattedLastUpdated !== '—') {
       badges.push({ key: 'updated', icon: 'clock', label: `Last updated • ${formattedLastUpdated}` });
     }
 
-    if (profile?.name) {
-      badges.push({ key: 'owner', icon: 'user', label: profile.name });
-    }
-
     return badges;
-  }, [totalRepositories, formattedLastUpdated, profile?.name]);
+  }, [formattedLastUpdated]);
 
   const qualityGateConfig = profile?.quality_gates ?? null;
 
@@ -539,11 +533,11 @@ function App() {
                   className="inline-flex items-center gap-2 rounded-full border border-slate-200/70 bg-white/90 px-3 py-2 text-sm font-semibold text-slate-700 shadow-[0_14px_32px_-28px_rgba(15,23,42,0.35)] transition hover:border-accent/50 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
                   aria-haspopup="true"
                   aria-expanded={isProfileMenuOpen}
+                  aria-label="Open profile menu"
                 >
                   <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-accent/10 text-sm font-semibold uppercase text-accent">
                     A
                   </span>
-                  <span>Akash</span>
                   <Icon
                     name="chevron-down"
                     width={16}
@@ -554,6 +548,7 @@ function App() {
                 {isProfileMenuOpen && (
                   <div className="absolute right-0 mt-2 w-64 rounded-xl border border-slate-200/70 bg-white p-4 shadow-[0_22px_45px_-30px_rgba(15,23,42,0.45)]">
                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Connected workspaces</p>
+                    <p className="mt-1 text-sm font-medium text-slate-600">{connectedWorkspacesLabel}</p>
                     <ul className="mt-2 space-y-1">
                       {repositories.length === 0 && (
                         <li className="text-sm text-slate-500">No workspaces connected yet.</li>
