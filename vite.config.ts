@@ -5,6 +5,6 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: '0.0.0.0',
-    allowedHosts: ['aegis-gui.onrender.com']
+    allowedHosts: ['aegis-gui.onrender.com','aegis.4thwallsec.com']
   }
 });
