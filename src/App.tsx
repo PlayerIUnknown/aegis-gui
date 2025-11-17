@@ -542,9 +542,9 @@ security-scan:
           <button
             type="button"
             onClick={() => setIsSidebarOpen(false)}
-            className="absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200/70 bg-white/80 text-slate-500 transition hover:border-accent/50 hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
+            className="absolute right-4 top-4 inline-flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200/70 bg-white/80 text-slate-500 transition hover:border-accent/50 hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
           >
-            <Icon name="x" width={16} height={16} />
+            <Icon name="x" width={12} height={12} />
             <span className="sr-only">Collapse navigation</span>
           </button>
           <div className="space-y-4 pt-4">
@@ -593,19 +593,7 @@ security-scan:
               );
             })}
           </nav>
-          <div className="mt-auto space-y-4 pb-2">
-            <div className="rounded-lg border border-slate-200/70 bg-white/90 p-4 text-xs text-slate-500 shadow-[0_16px_36px_-28px_rgba(15,23,42,0.25)]">
-              <p className="font-semibold uppercase tracking-wide text-slate-600">Signed in as</p>
-              <p className="mt-1 break-all text-sm text-slate-900">{profile?.email ?? '—'}</p>
-            </div>
-            <button
-              type="button"
-              onClick={signOut}
-              className="w-full rounded-lg border border-slate-200/70 bg-white py-3 text-sm font-semibold uppercase tracking-wide text-slate-700 transition hover:border-danger/50 hover:bg-danger/10 hover:text-danger"
-            >
-              Sign out
-            </button>
-          </div>
+          <div className="mt-auto pb-2" />
         </div>
       </aside>
 
@@ -615,15 +603,15 @@ security-scan:
         }`}
       >
         <div className="sticky top-0 z-30 border-b border-slate-200/70 bg-white/90 backdrop-blur">
-          <div className="flex h-20 w-full flex-wrap items-center gap-3 px-4 sm:px-6">
+          <div className="flex h-16 w-full flex-wrap items-center gap-3 px-4 sm:px-6">
             <div className="flex items-center gap-3">
               {!isSidebarOpen && (
                 <button
                   type="button"
                   onClick={() => setIsSidebarOpen(true)}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/70 bg-white text-slate-600 transition hover:border-accent/50 hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200/70 bg-white text-slate-600 transition hover:border-accent/50 hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
                 >
-                  <Icon name="menu" width={18} height={18} />
+                  <Icon name="menu" width={16} height={16} />
                   <span className="sr-only">Expand navigation</span>
                 </button>
               )}
@@ -665,9 +653,10 @@ security-scan:
               <button
                 type="button"
                 onClick={handleRefresh}
-                className="inline-flex items-center gap-2 rounded-full border border-slate-200/70 bg-white/80 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-600 transition hover:border-accent/50 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200/70 bg-white/80 text-slate-600 transition hover:border-accent/50 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+                aria-label="Refresh data"
               >
-                <Icon name="refresh" width={14} height={14} /> Refresh
+                <Icon name="refresh" width={16} height={16} />
               </button>
               <div ref={profileMenuRef} className="relative ml-2">
                 <button
@@ -692,19 +681,6 @@ security-scan:
                   <div className="absolute right-0 mt-2 w-64 rounded-xl border border-slate-200/70 bg-white p-4 shadow-[0_22px_45px_-30px_rgba(15,23,42,0.45)]">
                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Connected workspaces</p>
                     <p className="mt-1 text-sm font-medium text-slate-600">{connectedWorkspacesLabel}</p>
-                    <ul className="mt-2 space-y-1">
-                      {repositories.length === 0 && (
-                        <li className="text-sm text-slate-500">No workspaces connected yet.</li>
-                      )}
-                      {repositories.slice(0, 5).map((repo) => (
-                        <li key={repo.id} className="truncate text-sm text-slate-700">
-                          {repo.repoName}
-                        </li>
-                      ))}
-                      {repositories.length > 5 && (
-                        <li className="text-xs text-slate-500">and {repositories.length - 5} more…</li>
-                      )}
-                    </ul>
                     <button
                       type="button"
                       onClick={() => {
