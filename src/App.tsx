@@ -34,6 +34,15 @@ const TOKEN_STORAGE_KEY = 'jwtToken';
 const TENANT_STORAGE_KEY = 'tenantId';
 
 type RiskFilter = 'all' | 'healthy' | 'attention';
+type CiOptionKey = 'github' | 'gitlab' | 'jenkins' | 'bitbucket';
+
+type CiOption = {
+  label: string;
+  summary: string;
+  description: string;
+  prerequisites: string[];
+  snippet: string;
+};
 
 const riskFilters: Array<{ value: RiskFilter; label: string; description: string }> = [
   {
@@ -69,6 +78,7 @@ function App() {
   const [activeRepositoryId, setActiveRepositoryId] = useState<string | null>(null);
   const [copyMessage, setCopyMessage] = useState<string | null>(null);
   const [snippetCopyMessage, setSnippetCopyMessage] = useState<string | null>(null);
+  const [selectedCiOption, setSelectedCiOption] = useState<CiOptionKey>('github');
   const [isSavingQualityGates, setIsSavingQualityGates] = useState(false);
   const [qualityGateMessage, setQualityGateMessage] = useState<
     { type: 'success' | 'error'; text: string } | null
@@ -81,9 +91,18 @@ function App() {
   });
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement | null>(null);
-  const actionsSnippet = useMemo(() => {
-    const apiKey = profile?.api_key ?? '${{ secrets.AEGIS_API_KEY }}';
-    return String.raw`- name: Run Aegis Security Scan
+  const ciOptions = useMemo<Record<CiOptionKey, CiOption>>(() => {
+    const githubApiKey = profile?.api_key ?? '${{ secrets.AEGIS_API_KEY }}';
+    return {
+      github: {
+        label: 'GitHub Actions',
+        summary: 'Add this step to your workflow and store the API key as AEGIS_API_KEY.',
+        description: 'Copy the workflow as-is and paste it into your CI configuration. Update the image tag or target path whenever needed.',
+        prerequisites: [
+          'Store the tenant API key as an encrypted secret named AEGIS_API_KEY.',
+          'Grant the workflow permission to run Docker commands inside the job.',
+        ],
+        snippet: String.raw`- name: Run Aegis Security Scan
   run: |
     docker run --rm \
       -v \${{ github.workspace }}:/app/target \
@@ -92,9 +111,132 @@ function App() {
       -e GITHUB_SHA=\${{ github.sha }} \
       playerunknown23/aegis:latest \
       /app/target \
-      --api-key ${apiKey} \
+      --api-key ${githubApiKey} \
       --config-api-url ${BASE_URL} \
-      --parallel`;
+      --parallel`,
+      },
+      gitlab: {
+        label: 'GitLab CI/CD',
+        summary: 'Drop this job definition into your .gitlab-ci.yml file.',
+        description: 'This sample uses a Docker-in-Docker runner and surfaces the same metadata that GitHub provides by default.',
+        prerequisites: [
+          'Ensure your GitLab runner is configured to support Docker-in-Docker.',
+          'Store AEGIS_API_KEY and CONFIG_API_URL as masked CI/CD variables.',
+        ],
+        snippet: String.raw`stages:
+  - scan
+
+variables:
+  DOCKER_TLS_CERTDIR: ""
+
+security-scan:
+  stage: scan
+  image: docker:24.0.5
+  services:
+    - name: docker:24.0.5-dind
+      alias: docker
+  script:
+    - echo "=== Pulling Aegis image ==="
+    - docker pull playerunknown23/aegis:latest || true
+    - echo "=== Running Aegis scanner ==="
+    - |
+      set -euo pipefail
+      if [ -n "${'${'}CONFIG_API_URL:-}" ]; then
+        CONFIG_ARG="--config-api-url=${'${'}CONFIG_API_URL}"
+      else
+        CONFIG_ARG=""
+      fi
+      docker run --rm \
+        -v "$CI_PROJECT_DIR":/app/target:ro \
+        -v "$CI_PROJECT_DIR/results":/app/results:rw \
+        -e AEGIS_API_KEY="$AEGIS_API_KEY" \
+        -e CONFIG_API_URL="$CONFIG_API_URL" \
+        -e GITHUB_REPOSITORY="$CI_PROJECT_PATH" \
+        -e GITHUB_REF="$CI_COMMIT_REF_NAME" \
+        -e GITHUB_SHA="$CI_COMMIT_SHA" \
+        playerunknown23/aegis:latest \
+        /app/target \
+        --api-key "$AEGIS_API_KEY" \
+        $CONFIG_ARG \
+        --parallel
+  allow_failure: false`,
+      },
+      jenkins: {
+        label: 'Jenkins',
+        summary: 'Add this stage to the stages block in your Jenkinsfile.',
+        description: 'The snippet pulls the latest image, maps the workspace, and propagates Jenkins metadata to Aegis.',
+        prerequisites: [
+          'Ensure the Jenkins agent (or node) has Docker installed and configured.',
+          'Store AEGIS_API_KEY and CONFIG_API_URL as String Credentials (e.g., aegis_api_key and config_api_url).',
+        ],
+        snippet: String.raw`stage('Run Security Scan (Docker)') {
+  steps {
+    withCredentials([
+      string(credentialsId: 'aegis_api_key', variable: 'AEGIS_API_KEY'),
+      string(credentialsId: 'config_api_url', variable: 'CONFIG_API_URL')
+    ]) {
+      sh '''
+        set -euo pipefail
+        echo "Pulling Aegis image..."
+        docker pull playerunknown23/aegis:latest || true 
+        echo "Running Aegis scanner container..."
+        SCANNER_EXIT=0
+        # Set config arg only if variable is not empty
+        if [ -n "${'${'}CONFIG_API_URL:-}" ]; then
+          CONFIG_ARG="--config-api-url=${'${'}CONFIG_API_URL}"
+        else
+          CONFIG_ARG=""
+        fi
+        docker run --rm \
+          -v "${'${'}WORKSPACE}:/app/target:ro" \
+          -v "${'${'}WORKSPACE}/results:/app/results:rw" \
+          -e AEGIS_API_KEY="${'${'}AEGIS_API_KEY}" \
+          -e CONFIG_API_URL="${'${'}CONFIG_API_URL}" \
+          -e GITHUB_REPOSITORY="${'${'}JOB_NAME}" \
+          -e GITHUB_REF="${'${'}BRANCH_NAME:-unknown-ref}" \
+          -e GITHUB_SHA="${'${'}GIT_COMMIT:-unknown-sha}" \
+          playerunknown23/aegis:latest \
+          /app/target \
+          --api-key "${'${'}AEGIS_API_KEY}" \
+          ${'${'}CONFIG_ARG} \
+          --parallel || SCANNER_EXIT=$? 
+        echo "Aegis exit code: $SCANNER_EXIT"
+        exit $SCANNER_EXIT
+      '''
+    }
+  }
+}`,
+      },
+      bitbucket: {
+        label: 'Bitbucket Pipelines',
+        summary: 'Add this step to your bitbucket-pipelines.yml file.',
+        description: 'The example enables the Docker service and keeps the pipeline green even if Aegis finds vulnerabilities.',
+        prerequisites: [
+          'Enable the docker service inside the pipeline.',
+          'Store AEGIS_API_KEY and CONFIG_API_URL as secured repository variables.',
+        ],
+        snippet: String.raw`- step:
+    name: "Aegis - pull & run"
+    services:
+      - docker
+    script:
+      - set -euo pipefail
+      - docker pull playerunknown23/aegis:latest
+      - |
+        docker run --rm \
+          -v "$BITBUCKET_CLONE_DIR":/app/target:ro \
+          -e AEGIS_API_KEY="$AEGIS_API_KEY" \
+          -e CONFIG_API_URL="$CONFIG_API_URL" \
+          -e GITHUB_REPOSITORY="$BITBUCKET_REPO_FULL_NAME" \
+          -e GITHUB_REF="$BITBUCKET_BRANCH" \
+          -e GITHUB_SHA="$BITBUCKET_COMMIT" \
+          playerunknown23/aegis:latest \
+          /app/target \
+          --api-key "$AEGIS_API_KEY" \
+          ${'${'}CONFIG_API_URL:+--config-api-url "$CONFIG_API_URL"} \
+          --parallel || true`,
+      },
+    };
   }, [profile?.api_key]);
 
   const signOut = useCallback(() => {
@@ -308,16 +450,17 @@ function App() {
     }
   }, [profile]);
 
-  const handleCopyActionsSnippet = useCallback(async () => {
+  const handleCopyCiSnippet = useCallback(async () => {
+    const snippet = ciOptions[selectedCiOption].snippet;
     try {
-      await navigator.clipboard.writeText(actionsSnippet);
-      setSnippetCopyMessage('Workflow snippet copied to clipboard.');
+      await navigator.clipboard.writeText(snippet);
+      setSnippetCopyMessage(`${ciOptions[selectedCiOption].label} snippet copied to clipboard.`);
     } catch (copyError) {
       setSnippetCopyMessage('Unable to copy workflow snippet.');
     } finally {
       setTimeout(() => setSnippetCopyMessage(null), 2500);
     }
-  }, [actionsSnippet]);
+  }, [ciOptions, selectedCiOption]);
 
   const handleSaveQualityGates = useCallback(
     async (config: QualityGateConfig) => {
@@ -744,26 +887,50 @@ function App() {
                   </div>
 
                   <div className="rounded-xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_24px_60px_-45px_rgba(15,23,42,0.5)]">
-                    <div className="flex flex-wrap items-start justify-between gap-4">
-                      <div className="space-y-2 text-slate-600">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">GitHub Actions snippet</p>
-                        <p className="text-sm">
-                          Add this step to your workflow and store the API key as <code className="font-mono text-indigo-900">AEGIS_API_KEY</code>.
-                        </p>
-                        <p className="text-xs">
-                          Copy the workflow as-is and paste it into your CI configuration. Update the image tag or target path whenever needed.
-                        </p>
+                    <div className="flex flex-wrap gap-3">
+                      {(Object.entries(ciOptions) as Array<[CiOptionKey, CiOption]>).map(([key, option]) => {
+                        const isActive = selectedCiOption === key;
+                        return (
+                          <button
+                            key={key}
+                            type="button"
+                            onClick={() => setSelectedCiOption(key)}
+                            className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-wide transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 ${
+                              isActive
+                                ? 'border-indigo-500/60 bg-indigo-600/10 text-indigo-700 shadow-[0_12px_30px_-20px_rgba(79,70,229,0.75)]'
+                                : 'border-slate-200/70 bg-white/80 text-slate-600 hover:border-accent/40 hover:text-accent'
+                            }`}
+                            aria-pressed={isActive}
+                          >
+                            {option.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div className="mt-6 flex flex-wrap items-start justify-between gap-4">
+                      <div className="space-y-3 text-slate-600">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{ciOptions[selectedCiOption].label} snippet</p>
+                        <p className="text-sm">{ciOptions[selectedCiOption].summary}</p>
+                        <p className="text-xs">{ciOptions[selectedCiOption].description}</p>
+                        <div>
+                          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Prerequisites</p>
+                          <ul className="mt-2 list-disc space-y-1 pl-4 text-xs text-slate-500">
+                            {ciOptions[selectedCiOption].prerequisites.map((item) => (
+                              <li key={item}>{item}</li>
+                            ))}
+                          </ul>
+                        </div>
                       </div>
                       <button
                         type="button"
-                        onClick={handleCopyActionsSnippet}
+                        onClick={handleCopyCiSnippet}
                         className="inline-flex items-center gap-2 rounded-full border border-slate-200/70 bg-white/80 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-indigo-700 transition hover:border-accent/50 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
                       >
                         <Icon name="link" width={14} height={14} /> Copy snippet
                       </button>
                     </div>
                     <pre className="mt-4 max-h-[420px] overflow-auto rounded-lg border border-indigo-600/60 bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-800 p-4 text-xs text-white shadow-[0_25px_55px_-35px_rgba(30,41,59,0.75)]">
-{actionsSnippet}
+{ciOptions[selectedCiOption].snippet}
                     </pre>
                     {snippetCopyMessage && (
                       <p className="mt-3 rounded-lg border border-accent/30 bg-indigo-900 px-3 py-2 text-xs text-indigo-100 shadow-[0_12px_24px_-18px_rgba(30,41,59,0.6)]">
