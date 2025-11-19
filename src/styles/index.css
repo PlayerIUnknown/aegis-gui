@@ -8,9 +8,9 @@
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
-  padding: 0.85rem 1.6rem;
+  padding: 0.55rem 1.3rem;
   border: none;
-  border-radius: 10px;
+  border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -34,7 +34,7 @@
   position: absolute;
   inset: 1px;
   background: #272727;
-  border-radius: 9px;
+  border-radius: inherit;
   transition: opacity 0.5s ease;
 }
 
@@ -43,7 +43,7 @@
   position: absolute;
   inset: 0;
   background: linear-gradient(45deg, #0ce39a, #69007f, #fc0987);
-  border-radius: 9px;
+  border-radius: inherit;
   opacity: 0;
   filter: blur(20px);
   transition: opacity 0.5s ease;
