@@ -502,12 +502,19 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                         <button
                           type="button"
                           onClick={() => triggerAiFix(key, finding)}
-                          className="inline-flex items-center gap-2 rounded-full border border-accent bg-accent px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-white shadow-[0_18px_36px_-24px_rgba(99,102,241,0.6)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-70"
+                          className={`copilot-button${isLoadingFix ? ' copilot-button--loading' : ''}`}
                           disabled={isLoadingFix}
                           aria-busy={isLoadingFix}
                         >
-                          <span aria-hidden="true" className="text-white">✨</span> Fix with AI
-                          {isLoadingFix && <Icon name="refresh" width={12} height={12} className="animate-spin" />}
+                          <span>
+                            <span aria-hidden="true" className="text-white">
+                              ✨
+                            </span>{' '}
+                            Fix with Copilot
+                            {isLoadingFix && (
+                              <Icon name="refresh" width={12} height={12} className="ml-2 text-white animate-spin" />
+                            )}
+                          </span>
                         </button>
                       </div>
                       {expanded && (
