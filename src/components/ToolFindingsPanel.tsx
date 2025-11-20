@@ -164,6 +164,19 @@ const getSeverityRank = (severity?: string) => {
   return severityOrder[normalized] ?? Number.MAX_SAFE_INTEGER;
 };
 
+const severityPillStyles: Record<string, string> = {
+  critical: 'border-red-900/70 bg-red-900 text-white shadow-[0_6px_18px_-10px_rgba(127,29,29,0.85)]',
+  high: 'border-red-600/70 bg-red-600 text-white shadow-[0_6px_18px_-10px_rgba(220,38,38,0.7)]',
+  medium: 'border-orange-500/70 bg-orange-500 text-white shadow-[0_6px_18px_-10px_rgba(234,88,12,0.65)]',
+  low: 'border-yellow-400/70 bg-yellow-400 text-slate-900 shadow-[0_6px_18px_-10px_rgba(202,138,4,0.55)]',
+  default: 'border-slate-200/80 bg-slate-100 text-slate-700 shadow-[0_6px_16px_-12px_rgba(15,23,42,0.35)]',
+};
+
+const getSeverityPillClassName = (severity?: string) => {
+  const normalized = normalizeSeverity(severity);
+  return severityPillStyles[normalized] ?? severityPillStyles.default;
+};
+
 const shouldSortBySeverity = (toolName: string) =>
   matchesFilter(toolName, 'sca') || matchesFilter(toolName, 'secrets') || matchesFilter(toolName, 'vulnScan');
 
@@ -215,6 +228,7 @@ type ScaPackageGroup = {
   modules: string[];
   severityRank: number;
   severityLabel: string;
+  severityValue?: string;
   findings: ScaFinding[];
 };
 
@@ -245,6 +259,7 @@ const groupScaFindings = (findings: unknown[]) => {
         modules: [],
         severityRank,
         severityLabel,
+        severityValue: entry.severity,
         findings: [],
       });
     }
@@ -255,6 +270,7 @@ const groupScaFindings = (findings: unknown[]) => {
     if (severityRank < group.severityRank) {
       group.severityRank = severityRank;
       group.severityLabel = severityLabel;
+      group.severityValue = entry.severity;
     }
 
     const moduleName = resolveModuleName(entry);
@@ -417,17 +433,17 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
           className="max-w-full overflow-hidden rounded-xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_28px_68px_-44px_rgba(15,23,42,0.5)]"
         >
           <div className="flex items-start justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-accent/10 text-accent">
-                {toolIconMap[toolName] ?? <Icon name="package" width={20} height={20} />}
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-accent/10 text-accent">
+                  {toolIconMap[toolName] ?? <Icon name="package" width={20} height={20} />}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">{toolName}</p>
+                  <p className="text-sm font-semibold text-slate-800">
+                    {toolData.output.length} finding{toolData.output.length === 1 ? '' : 's'} reported
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-semibold text-slate-900">{toolName}</p>
-                <p className="text-xs text-slate-500">
-                  {toolData.output.length} finding{toolData.output.length === 1 ? '' : 's'} reported
-                </p>
-              </div>
-            </div>
             <span className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600 shadow-[0_12px_28px_-20px_rgba(15,23,42,0.4)]">
               <Icon name={toolData.output.length > 0 ? 'alert' : 'check-circle'} width={14} height={14} />
               {toolData.output.length > 0 ? 'Review required' : 'Clean'}
@@ -457,7 +473,9 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                           key={key}
                           className="relative rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
                         >
-                          <span className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                          <span
+                            className={`absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${getSeverityPillClassName(finding.severity)}`}
+                          >
                             <Icon name="alert" width={12} height={12} /> {severity}
                           </span>
                           <div className="pr-24">
@@ -493,8 +511,7 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                           key={key}
                           className="rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
                         >
-                          <p className="text-sm font-semibold text-slate-900">{finding.name ?? 'Unnamed component'}</p>
-                          <dl className="mt-2 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)]">
+                          <dl className="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)]">
                             <div className="space-y-1">
                               <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Package name</dt>
                               <dd className="font-medium text-slate-900 break-words">{finding.name ?? 'Unknown'}</dd>
@@ -518,14 +535,15 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                           key={key}
                           className="relative space-y-3 rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
                         >
-                          <span className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                          <span
+                            className={`absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${getSeverityPillClassName(finding.severity)}`}
+                          >
                             <Icon name="alert" width={12} height={12} /> {formatSeverity(finding.severity)}
                           </span>
                           <div className="pr-24">
                             <p className="text-sm font-semibold text-slate-900">
                               {finding.description ? `${finding.description} exposed` : 'Secret exposed'}
                             </p>
-                            <p className="mt-1 text-xs text-slate-500">Match: {finding.match}</p>
                           </div>
                           <div className="space-y-2 rounded-lg border border-rose-400/70 bg-gradient-to-br from-white/95 via-rose-50 to-rose-100 p-4 text-xs text-rose-900 shadow-[0_22px_48px_-32px_rgba(244,63,94,0.3)]">
                             <p className="font-mono text-[11px] uppercase tracking-wide text-rose-500">
@@ -553,7 +571,9 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                           key={key}
                           className="relative space-y-3 rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
                         >
-                          <span className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                          <span
+                            className={`absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${getSeverityPillClassName(finding.severity)}`}
+                          >
                             <Icon name="alert" width={12} height={12} /> {formatSeverity(finding.severity)}
                           </span>
                           <div className="pr-24">
@@ -663,12 +683,13 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                           key={group.key}
                           className="relative rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
                         >
-                          <span className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                          <span
+                            className={`absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${getSeverityPillClassName(group.severityValue)}`}
+                          >
                             <Icon name="alert" width={12} height={12} /> {group.severityLabel}
                           </span>
                           <div className="pr-24">
-                            <p className="text-sm font-semibold text-slate-900 break-words">{group.packageName}</p>
-                            <dl className="mt-3 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)]">
+                            <dl className="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)]">
                               <div className="space-y-1">
                                 <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Package</dt>
                                 <dd className="font-medium text-slate-900 break-words">{group.packageName}</dd>
@@ -695,28 +716,16 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                                   key={groupKey}
                                   className="rounded-lg border border-slate-200/70 bg-white/90 p-3 text-xs text-slate-700"
                                 >
-                                  <div className="flex flex-wrap items-center justify-between gap-2">
-                                    <p className="text-sm font-semibold text-slate-900">
-                                      {groupFinding.id ?? 'Untracked vulnerability'}
-                                    </p>
-                                    <span className="inline-flex items-center gap-1 rounded-full border border-accent/30 bg-white px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-slate-600">
-                                      {formatSeverity(groupFinding.severity)}
-                                    </span>
-                                  </div>
-                                  <dl className="mt-2 grid gap-x-4 gap-y-1 text-xs sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+                                  <p className="text-sm font-semibold text-slate-900">
+                                    {groupFinding.id ?? 'Untracked vulnerability'}
+                                  </p>
+                                  <p className="mt-1 text-xs text-slate-600 whitespace-pre-line">
+                                    {groupFinding.description ?? 'No description available.'}
+                                  </p>
+                                  <dl className="mt-2 grid gap-x-4 gap-y-1 text-xs sm:grid-cols-[minmax(0,1fr)]">
                                     <div className="space-y-0.5">
                                       <dt className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Fix version</dt>
                                       <dd className="font-semibold text-emerald-600 break-words">{fixVersions ?? '—'}</dd>
-                                    </div>
-                                    <div className="space-y-0.5">
-                                      <dt className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Severity</dt>
-                                      <dd className="font-semibold text-rose-600">{formatSeverity(groupFinding.severity)}</dd>
-                                    </div>
-                                    <div className="space-y-0.5 sm:col-span-2">
-                                      <dt className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Description</dt>
-                                      <dd className="text-xs text-slate-700 whitespace-pre-line">
-                                        {groupFinding.description ?? 'No description available.'}
-                                      </dd>
                                     </div>
                                   </dl>
                                 </div>

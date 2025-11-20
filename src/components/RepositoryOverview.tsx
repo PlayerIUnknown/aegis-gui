@@ -49,41 +49,44 @@ export const RepositoryOverview: React.FC<RepositoryOverviewProps> = ({ reposito
         <RepositoryStat icon="check-circle" label="Passing" value={passingRuns} tone="success" />
         <RepositoryStat icon="x-circle" label="Failed" value={failedRuns} tone="danger" />
         <RepositoryStat icon="clock" label="Running" value={runningRuns} tone="warning" />
-        <RepositoryStat
-          icon="git-commit"
-          label="Last completed run"
-          value={lastCompletedDate}
-          helper={latestRun?.repository.commitHash ? `Commit #${latestRun.repository.commitHash.slice(0, 8)}` : undefined}
-        />
-        <RepositoryStat
-          icon="git-branch"
-          label="Branch"
-          value={latestRun?.repository.branch ?? '—'}
-          helper={latestRun?.scanType ?? undefined}
-        />
-        <RepositoryStat
-          icon="shield"
-          label="Quality gate"
-          value={
-            latestRun?.qualityGatePassed === true
-              ? 'Passed'
-              : latestRun?.qualityGatePassed === false
-              ? 'Failed'
-              : latestRun
-              ? 'Pending'
-              : '—'
-          }
-          helper={latestRun ? `Status: ${latestRun.status}` : undefined}
-        />
-        <RepositoryStat
-          icon="package"
-          label="Packages in last run"
-          value={latestRun?.summary.packagesFound ?? '—'}
-          helper={
-            latestRun ? `${latestRun.summary.vulnerabilitiesInPackages} vulnerable` : undefined
-          }
-        />
       </dl>
+
+      <div className="mt-2 rounded-xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white shadow-[0_22px_52px_-38px_rgba(15,23,42,0.45)]">
+        <div className="divide-y divide-slate-200/60">
+          <InlineRepositoryStat
+            icon="git-commit"
+            label="Last completed run"
+            value={lastCompletedDate}
+            helper={latestRun?.repository.commitHash ? `Commit #${latestRun.repository.commitHash.slice(0, 8)}` : undefined}
+          />
+          <InlineRepositoryStat
+            icon="git-branch"
+            label="Branch"
+            value={latestRun?.repository.branch ?? '—'}
+            helper={latestRun?.scanType ?? undefined}
+          />
+          <InlineRepositoryStat
+            icon="shield"
+            label="Quality gate"
+            value={
+              latestRun?.qualityGatePassed === true
+                ? 'Passed'
+                : latestRun?.qualityGatePassed === false
+                ? 'Failed'
+                : latestRun
+                ? 'Pending'
+                : '—'
+            }
+            helper={latestRun ? `Status: ${latestRun.status}` : undefined}
+          />
+          <InlineRepositoryStat
+            icon="package"
+            label="Packages in last run"
+            value={latestRun?.summary.packagesFound ?? '—'}
+            helper={latestRun ? `${latestRun.summary.vulnerabilitiesInPackages} vulnerable` : undefined}
+          />
+        </div>
+      </div>
     </section>
   );
 };
@@ -122,5 +125,25 @@ const RepositoryStat: React.FC<RepositoryStatProps> = ({ icon, label, value, hel
     <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</dt>
     <dd className="mt-2 text-lg font-semibold text-inherit">{value}</dd>
     {helper && <p className="mt-1 text-xs text-slate-500">{helper}</p>}
+  </div>
+);
+
+type InlineRepositoryStatProps = {
+  icon: RepositoryStatProps['icon'];
+  label: string;
+  value: number | string;
+  helper?: string;
+};
+
+const InlineRepositoryStat: React.FC<InlineRepositoryStatProps> = ({ icon, label, value, helper }) => (
+  <div className="flex items-start gap-3 px-5 py-4">
+    <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
+      <Icon name={icon} width={16} height={16} />
+    </div>
+    <div>
+      <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{label}</p>
+      <p className="text-sm font-semibold text-slate-900">{value}</p>
+      {helper && <p className="text-xs text-slate-500">{helper}</p>}
+    </div>
   </div>
 );

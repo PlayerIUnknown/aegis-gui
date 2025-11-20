@@ -136,39 +136,8 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
               </div>
               {isOpen && (
                 <div className="mt-6 space-y-6">
+                  <ToolFilterTabs activeFilter={activeToolFilter} onToggle={handleFilterToggle} />
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    <DetailStat
-                      label="SBOM"
-                      tooltip="Enumerates dependencies and components detected in the build."
-                      value={run.summary.packagesFound}
-                      tone="accent"
-                      isActive={activeToolFilter === 'sbom'}
-                      onClick={() => handleFilterToggle('sbom')}
-                    />
-                    <DetailStat
-                      label="SCA"
-                      tooltip="Identifies known vulnerabilities affecting third-party packages."
-                      value={run.summary.vulnerabilitiesInPackages}
-                      tone="warning"
-                      isActive={activeToolFilter === 'sca'}
-                      onClick={() => handleFilterToggle('sca')}
-                    />
-                    <DetailStat
-                      label="Vuln Scan"
-                      tooltip="Surfaces security issues uncovered in application source code."
-                      value={run.summary.codeVulnerabilities}
-                      tone="neutral"
-                      isActive={activeToolFilter === 'vulnScan'}
-                      onClick={() => handleFilterToggle('vulnScan')}
-                    />
-                    <DetailStat
-                      label="Secrets"
-                      tooltip="Flags hardcoded credentials, tokens, and other sensitive values."
-                      value={run.summary.secretsFound}
-                      tone="danger"
-                      isActive={activeToolFilter === 'secrets'}
-                      onClick={() => handleFilterToggle('secrets')}
-                    />
                     <DetailStat label="Low" value={run.summary.lowSeverity} tone="success" />
                     <DetailStat label="Medium" value={run.summary.mediumSeverity} tone="warning" />
                     <DetailStat label="High" value={run.summary.highSeverity} tone="danger" />
@@ -194,6 +163,85 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
     </div>
   );
 };
+
+type ToolFilterTabsProps = {
+  activeFilter: ToolCategoryFilter | null;
+  onToggle: (filter: ToolCategoryFilter) => void;
+};
+
+const filterOptions: Array<{
+  label: string;
+  description: string;
+  filter: ToolCategoryFilter;
+  icon: 'package-export' | 'bug' | 'code' | 'key';
+}> = [
+  {
+    label: 'SBOM',
+    description: 'Dependency inventory',
+    filter: 'sbom',
+    icon: 'package-export',
+  },
+  {
+    label: 'SCA',
+    description: 'Open-source risks',
+    filter: 'sca',
+    icon: 'bug',
+  },
+  {
+    label: 'Vuln scan',
+    description: 'Code weaknesses',
+    filter: 'vulnScan',
+    icon: 'code',
+  },
+  {
+    label: 'Secrets',
+    description: 'Exposed credentials',
+    filter: 'secrets',
+    icon: 'key',
+  },
+];
+
+const ToolFilterTabs: React.FC<ToolFilterTabsProps> = ({ activeFilter, onToggle }) => (
+  <div className="rounded-xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-2 shadow-[0_22px_52px_-38px_rgba(15,23,42,0.45)]">
+    <div className="flex flex-col gap-2 md:flex-row">
+      {filterOptions.map(({ label, description, filter, icon }) => {
+        const isActive = activeFilter === filter;
+        return (
+          <button
+            key={filter}
+            type="button"
+            role="tab"
+            aria-pressed={isActive}
+            onClick={() => onToggle(filter)}
+            className={clsx(
+              'group relative flex-1 rounded-lg px-4 py-3 text-left transition',
+              'border border-transparent bg-transparent hover:bg-white/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 focus-visible:ring-offset-2',
+              isActive &&
+                'border-accent/40 bg-white shadow-[0_20px_48px_-32px_rgba(15,23,42,0.4)] ring-1 ring-inset ring-accent/20',
+            )}
+          >
+            <div className="flex items-center gap-3">
+              <span className={clsx('flex h-9 w-9 items-center justify-center rounded-lg', isActive ? 'bg-accent/10 text-accent' : 'bg-slate-100 text-slate-500')}>
+                <Icon name={icon} width={18} height={18} />
+              </span>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-slate-900">{label}</p>
+                <p className="text-xs text-slate-500">{description}</p>
+              </div>
+            </div>
+            <span
+              aria-hidden
+              className={clsx(
+                'pointer-events-none absolute inset-x-4 -bottom-1 h-1 rounded-full bg-accent/20 transition',
+                isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-60',
+              )}
+            />
+          </button>
+        );
+      })}
+    </div>
+  </div>
+);
 
 type DetailStatProps = {
   label: string;
