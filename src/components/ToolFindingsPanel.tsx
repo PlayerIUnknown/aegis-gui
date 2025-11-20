@@ -16,10 +16,18 @@ const toolIconMap: Record<string, JSX.Element> = {
   'Secret Scanning': <Icon name="key" width={20} height={20} />,
 };
 
+type ScaPackageInfo = {
+  name?: string;
+  version?: string;
+  module?: string;
+  path?: string;
+};
+
 type ScaFinding = {
   id?: string;
   fix?: unknown;
-  package?: { name?: string; version?: string };
+  package?: ScaPackageInfo;
+  module?: string;
   severity?: string;
   description?: string;
 };
@@ -200,6 +208,91 @@ const getFindingSeverity = (finding: unknown): string | undefined => {
   return undefined;
 };
 
+type ScaPackageGroup = {
+  key: string;
+  packageName: string;
+  packageVersion: string;
+  modules: string[];
+  severityRank: number;
+  severityLabel: string;
+  findings: ScaFinding[];
+};
+
+const resolveModuleName = (finding: ScaFinding) =>
+  finding.package?.module ?? finding.package?.path ?? finding.module;
+
+const groupScaFindings = (findings: unknown[]) => {
+  const groupsMap = new Map<string, ScaPackageGroup>();
+  const leftovers: unknown[] = [];
+
+  findings.forEach((entry) => {
+    if (!isScaFinding(entry)) {
+      leftovers.push(entry);
+      return;
+    }
+
+    const packageName = entry.package?.name?.trim() || 'Unknown package';
+    const packageVersion = entry.package?.version?.trim() || 'Unknown version';
+    const key = `${packageName}@@${packageVersion}`;
+    const severityRank = getSeverityRank(entry.severity);
+    const severityLabel = formatSeverity(entry.severity);
+
+    if (!groupsMap.has(key)) {
+      groupsMap.set(key, {
+        key,
+        packageName,
+        packageVersion,
+        modules: [],
+        severityRank,
+        severityLabel,
+        findings: [],
+      });
+    }
+
+    const group = groupsMap.get(key)!;
+    group.findings.push(entry);
+
+    if (severityRank < group.severityRank) {
+      group.severityRank = severityRank;
+      group.severityLabel = severityLabel;
+    }
+
+    const moduleName = resolveModuleName(entry);
+    if (moduleName && !group.modules.includes(moduleName)) {
+      group.modules.push(moduleName);
+    }
+  });
+
+  const groups = Array.from(groupsMap.values()).map((group) => ({
+    ...group,
+    findings: [...group.findings].sort((findingA, findingB) => {
+      const severityComparison =
+        getSeverityRank(findingA.severity) - getSeverityRank(findingB.severity);
+
+      if (severityComparison !== 0) {
+        return severityComparison;
+      }
+
+      const idA = findingA.id ?? '';
+      const idB = findingB.id ?? '';
+      return idA.localeCompare(idB);
+    }),
+  }));
+
+  groups.sort((groupA, groupB) => {
+    if (groupA.severityRank === groupB.severityRank) {
+      if (groupA.packageName === groupB.packageName) {
+        return groupA.packageVersion.localeCompare(groupB.packageVersion);
+      }
+      return groupA.packageName.localeCompare(groupB.packageName);
+    }
+
+    return groupA.severityRank - groupB.severityRank;
+  });
+
+  return { groups, leftovers };
+};
+
 export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, activeFilter }) => {
   const [expandedSnippets, setExpandedSnippets] = useState<Record<string, boolean>>({});
   const [aiFixStates, setAiFixStates] = useState<Record<string, AiFixState>>({});
@@ -302,6 +395,15 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
 
   const entriesToRender = filteredEntries;
 
+  const sortFindingsForTool = (toolName: string, findings: unknown[]) =>
+    shouldSortBySeverity(toolName)
+      ? [...findings].sort(
+          (findingA, findingB) =>
+            getSeverityRank(getFindingSeverity(findingA)) -
+            getSeverityRank(getFindingSeverity(findingB)),
+        )
+      : findings;
+
   return (
     <div className="space-y-4">
       {entriesToRender.length === 0 && activeFilter && (
@@ -333,237 +435,331 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
           </div>
           {toolData.output.length > 0 ? (
             <div className="mt-4 space-y-3">
-              {(
-                shouldSortBySeverity(toolName)
-                  ? [...toolData.output].sort(
-                      (findingA, findingB) =>
-                        getSeverityRank(getFindingSeverity(findingA)) -
-                        getSeverityRank(getFindingSeverity(findingB)),
-                    )
-                  : toolData.output
-              ).map((finding, index) => {
-                const key = `${toolName}-${index}`;
+              {(() => {
+                const sortedFindings = sortFindingsForTool(toolName, toolData.output);
+                const isSecretTool = toolName.toLowerCase().includes('secret');
+                const isScaTool = matchesFilter(toolName, 'sca');
+                const shouldShowRemediation = isSecretTool && sortedFindings.length > 0;
+                const scaGrouping = isScaTool ? groupScaFindings(sortedFindings) : null;
 
-                if (isScaFinding(finding)) {
-                  const packageName = finding.package?.name ?? 'Unknown package';
-                  const packageVersion = finding.package?.version ?? 'Unknown version';
-                  const severity = formatSeverity(finding.severity);
-                  const fixVersions = formatFixVersions(finding.fix);
+                const renderDefaultFindings = () =>
+                  sortedFindings.map((finding, index) => {
+                    const key = `${toolName}-${index}`;
 
-                  return (
-                    <div
-                      key={key}
-                      className="relative rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
-                    >
-                      <span className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
-                        <Icon name="alert" width={12} height={12} /> {severity}
-                      </span>
-                      <div className="pr-24">
-                        <p className="text-sm font-semibold text-slate-900">{finding.id ?? 'Untracked vulnerability'}</p>
-                        <dl className="mt-3 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)]">
-                          <div className="space-y-1">
-                            <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Package</dt>
-                            <dd className="font-medium text-slate-900 break-words">{packageName}</dd>
-                          </div>
-                          <div className="space-y-1">
-                            <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Version</dt>
-                            <dd className="font-semibold text-rose-600 break-words">{packageVersion}</dd>
-                          </div>
-                          <div className="space-y-1 sm:col-start-3">
-                            <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Fix version</dt>
-                            <dd className="font-semibold text-emerald-600 break-words">{fixVersions ?? '—'}</dd>
-                          </div>
-                          <div className="space-y-1 sm:col-span-3">
-                            <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Description</dt>
-                            <dd className="text-sm text-slate-700 whitespace-pre-line">
-                              {finding.description ?? 'No description available.'}
-                            </dd>
-                          </div>
-                        </dl>
-                      </div>
-                    </div>
-                  );
-                }
+                    if (isScaFinding(finding)) {
+                      const packageName = finding.package?.name ?? 'Unknown package';
+                      const packageVersion = finding.package?.version ?? 'Unknown version';
+                      const severity = formatSeverity(finding.severity);
+                      const fixVersions = formatFixVersions(finding.fix);
 
-                if (toolName.toLowerCase().includes('sbom') && isSbomFinding(finding)) {
-                  return (
-                    <div
-                      key={key}
-                      className="rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
-                    >
-                      <p className="text-sm font-semibold text-slate-900">{finding.name ?? 'Unnamed component'}</p>
-                      <dl className="mt-2 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)]">
-                        <div className="space-y-1">
-                          <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Package name</dt>
-                          <dd className="font-medium text-slate-900 break-words">{finding.name ?? 'Unknown'}</dd>
+                      return (
+                        <div
+                          key={key}
+                          className="relative rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
+                        >
+                          <span className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                            <Icon name="alert" width={12} height={12} /> {severity}
+                          </span>
+                          <div className="pr-24">
+                            <p className="text-sm font-semibold text-slate-900">{finding.id ?? 'Untracked vulnerability'}</p>
+                            <dl className="mt-3 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)]">
+                              <div className="space-y-1">
+                                <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Package</dt>
+                                <dd className="font-medium text-slate-900 break-words">{packageName}</dd>
+                              </div>
+                              <div className="space-y-1">
+                                <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Version</dt>
+                                <dd className="font-semibold text-rose-600 break-words">{packageVersion}</dd>
+                              </div>
+                              <div className="space-y-1 sm:col-start-3">
+                                <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Fix version</dt>
+                                <dd className="font-semibold text-emerald-600 break-words">{fixVersions ?? '—'}</dd>
+                              </div>
+                              <div className="space-y-1 sm:col-span-3">
+                                <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Description</dt>
+                                <dd className="text-sm text-slate-700 whitespace-pre-line">
+                                  {finding.description ?? 'No description available.'}
+                                </dd>
+                              </div>
+                            </dl>
+                          </div>
                         </div>
-                        <div className="space-y-1">
-                          <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Type</dt>
-                          <dd className="font-medium text-slate-900 break-words">{finding.type ?? 'Unknown'}</dd>
-                        </div>
-                        <div className="space-y-1">
-                          <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Version</dt>
-                          <dd className="font-medium text-slate-900 break-words">{finding.version ?? 'Unknown'}</dd>
-                        </div>
-                      </dl>
-                    </div>
-                  );
-                }
+                      );
+                    }
 
-                if (toolName.toLowerCase().includes('secret') && isSecretFinding(finding)) {
-                  const expanded = isSnippetExpanded(key);
-                  return (
-                    <div
-                      key={key}
-                      className="relative space-y-3 rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
-                    >
-                      <span className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
-                        <Icon name="alert" width={12} height={12} /> {formatSeverity(finding.severity)}
-                      </span>
-                      <div className="pr-24">
-                        <p className="text-sm font-semibold text-slate-900">
-                          {finding.description ? `${finding.description} exposed` : 'Secret exposed'}
-                        </p>
-                        <p className="mt-1 text-xs text-slate-500">Match: {finding.match}</p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => toggleSnippet(key)}
-                        className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-white/90 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-700 transition hover:text-accent"
-                        aria-expanded={expanded}
-                      >
-                        {expanded ? 'Hide code snippet' : 'Show code snippet'}
-                        <Icon name={expanded ? 'chevron-up' : 'chevron-down'} width={12} height={12} />
-                      </button>
-                      {expanded && (
-                        <>
+                    if (toolName.toLowerCase().includes('sbom') && isSbomFinding(finding)) {
+                      return (
+                        <div
+                          key={key}
+                          className="rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
+                        >
+                          <p className="text-sm font-semibold text-slate-900">{finding.name ?? 'Unnamed component'}</p>
+                          <dl className="mt-2 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)]">
+                            <div className="space-y-1">
+                              <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Package name</dt>
+                              <dd className="font-medium text-slate-900 break-words">{finding.name ?? 'Unknown'}</dd>
+                            </div>
+                            <div className="space-y-1">
+                              <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Type</dt>
+                              <dd className="font-medium text-slate-900 break-words">{finding.type ?? 'Unknown'}</dd>
+                            </div>
+                            <div className="space-y-1">
+                              <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Version</dt>
+                              <dd className="font-medium text-slate-900 break-words">{finding.version ?? 'Unknown'}</dd>
+                            </div>
+                          </dl>
+                        </div>
+                      );
+                    }
+
+                    if (toolName.toLowerCase().includes('secret') && isSecretFinding(finding)) {
+                      return (
+                        <div
+                          key={key}
+                          className="relative space-y-3 rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
+                        >
+                          <span className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                            <Icon name="alert" width={12} height={12} /> {formatSeverity(finding.severity)}
+                          </span>
+                          <div className="pr-24">
+                            <p className="text-sm font-semibold text-slate-900">
+                              {finding.description ? `${finding.description} exposed` : 'Secret exposed'}
+                            </p>
+                            <p className="mt-1 text-xs text-slate-500">Match: {finding.match}</p>
+                          </div>
                           <div className="space-y-2 rounded-lg border border-rose-400/70 bg-gradient-to-br from-white/95 via-rose-50 to-rose-100 p-4 text-xs text-rose-900 shadow-[0_22px_48px_-32px_rgba(244,63,94,0.3)]">
                             <p className="font-mono text-[11px] uppercase tracking-wide text-rose-500">
                               {finding.file ?? 'Unknown file'}:{finding.line ?? '—'}
                             </p>
                             <pre className="whitespace-pre-wrap break-all font-mono text-xs text-rose-950">{finding.match}</pre>
                           </div>
-                          <div className="space-y-2 rounded-lg border border-emerald-400/70 bg-gradient-to-br from-white/95 via-emerald-50 to-emerald-100 p-4 text-xs text-emerald-900 shadow-[0_22px_48px_-32px_rgba(16,185,129,0.32)]">
-                            <p className="text-sm font-semibold text-emerald-900">Recommended remediation</p>
-                            <ul className="list-disc space-y-1 pl-5 text-xs text-emerald-800">
-                              <li>
-                                Remove the exposed value from source control and reference it via a secrets manager or environment variable instead of hardcoding it.
-                              </li>
-                              <li>Rotate the compromised credential and audit recent usage for suspicious access.</li>
-                              <li>
-                                Update deployment pipelines to inject secrets at runtime and add automated scanning to prevent future commits with sensitive strings.
-                              </li>
-                            </ul>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  );
-                }
+                        </div>
+                      );
+                    }
 
-                if (isVulnerabilityFinding(finding)) {
-                  const expanded = isSnippetExpanded(key);
-                  const fixState = aiFixStates[key];
-                  const isLoadingFix = fixState?.status === 'loading';
-                  const hasFixError = fixState?.status === 'error';
-                  const hasFixResult = fixState?.status === 'success' && fixState.result;
-                  const message = finding.message ?? '';
-                  const { title, description } = splitVulnerabilityMessage(message);
-                  const hasDescription = description.length > 0;
-                  const displayTitle = title || message;
-                  const shouldShowDescription = hasDescription;
-                  return (
-                    <div
-                      key={key}
-                      className="relative space-y-3 rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
-                    >
-                      <span className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
-                        <Icon name="alert" width={12} height={12} /> {formatSeverity(finding.severity)}
-                      </span>
-                      <div className="pr-24">
-                        <p className="text-sm font-semibold text-slate-900 whitespace-pre-line">{displayTitle}</p>
-                        {shouldShowDescription && (
-                          <p className="mt-1 whitespace-pre-line text-xs text-slate-600">{description}</p>
-                        )}
-                        <p className="mt-1 text-xs text-slate-500">
-                          File: {finding.file ?? 'Unknown file'} • Line {finding.line ?? '—'}
-                        </p>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        <button
-                          type="button"
-                          onClick={() => toggleSnippet(key)}
-                          className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-white/90 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-700 transition hover:text-accent"
-                          aria-expanded={expanded}
+                    if (isVulnerabilityFinding(finding)) {
+                      const expanded = isSnippetExpanded(key);
+                      const fixState = aiFixStates[key];
+                      const isLoadingFix = fixState?.status === 'loading';
+                      const hasFixError = fixState?.status === 'error';
+                      const hasFixResult = fixState?.status === 'success' && fixState.result;
+                      const message = finding.message ?? '';
+                      const { title, description } = splitVulnerabilityMessage(message);
+                      const hasDescription = description.length > 0;
+                      const displayTitle = title || message;
+                      const shouldShowDescription = hasDescription;
+                      return (
+                        <div
+                          key={key}
+                          className="relative space-y-3 rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
                         >
-                          {expanded ? 'Hide snippet' : 'Show snippet'}
-                          <Icon name={expanded ? 'chevron-up' : 'chevron-down'} width={12} height={12} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => triggerAiFix(key, finding)}
-                          className={`copilot-button${isLoadingFix ? ' copilot-button--loading' : ''}`}
-                          disabled={isLoadingFix}
-                          aria-busy={isLoadingFix}
-                        >
-                          <span>
-                            <span aria-hidden="true" className="text-white">
-                              ✨
-                            </span>{' '}
-                            Fix with Copilot
-                            {isLoadingFix && (
-                              <Icon name="refresh" width={12} height={12} className="ml-2 text-white animate-spin" />
-                            )}
+                          <span className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                            <Icon name="alert" width={12} height={12} /> {formatSeverity(finding.severity)}
                           </span>
-                        </button>
-                      </div>
-                      {expanded && (
-                        <div className="space-y-2 rounded-lg border border-rose-400/70 bg-gradient-to-br from-white/95 via-rose-50 to-rose-100 p-4 text-xs text-rose-900 shadow-[0_22px_48px_-32px_rgba(244,63,94,0.3)]">
-                          <p className="font-mono text-[11px] uppercase tracking-wide text-rose-500">
-                            {finding.file ?? 'Unknown file'}:{finding.line ?? '—'}-{finding.end_line ?? finding.line ?? '—'}
-                          </p>
-                          <pre className="whitespace-pre-wrap break-all font-mono text-xs text-rose-950">{finding.code_snippet ?? 'Snippet unavailable.'}</pre>
-                        </div>
-                      )}
-                      {isLoadingFix && (
-                        <p className="text-xs font-medium text-slate-500">Generating secure fix suggestion…</p>
-                      )}
-                      {hasFixError && fixState?.error && (
-                        <p className="rounded-lg border border-rose-400/60 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-600">
-                          Unable to generate fix: {fixState.error}
-                        </p>
-                      )}
-                      {hasFixResult && fixState?.result && (
-                        <div className="space-y-2 rounded-lg border border-emerald-400/70 bg-gradient-to-br from-white/95 via-emerald-50 to-emerald-100 p-4 text-xs text-emerald-900 shadow-[0_22px_48px_-32px_rgba(16,185,129,0.32)]">
-                          <div className="flex items-start justify-between gap-2">
-                            <p className="text-sm font-semibold text-emerald-900">
-                              {fixState.result.fix_description ?? 'Suggested remediation'}
-                            </p>
-                            {fixState.result.vulnerability_id && (
-                              <span className="rounded-full border border-emerald-300/70 bg-emerald-100/70 px-2 py-0.5 text-[10px] uppercase tracking-wide text-emerald-700">
-                                Ref: {fixState.result.vulnerability_id}
-                              </span>
+                          <div className="pr-24">
+                            <p className="text-sm font-semibold text-slate-900 whitespace-pre-line">{displayTitle}</p>
+                            {shouldShowDescription && (
+                              <p className="mt-1 whitespace-pre-line text-xs text-slate-600">{description}</p>
                             )}
+                            <p className="mt-1 text-xs text-slate-500">
+                              File: {finding.file ?? 'Unknown file'} • Line {finding.line ?? '—'}
+                            </p>
                           </div>
-                          <div className="space-y-1 rounded-lg border border-emerald-300/70 bg-gradient-to-br from-white/95 via-emerald-50 to-emerald-100 p-3">
-                            <p className="font-mono text-[11px] uppercase tracking-wide text-emerald-600">AI Fixed Snippet</p>
-                            <pre className="whitespace-pre-wrap break-all font-mono text-xs text-emerald-900">{fixState.result.fixed_code ?? 'No updated code provided.'}</pre>
+                          <div className="flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              onClick={() => toggleSnippet(key)}
+                              className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-white/90 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-700 transition hover:text-accent"
+                              aria-expanded={expanded}
+                            >
+                              {expanded ? 'Hide snippet' : 'Show snippet'}
+                              <Icon name={expanded ? 'chevron-up' : 'chevron-down'} width={12} height={12} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => triggerAiFix(key, finding)}
+                              className={`copilot-button${isLoadingFix ? ' copilot-button--loading' : ''}`}
+                              disabled={isLoadingFix}
+                              aria-busy={isLoadingFix}
+                            >
+                              <span>
+                                <span aria-hidden="true" className="text-white">
+                                  ✨
+                                </span>{' '}
+                                Fix with Copilot
+                                {isLoadingFix && (
+                                  <Icon name="refresh" width={12} height={12} className="ml-2 text-white animate-spin" />
+                                )}
+                              </span>
+                            </button>
                           </div>
+                          {expanded && (
+                            <div className="space-y-2 rounded-lg border border-rose-400/70 bg-gradient-to-br from-white/95 via-rose-50 to-rose-100 p-4 text-xs text-rose-900 shadow-[0_22px_48px_-32px_rgba(244,63,94,0.3)]">
+                              <p className="font-mono text-[11px] uppercase tracking-wide text-rose-500">
+                                {finding.file ?? 'Unknown file'}:{finding.line ?? '—'}-{finding.end_line ?? finding.line ?? '—'}
+                              </p>
+                              <pre className="whitespace-pre-wrap break-all font-mono text-xs text-rose-950">{finding.code_snippet ?? 'Snippet unavailable.'}</pre>
+                            </div>
+                          )}
+                          {isLoadingFix && (
+                            <p className="text-xs font-medium text-slate-500">Generating secure fix suggestion…</p>
+                          )}
+                          {hasFixError && fixState?.error && (
+                            <p className="rounded-lg border border-rose-400/60 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-600">
+                              Unable to generate fix: {fixState.error}
+                            </p>
+                          )}
+                          {hasFixResult && fixState?.result && (
+                            <div className="space-y-2 rounded-lg border border-emerald-400/70 bg-gradient-to-br from-white/95 via-emerald-50 to-emerald-100 p-4 text-xs text-emerald-900 shadow-[0_22px_48px_-32px_rgba(16,185,129,0.32)]">
+                              <div className="flex items-start justify-between gap-2">
+                                <p className="text-sm font-semibold text-emerald-900">
+                                  {fixState.result.fix_description ?? 'Suggested remediation'}
+                                </p>
+                                {fixState.result.vulnerability_id && (
+                                  <span className="rounded-full border border-emerald-300/70 bg-emerald-100/70 px-2 py-0.5 text-[10px] uppercase tracking-wide text-emerald-700">
+                                    Ref: {fixState.result.vulnerability_id}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="space-y-1 rounded-lg border border-emerald-300/70 bg-gradient-to-br from-white/95 via-emerald-50 to-emerald-100 p-3">
+                                <p className="font-mono text-[11px] uppercase tracking-wide text-emerald-600">AI Fixed Snippet</p>
+                                <pre className="whitespace-pre-wrap break-all font-mono text-xs text-emerald-900">{fixState.result.fixed_code ?? 'No updated code provided.'}</pre>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div
+                        key={key}
+                        className="rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-xs text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
+                      >
+                        <pre className="max-h-60 overflow-y-auto whitespace-pre-wrap break-all">{JSON.stringify(finding, null, 2)}</pre>
+                      </div>
+                    );
+                  });
+
+                if (isScaTool && scaGrouping) {
+                  return (
+                    <>
+                      {shouldShowRemediation && (
+                        <div className="space-y-2 rounded-lg border border-emerald-400/70 bg-gradient-to-br from-white/95 via-emerald-50 to-emerald-100 p-4 text-xs text-emerald-900 shadow-[0_22px_48px_-32px_rgba(16,185,129,0.32)]">
+                          <p className="text-sm font-semibold text-emerald-900">Recommended remediation</p>
+                          <ul className="list-disc space-y-1 pl-5 text-xs text-emerald-800">
+                            <li>
+                              Remove the exposed value from source control and reference it via a secrets manager or environment variable instead of hardcoding it.
+                            </li>
+                            <li>Rotate the compromised credential and audit recent usage for suspicious access.</li>
+                            <li>
+                              Update deployment pipelines to inject secrets at runtime and add automated scanning to prevent future commits with sensitive strings.
+                            </li>
+                          </ul>
                         </div>
                       )}
-                    </div>
+                      {scaGrouping.groups.map((group) => (
+                        <div
+                          key={group.key}
+                          className="relative rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
+                        >
+                          <span className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                            <Icon name="alert" width={12} height={12} /> {group.severityLabel}
+                          </span>
+                          <div className="pr-24">
+                            <p className="text-sm font-semibold text-slate-900 break-words">{group.packageName}</p>
+                            <dl className="mt-3 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)]">
+                              <div className="space-y-1">
+                                <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Package</dt>
+                                <dd className="font-medium text-slate-900 break-words">{group.packageName}</dd>
+                              </div>
+                              <div className="space-y-1">
+                                <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Version</dt>
+                                <dd className="font-semibold text-rose-600 break-words">{group.packageVersion}</dd>
+                              </div>
+                              {group.modules.length > 0 && (
+                                <div className="space-y-1 sm:col-start-3">
+                                  <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Module</dt>
+                                  <dd className="font-medium text-slate-900 break-words">{group.modules.join(', ')}</dd>
+                                </div>
+                              )}
+                            </dl>
+                          </div>
+                          <div className="mt-4 space-y-2">
+                            {group.findings.map((groupFinding, groupIndex) => {
+                              const groupKey = `${group.key}-${groupIndex}`;
+                              const fixVersions = formatFixVersions(groupFinding.fix);
+
+                              return (
+                                <div
+                                  key={groupKey}
+                                  className="rounded-lg border border-slate-200/70 bg-white/90 p-3 text-xs text-slate-700"
+                                >
+                                  <div className="flex flex-wrap items-center justify-between gap-2">
+                                    <p className="text-sm font-semibold text-slate-900">
+                                      {groupFinding.id ?? 'Untracked vulnerability'}
+                                    </p>
+                                    <span className="inline-flex items-center gap-1 rounded-full border border-accent/30 bg-white px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-slate-600">
+                                      {formatSeverity(groupFinding.severity)}
+                                    </span>
+                                  </div>
+                                  <dl className="mt-2 grid gap-x-4 gap-y-1 text-xs sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+                                    <div className="space-y-0.5">
+                                      <dt className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Fix version</dt>
+                                      <dd className="font-semibold text-emerald-600 break-words">{fixVersions ?? '—'}</dd>
+                                    </div>
+                                    <div className="space-y-0.5">
+                                      <dt className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Severity</dt>
+                                      <dd className="font-semibold text-rose-600">{formatSeverity(groupFinding.severity)}</dd>
+                                    </div>
+                                    <div className="space-y-0.5 sm:col-span-2">
+                                      <dt className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Description</dt>
+                                      <dd className="text-xs text-slate-700 whitespace-pre-line">
+                                        {groupFinding.description ?? 'No description available.'}
+                                      </dd>
+                                    </div>
+                                  </dl>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
+                      {scaGrouping.leftovers.map((finding, index) => {
+                        const key = `${toolName}-other-${index}`;
+                        return (
+                          <div
+                            key={key}
+                            className="rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-xs text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
+                          >
+                            <pre className="max-h-60 overflow-y-auto whitespace-pre-wrap break-all">{JSON.stringify(finding, null, 2)}</pre>
+                          </div>
+                        );
+                      })}
+                    </>
                   );
                 }
 
                 return (
-                  <div
-                    key={key}
-                    className="rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-xs text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
-                  >
-                    <pre className="max-h-60 overflow-y-auto whitespace-pre-wrap break-all">{JSON.stringify(finding, null, 2)}</pre>
-                  </div>
+                  <>
+                    {shouldShowRemediation && !isScaTool && (
+                      <div className="space-y-2 rounded-lg border border-emerald-400/70 bg-gradient-to-br from-white/95 via-emerald-50 to-emerald-100 p-4 text-xs text-emerald-900 shadow-[0_22px_48px_-32px_rgba(16,185,129,0.32)]">
+                        <p className="text-sm font-semibold text-emerald-900">Recommended remediation</p>
+                        <ul className="list-disc space-y-1 pl-5 text-xs text-emerald-800">
+                          <li>
+                            Remove the exposed value from source control and reference it via a secrets manager or environment variable instead of hardcoding it.
+                          </li>
+                          <li>Rotate the compromised credential and audit recent usage for suspicious access.</li>
+                          <li>
+                            Update deployment pipelines to inject secrets at runtime and add automated scanning to prevent future commits with sensitive strings.
+                          </li>
+                        </ul>
+                      </div>
+                    )}
+                    {renderDefaultFindings()}
+                  </>
                 );
-              })}
+              })()}
             </div>
           ) : (
             <p className="mt-4 rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-xs text-slate-600 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]">
