@@ -89,12 +89,16 @@ export const RepositoryOverview: React.FC<RepositoryOverviewProps> = ({ reposito
       </dl>
 
       <div className="mt-2 rounded-xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white shadow-[0_22px_52px_-38px_rgba(15,23,42,0.45)]">
-        <div className="flex flex-col">
-          {inlineStats.map((stat, index) => (
-            <div key={stat.key} className="relative">
-              {index > 0 && <div className="pointer-events-none absolute inset-x-5 top-0 h-px bg-slate-200/60" />}
-              <InlineRepositoryStat icon={stat.icon} label={stat.label} value={stat.value} helper={stat.helper} />
-            </div>
+        <div className="flex flex-wrap divide-x divide-slate-200/60">
+          {inlineStats.map((stat) => (
+            <InlineRepositoryStat
+              key={stat.key}
+              icon={stat.icon}
+              label={stat.label}
+              value={stat.value}
+              helper={stat.helper}
+              className="flex-1"
+            />
           ))}
         </div>
       </div>
@@ -144,10 +148,11 @@ type InlineRepositoryStatProps = {
   label: string;
   value: number | string;
   helper?: string;
+  className?: string;
 };
 
-const InlineRepositoryStat: React.FC<InlineRepositoryStatProps> = ({ icon, label, value, helper }) => (
-  <div className="flex items-start gap-3 px-5 py-4">
+const InlineRepositoryStat: React.FC<InlineRepositoryStatProps> = ({ icon, label, value, helper, className }) => (
+  <div className={`flex items-start gap-3 px-5 py-4 ${className ?? ''}`}>
     <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
       <Icon name={icon} width={16} height={16} />
     </div>
