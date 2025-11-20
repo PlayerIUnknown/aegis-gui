@@ -25,6 +25,43 @@ export const RepositoryOverview: React.FC<RepositoryOverviewProps> = ({ reposito
   const passingRuns = repository.scans.filter((scan) => scan.qualityGatePassed === true).length;
   const failedRuns = repository.scans.filter((scan) => scan.qualityGatePassed === false).length;
   const runningRuns = repository.scans.filter((scan) => scan.status === 'running').length;
+  const inlineStats: Array<InlineRepositoryStatProps & { key: string }> = [
+    {
+      key: 'last-completed',
+      icon: 'git-commit',
+      label: 'Last completed run',
+      value: lastCompletedDate,
+      helper: latestRun?.repository.commitHash ? `Commit #${latestRun.repository.commitHash.slice(0, 8)}` : undefined,
+    },
+    {
+      key: 'branch',
+      icon: 'git-branch',
+      label: 'Branch',
+      value: latestRun?.repository.branch ?? '—',
+      helper: latestRun?.scanType ?? undefined,
+    },
+    {
+      key: 'quality-gate',
+      icon: 'shield',
+      label: 'Quality gate',
+      value:
+        latestRun?.qualityGatePassed === true
+          ? 'Passed'
+          : latestRun?.qualityGatePassed === false
+          ? 'Failed'
+          : latestRun
+          ? 'Pending'
+          : '—',
+      helper: latestRun ? `Status: ${latestRun.status}` : undefined,
+    },
+    {
+      key: 'packages',
+      icon: 'package',
+      label: 'Packages in last run',
+      value: latestRun?.summary.packagesFound ?? '—',
+      helper: latestRun ? `${latestRun.summary.vulnerabilitiesInPackages} vulnerable` : undefined,
+    },
+  ];
 
   return (
     <section className="space-y-5 rounded-xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-6 shadow-[0_28px_68px_-44px_rgba(15,23,42,0.5)]">
@@ -52,39 +89,13 @@ export const RepositoryOverview: React.FC<RepositoryOverviewProps> = ({ reposito
       </dl>
 
       <div className="mt-2 rounded-xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white shadow-[0_22px_52px_-38px_rgba(15,23,42,0.45)]">
-        <div className="divide-y divide-slate-200/60">
-          <InlineRepositoryStat
-            icon="git-commit"
-            label="Last completed run"
-            value={lastCompletedDate}
-            helper={latestRun?.repository.commitHash ? `Commit #${latestRun.repository.commitHash.slice(0, 8)}` : undefined}
-          />
-          <InlineRepositoryStat
-            icon="git-branch"
-            label="Branch"
-            value={latestRun?.repository.branch ?? '—'}
-            helper={latestRun?.scanType ?? undefined}
-          />
-          <InlineRepositoryStat
-            icon="shield"
-            label="Quality gate"
-            value={
-              latestRun?.qualityGatePassed === true
-                ? 'Passed'
-                : latestRun?.qualityGatePassed === false
-                ? 'Failed'
-                : latestRun
-                ? 'Pending'
-                : '—'
-            }
-            helper={latestRun ? `Status: ${latestRun.status}` : undefined}
-          />
-          <InlineRepositoryStat
-            icon="package"
-            label="Packages in last run"
-            value={latestRun?.summary.packagesFound ?? '—'}
-            helper={latestRun ? `${latestRun.summary.vulnerabilitiesInPackages} vulnerable` : undefined}
-          />
+        <div className="flex flex-col">
+          {inlineStats.map((stat, index) => (
+            <div key={stat.key} className="relative">
+              {index > 0 && <div className="pointer-events-none absolute inset-x-5 top-0 h-px bg-slate-200/60" />}
+              <InlineRepositoryStat icon={stat.icon} label={stat.label} value={stat.value} helper={stat.helper} />
+            </div>
+          ))}
         </div>
       </div>
     </section>

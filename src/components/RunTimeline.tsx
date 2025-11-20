@@ -148,7 +148,13 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
                       Loading tool results…
                     </p>
                   )}
-                  {!isLoading && <ToolFindingsPanel tools={details?.tools} activeFilter={activeToolFilter} />}
+                  {!isLoading && (
+                    <ToolFindingsPanel
+                      tools={details?.tools}
+                      activeFilter={activeToolFilter}
+                      repository={details?.repository}
+                    />
+                  )}
                   {run.targetPath && (
                     <p className="text-xs text-slate-500">
                       Target path: <span className="font-mono text-slate-800">{run.targetPath}</span>
