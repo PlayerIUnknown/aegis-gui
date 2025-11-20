@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
 import { Icon } from './Icon';
+import type { RepositoryInfoView } from '../types/domain';
 
 export type ToolCategoryFilter = 'sbom' | 'sca' | 'vulnScan' | 'secrets';
 
 type ToolFindingsPanelProps = {
   tools?: Record<string, { output: unknown[] }>;
   activeFilter?: ToolCategoryFilter | null;
+  repository?: RepositoryInfoView;
 };
 
 const toolIconMap: Record<string, JSX.Element> = {
@@ -118,6 +120,64 @@ const formatFixVersions = (fix: unknown): string | null => {
   return null;
 };
 
+const extractFixVersions = (fix: unknown): string[] => {
+  if (Array.isArray(fix)) {
+    return fix.filter((value): value is string => typeof value === 'string');
+  }
+
+  if (typeof fix === 'string' && fix.trim().length > 0) {
+    return fix
+      .split(',')
+      .map((entry) => entry.trim())
+      .filter((entry) => entry.length > 0);
+  }
+
+  return [];
+};
+
+const normalizeVersionValue = (version: string) => version.replace(/^v/i, '').trim();
+
+const compareVersionValues = (a: string, b: string) => {
+  const cleanA = normalizeVersionValue(a);
+  const cleanB = normalizeVersionValue(b);
+
+  const segmentsA = cleanA.split('.');
+  const segmentsB = cleanB.split('.');
+  const maxLength = Math.max(segmentsA.length, segmentsB.length);
+
+  for (let index = 0; index < maxLength; index += 1) {
+    const rawA = segmentsA[index] ?? '0';
+    const rawB = segmentsB[index] ?? '0';
+    const numericA = Number.parseInt(rawA, 10);
+    const numericB = Number.parseInt(rawB, 10);
+
+    const valueA = Number.isFinite(numericA) ? numericA : rawA;
+    const valueB = Number.isFinite(numericB) ? numericB : rawB;
+
+    if (valueA === valueB) {
+      continue;
+    }
+
+    if (typeof valueA === 'number' && typeof valueB === 'number') {
+      return valueA - valueB;
+    }
+
+    return `${valueA}`.localeCompare(`${valueB}`);
+  }
+
+  return 0;
+};
+
+const getLatestFixVersion = (findings: ScaFinding[]): string | null => {
+  const allFixVersions = findings.flatMap((finding) => extractFixVersions(finding.fix));
+
+  if (allFixVersions.length === 0) {
+    return null;
+  }
+
+  return allFixVersions.sort(compareVersionValues).at(-1) ?? null;
+};
+
 const filterMatchers: Record<ToolCategoryFilter, string[]> = {
   sbom: ['sbom'],
   sca: ['sca', 'package'],
@@ -176,6 +236,9 @@ const getSeverityPillClassName = (severity?: string) => {
   const normalized = normalizeSeverity(severity);
   return severityPillStyles[normalized] ?? severityPillStyles.default;
 };
+
+const severityBadgeBaseClass =
+  'absolute right-3 top-3 inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide';
 
 const shouldSortBySeverity = (toolName: string) =>
   matchesFilter(toolName, 'sca') || matchesFilter(toolName, 'secrets') || matchesFilter(toolName, 'vulnScan');
@@ -309,7 +372,50 @@ const groupScaFindings = (findings: unknown[]) => {
   return { groups, leftovers };
 };
 
-export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, activeFilter }) => {
+const buildSbomRows = (findings: unknown[]): SbomFinding[] =>
+  findings
+    .filter((entry): entry is SbomFinding => isSbomFinding(entry))
+    .map((finding) => ({
+      name: finding.name?.trim() || 'Unknown',
+      version: finding.version?.trim() || '—',
+      type: finding.type?.trim() || 'Unknown',
+    }));
+
+const formatSbomCsv = (repository: RepositoryInfoView | undefined, rows: SbomFinding[]) => {
+  const repoName = repository?.repoName ?? 'Unknown repository';
+  const branch = repository?.branch ?? '—';
+  const commit = repository?.commitHash ?? '—';
+  const metaLines = [`Repository,"${repoName}"`, `Branch,"${branch}"`, `Commit,"${commit}"`, ''];
+  const header = ['Package', 'Type', 'Version'];
+  const sbomLines = rows.map((row) => [row.name, row.type, row.version].map((value) => `"${value}"`).join(','));
+
+  return [...metaLines, header.join(','), ...sbomLines].join('\n');
+};
+
+const formatSbomPdf = (repository: RepositoryInfoView | undefined, rows: SbomFinding[]) => {
+  const repoName = repository?.repoName ?? 'Unknown repository';
+  const branch = repository?.branch ?? '—';
+  const commit = repository?.commitHash ?? '—';
+
+  const header = [`Repository: ${repoName}`, `Branch: ${branch}`, `Commit: ${commit}`, '', 'SBOM inventory:'];
+  const entries = rows.map((row, index) => `${index + 1}. ${row.name} (${row.type}) - v${row.version}`);
+
+  return [...header, ...entries].join('\n');
+};
+
+const triggerFileDownload = (content: string, mimeType: string, filename: string) => {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+};
+
+export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, activeFilter, repository }) => {
   const [expandedSnippets, setExpandedSnippets] = useState<Record<string, boolean>>({});
   const [aiFixStates, setAiFixStates] = useState<Record<string, AiFixState>>({});
 
@@ -395,6 +501,17 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
     }
   };
 
+  const handleSbomExport = (format: 'csv' | 'pdf', toolData: { output: unknown[] }) => {
+    const rows = buildSbomRows(toolData.output);
+    const timestamp = new Date().toISOString().slice(0, 10);
+    const filename = `${repository?.repoName ?? 'repository'}-sbom-${timestamp}.${format}`;
+
+    const content = format === 'csv' ? formatSbomCsv(repository, rows) : formatSbomPdf(repository, rows);
+    const mimeType = format === 'csv' ? 'text/csv' : 'application/pdf';
+
+    triggerFileDownload(content, mimeType, filename);
+  };
+
   const entries = Object.entries(tools);
   const sortedEntries = [...entries].sort(([toolA], [toolB]) => {
     const priorityA = resolveToolPriority(toolA);
@@ -444,10 +561,29 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                   </p>
                 </div>
               </div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600 shadow-[0_12px_28px_-20px_rgba(15,23,42,0.4)]">
-              <Icon name={toolData.output.length > 0 ? 'alert' : 'check-circle'} width={14} height={14} />
-              {toolData.output.length > 0 ? 'Review required' : 'Clean'}
-            </span>
+            {matchesFilter(toolName, 'sbom') ? (
+              <div className="flex flex-wrap justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleSbomExport('csv', toolData)}
+                  className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-slate-700 shadow-[0_12px_28px_-20px_rgba(15,23,42,0.4)] transition hover:text-accent"
+                >
+                  <Icon name="package-export" width={12} height={12} /> Export CSV
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSbomExport('pdf', toolData)}
+                  className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-slate-700 shadow-[0_12px_28px_-20px_rgba(15,23,42,0.4)] transition hover:text-accent"
+                >
+                  <Icon name="link" width={12} height={12} /> Export PDF
+                </button>
+              </div>
+            ) : (
+              <span className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600 shadow-[0_12px_28px_-20px_rgba(15,23,42,0.4)]">
+                <Icon name={toolData.output.length > 0 ? 'alert' : 'check-circle'} width={14} height={14} />
+                {toolData.output.length > 0 ? 'Review required' : 'Clean'}
+              </span>
+            )}
           </div>
           {toolData.output.length > 0 ? (
             <div className="mt-4 space-y-3">
@@ -474,11 +610,11 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                           className="relative rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
                         >
                           <span
-                            className={`absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${getSeverityPillClassName(finding.severity)}`}
+                            className={`${severityBadgeBaseClass} ${getSeverityPillClassName(finding.severity)}`}
                           >
-                            <Icon name="alert" width={12} height={12} /> {severity}
+                            {severity}
                           </span>
-                          <div className="pr-24">
+                          <div className="pr-16">
                             <p className="text-sm font-semibold text-slate-900">{finding.id ?? 'Untracked vulnerability'}</p>
                             <dl className="mt-3 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)]">
                               <div className="space-y-1">
@@ -536,11 +672,11 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                           className="relative space-y-3 rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
                         >
                           <span
-                            className={`absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${getSeverityPillClassName(finding.severity)}`}
+                            className={`${severityBadgeBaseClass} ${getSeverityPillClassName(finding.severity)}`}
                           >
-                            <Icon name="alert" width={12} height={12} /> {formatSeverity(finding.severity)}
+                            {formatSeverity(finding.severity)}
                           </span>
-                          <div className="pr-24">
+                          <div className="pr-16">
                             <p className="text-sm font-semibold text-slate-900">
                               {finding.description ? `${finding.description} exposed` : 'Secret exposed'}
                             </p>
@@ -572,11 +708,11 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                           className="relative space-y-3 rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
                         >
                           <span
-                            className={`absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${getSeverityPillClassName(finding.severity)}`}
+                            className={`${severityBadgeBaseClass} ${getSeverityPillClassName(finding.severity)}`}
                           >
-                            <Icon name="alert" width={12} height={12} /> {formatSeverity(finding.severity)}
+                            {formatSeverity(finding.severity)}
                           </span>
-                          <div className="pr-24">
+                          <div className="pr-16">
                             <p className="text-sm font-semibold text-slate-900 whitespace-pre-line">{displayTitle}</p>
                             {shouldShowDescription && (
                               <p className="mt-1 whitespace-pre-line text-xs text-slate-600">{description}</p>
@@ -683,13 +819,8 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                           key={group.key}
                           className="relative rounded-lg border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-white p-4 text-sm text-slate-700 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]"
                         >
-                          <span
-                            className={`absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${getSeverityPillClassName(group.severityValue)}`}
-                          >
-                            <Icon name="alert" width={12} height={12} /> {group.severityLabel}
-                          </span>
-                          <div className="pr-24">
-                            <dl className="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)]">
+                          <div>
+                            <dl className="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)]">
                               <div className="space-y-1">
                                 <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Package</dt>
                                 <dd className="font-medium text-slate-900 break-words">{group.packageName}</dd>
@@ -698,8 +829,12 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                                 <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Version</dt>
                                 <dd className="font-semibold text-rose-600 break-words">{group.packageVersion}</dd>
                               </div>
+                              <div className="space-y-1">
+                                <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Fixed version</dt>
+                                <dd className="font-semibold text-emerald-600 break-words">{getLatestFixVersion(group.findings) ?? '—'}</dd>
+                              </div>
                               {group.modules.length > 0 && (
-                                <div className="space-y-1 sm:col-start-3">
+                                <div className="space-y-1">
                                   <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Module</dt>
                                   <dd className="font-medium text-slate-900 break-words">{group.modules.join(', ')}</dd>
                                 </div>
@@ -710,12 +845,18 @@ export const ToolFindingsPanel: React.FC<ToolFindingsPanelProps> = ({ tools, act
                             {group.findings.map((groupFinding, groupIndex) => {
                               const groupKey = `${group.key}-${groupIndex}`;
                               const fixVersions = formatFixVersions(groupFinding.fix);
+                              const entrySeverityLabel = formatSeverity(groupFinding.severity);
 
                               return (
                                 <div
                                   key={groupKey}
-                                  className="rounded-lg border border-slate-200/70 bg-white/90 p-3 text-xs text-slate-700"
+                                  className="relative rounded-lg border border-slate-200/70 bg-white/90 p-3 text-xs text-slate-700"
                                 >
+                                  <span
+                                    className={`${severityBadgeBaseClass} ${getSeverityPillClassName(groupFinding.severity)}`}
+                                  >
+                                    {entrySeverityLabel}
+                                  </span>
                                   <p className="text-sm font-semibold text-slate-900">
                                     {groupFinding.id ?? 'Untracked vulnerability'}
                                   </p>
