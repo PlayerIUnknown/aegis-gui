@@ -392,6 +392,61 @@ const formatSbomCsv = (repository: RepositoryInfoView | undefined, rows: SbomFin
   return [...metaLines, header.join(','), ...sbomLines].join('\n');
 };
 
+const escapePdfText = (text: string) => text.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+
+const buildSimplePdf = (lines: string[]) => {
+  const encoder = new TextEncoder();
+  const sanitizedLines = lines.length > 0 ? lines : ['No SBOM entries available.'];
+  const contentLines = [
+    'BT',
+    '/F1 14 Tf',
+    '1 0 0 1 50 760 Tm',
+    '18 TL',
+    ...sanitizedLines.map((line, index) => `${index === 0 ? '' : 'T*'} (${escapePdfText(line)}) Tj`),
+    'ET',
+  ];
+
+  const contentStream = contentLines.join('\n');
+  const contentLength = encoder.encode(contentStream).length;
+  const objects: string[] = [];
+
+  const addObject = (content: string) => {
+    const id = objects.length + 1;
+    objects.push(`${id} 0 obj\n${content}\nendobj`);
+    return id;
+  };
+
+  const fontObjId = addObject('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>');
+  const contentObjId = addObject(`<< /Length ${contentLength} >>\nstream\n${contentStream}\nendstream`);
+
+  const pageObjId = objects.length + 1;
+  const pagesObjId = pageObjId + 1;
+  const catalogObjId = pagesObjId + 1;
+
+  addObject(
+    `<< /Type /Page /Parent ${pagesObjId} 0 R /Resources << /Font << /F1 ${fontObjId} 0 R >> >> /MediaBox [0 0 612 792] /Contents ${contentObjId} 0 R >>`,
+  );
+  addObject(`<< /Type /Pages /Kids [${pageObjId} 0 R] /Count 1 >>`);
+  addObject(`<< /Type /Catalog /Pages ${pagesObjId} 0 R >>`);
+
+  let pdf = '%PDF-1.4\n';
+  const offsets = ['0000000000 65535 f '];
+  let offset = encoder.encode(pdf).length;
+
+  objects.forEach((object) => {
+    offsets.push(`${String(offset).padStart(10, '0')} 00000 n `);
+    pdf += `${object}\n`;
+    offset += encoder.encode(`${object}\n`).length;
+  });
+
+  const xrefStart = offset;
+  pdf += `xref\n0 ${objects.length + 1}\n`;
+  pdf += `${offsets.join('\n')}\n`;
+  pdf += `trailer << /Size ${objects.length + 1} /Root ${catalogObjId} 0 R >>\nstartxref\n${xrefStart}\n%%EOF`;
+
+  return pdf;
+};
+
 const formatSbomPdf = (repository: RepositoryInfoView | undefined, rows: SbomFinding[]) => {
   const repoName = repository?.repoName ?? 'Unknown repository';
   const branch = repository?.branch ?? '—';
@@ -400,7 +455,7 @@ const formatSbomPdf = (repository: RepositoryInfoView | undefined, rows: SbomFin
   const header = [`Repository: ${repoName}`, `Branch: ${branch}`, `Commit: ${commit}`, '', 'SBOM inventory:'];
   const entries = rows.map((row, index) => `${index + 1}. ${row.name} (${row.type}) - v${row.version}`);
 
-  return [...header, ...entries].join('\n');
+  return buildSimplePdf([...header, ...entries]);
 };
 
 const triggerFileDownload = (content: string, mimeType: string, filename: string) => {
