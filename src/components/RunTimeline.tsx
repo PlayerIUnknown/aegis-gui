@@ -136,13 +136,13 @@ export const RunTimeline: React.FC<RunTimelineProps> = ({
               </div>
               {isOpen && (
                 <div className="mt-6 space-y-6">
-                  <ToolFilterTabs activeFilter={activeToolFilter} onToggle={handleFilterToggle} />
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     <DetailStat label="Low" value={run.summary.lowSeverity} tone="success" />
                     <DetailStat label="Medium" value={run.summary.mediumSeverity} tone="warning" />
                     <DetailStat label="High" value={run.summary.highSeverity} tone="danger" />
                     <DetailStat label="Critical" value={run.summary.criticalSeverity} tone="danger" />
                   </div>
+                  <ToolFilterTabs activeFilter={activeToolFilter} onToggle={handleFilterToggle} />
                   {isLoading && (
                     <p className="rounded-lg border border-slate-200/70 bg-white p-4 text-sm text-slate-600 shadow-[0_18px_42px_-32px_rgba(15,23,42,0.38)]">
                       Loading tool results…
